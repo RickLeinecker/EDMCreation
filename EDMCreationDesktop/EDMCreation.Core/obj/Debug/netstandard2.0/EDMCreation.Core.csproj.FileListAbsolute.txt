@@ -1,0 +1,9 @@
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\bin\Debug\netstandard2.0\EDMCreation.Core.deps.json
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\bin\Debug\netstandard2.0\EDMCreation.Core.dll
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\bin\Debug\netstandard2.0\EDMCreation.Core.pdb
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.AssemblyInfoInputs.cache
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.AssemblyInfo.cs
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.csproj.CoreCompileInputs.cache
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.dll
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.pdb
+C:\Users\jakeg\OneDrive\Desktop\EDMCreation\EDMCreationDesktop\EDMCreation.Core\obj\Debug\netstandard2.0\EDMCreation.Core.csprojAssemblyReference.cache
