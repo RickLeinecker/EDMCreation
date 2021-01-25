@@ -29,6 +29,14 @@ const usersRouter = require('./routes/users');
 
 app.use('', usersRouter);
 
+app.use("/api/testlogin", (req, res) => {
+    res.send(
+        {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        }
+    );
+});
+
 // Server
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
