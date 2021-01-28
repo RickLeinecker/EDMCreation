@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter } from "react-router-dom"; // To get current route
+import { withRouter, Link as RouterLink } from "react-router-dom"; // To get current route
 import {
 	AppBar,
 	Toolbar,
@@ -8,6 +8,7 @@ import {
 	fade,
 	makeStyles,
 	Link,
+	Menu,
 	MenuItem
 } from "@material-ui/core";
 import { BarChart, StarBorder, Search } from "@material-ui/icons";
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 		"&:hover": {
 			backgroundColor: fade(theme.palette.common.white, 0.25),
 		},
-		marginLeft: 0,
+		marginRight: 20,
 		width: "100%",
 		[theme.breakpoints.up("sm")]: {
 			marginLeft: theme.spacing(1),
@@ -66,7 +67,6 @@ const useStyles = makeStyles((theme) => ({
 	menuItem: {
 		display: "flex",
 		alignItems: "center",
-		flexWrap: "wrap",
 		color: "white",
 		"&.Mui-selected": {
 			backgroundColor: "#219653"
@@ -82,7 +82,7 @@ function NavBar(props) {
 	const classes = useStyles();
 	const { location: { pathname } } = props;
 	const [anchorEl, setAnchorEl] = React.useState(null);
-	const open = Boolean(anchorEl);
+	const [searchTerm, setSearchTerm] = React.useState(null);
 
 	const handleClick = (e) => {
 		setAnchorEl(e.currentTarget);
@@ -90,6 +90,14 @@ function NavBar(props) {
 
 	const handleClose = () => {
 		setAnchorEl(null);
+	};
+
+	const handleKeyPress = (e) => {
+		const enterKey = 13;
+
+		if (e.keyCode === enterKey) {
+			window.location.href = "/search?query=" + e.target.value;
+		}
 	};
 
 	return (
@@ -113,6 +121,7 @@ function NavBar(props) {
 									input: classes.inputInput,
 								}}
 								inputProps={{ "aria-label": "search" }}
+								onKeyDown={handleKeyPress}
 							/>
 						</div>
 						<ProfileIcon />
@@ -144,9 +153,8 @@ function NavBar(props) {
 						</MenuItem>
 						<MenuItem
 							selected={pathname === "/browsegenres"}
-							component={Link}
-							href="/browsegenres"
 							className={classes.menuItem}
+							onClick={handleClick}
 						>
 							<Typography color="inherit" variant="title" className={classes.menuItem}> Browse Genres
 							</Typography>
@@ -160,6 +168,43 @@ function NavBar(props) {
 							<Typography color="inherit" variant="title" className={classes.menuItem}> Random
 							</Typography>
 						</MenuItem>
+						<Menu
+							id="menu"
+							anchorEl={anchorEl}
+							keepMounted
+							open={Boolean(anchorEl)}
+							onClose={handleClose}
+							PaperProps={{
+								style: {
+									width: "18ch",
+								},
+							}}
+							getContentAnchorEl={null}
+							anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+							transformOrigin={{ vertical: "top", horizontal: "center" }}
+						>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 1
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 2
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 3
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 4
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 5
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 6
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+								Genre 7
+                    		</MenuItem>
+						</Menu>
 					</Toolbar>
 				</AppBar>
 			</div>

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
-import token from "../dummy-data/dummy-token.json";
 import axios from "axios";
 
 const styles = theme => ({
@@ -98,8 +97,8 @@ class LogIn extends Component {
 			password: this.state.password
 		};
 
-		axios.post('http://localhost:5000/api/testlogin')
-			.then(res => localStorage.setItem("access_token", token.access_token));
+		axios.post("http://localhost:5000/api/testlogin")
+			.then(res => localStorage.setItem("access_token", res.access_token));
 
 		if (this.props.originPath) {
 			window.location.href = this.props.originPath;
@@ -177,9 +176,9 @@ class LogIn extends Component {
 														</Button>
 													</Grid>
 													<Grid item>
-														<Link href="#" className={classes.makeAccountLink}>
+														<Link href="/register" className={classes.makeAccountLink}>
 															Make an account
-												</Link>
+														</Link>
 													</Grid>
 												</Grid>
 											</Grid>

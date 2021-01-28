@@ -7,7 +7,8 @@ import {
 	IconButton,
 	Accordion,
 	AccordionSummary,
-	AccordionDetails
+	AccordionDetails,
+	Link
 } from "@material-ui/core";
 import { Image, ExpandMore, Favorite, Visibility, ModeComment } from '@material-ui/icons';
 import "html-midi-player";
@@ -39,7 +40,7 @@ const styles = theme => ({
 		margin: 20,
 	},
 	largeIcon: {
-		fontSize: "7em",
+		fontSize: "10.6em",
 	},
 	smallIcon: {
 		fontSize: "1.1em",
@@ -113,13 +114,11 @@ class Compositions extends Component {
 										<Grid item xs container direction="column">
 											<Grid item xs>
 												<Typography variant="body2" className={classes.composer}>
-													by {composition.username}
+													by <Link href="/profile" color="inherit"> {composition.username} </Link>
 												</Typography>
 											</Grid>
 											<Grid item align="center">
-												<IconButton className={classes.image}>
 													<Image className={classes.largeIcon} />
-												</IconButton>
 											</Grid>
 											<Grid item xs>
 												<Typography variant="body2" className={classes.date}>

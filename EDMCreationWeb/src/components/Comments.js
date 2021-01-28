@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Typography, Grid, withStyles, Paper } from "@material-ui/core";
-import { SupervisedUserCircle } from "@material-ui/icons";
+import { AccountCircle } from "@material-ui/icons";
 
 const styles = theme => ({
     username: {
@@ -55,7 +55,7 @@ class Comments extends Component {
                         <Grid container spacing={2} className={classes.comment}>
                             <Grid item>
                                 <Typography variant="body2">
-                                    <SupervisedUserCircle className={classes.mediumIcon} />
+                                    <AccountCircle className={classes.mediumIcon} />
                                 </Typography>
                             </Grid>
                             <Grid item xs={12} sm>

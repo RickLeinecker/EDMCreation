@@ -1,11 +1,29 @@
 import React, { Component } from "react";
+import { Typography, withStyles } from "@material-ui/core";
+import Compositions from "./Compositions";
+import dummyCompositions from "../dummy-data/dummy-compositions.json";
 
-export default class TopFavorites extends Component {
+const styles = theme => ({
+	title: {
+		margin: "auto",
+		marginTop: 20,
+		marginBottom: 20,
+		maxWidth: 800,
+	},
+});
+
+class TopFavorites extends Component {
 	render() {
+		const { classes } = this.props;
+
 		return (
 			<div>
-				<p>You are on the TopFavorites component!</p>
+				<Typography variant="h5" className={classes.title}>
+					Top Favorites
+                </Typography>
 			</div>
 		)
 	}
 }
+
+export default withStyles(styles)(TopFavorites);

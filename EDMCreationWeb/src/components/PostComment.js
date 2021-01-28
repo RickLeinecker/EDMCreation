@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
+import { withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
 
 const styles = theme => ({
 	buttonBlock: {
@@ -39,6 +39,12 @@ const styles = theme => ({
 			color: "black"
 		}
 	},
+	links: {
+		color: "#219653",
+		hover: {
+			color: "#219653"
+		},
+	}
 });
 
 class PostComment extends Component {
@@ -56,7 +62,7 @@ class PostComment extends Component {
 	}
 
 	handleChange(e) {
-		this.setState({ [e.target.name]: e.target.value }, function() {this.changeButton()});
+		this.setState({ [e.target.name]: e.target.value }, function () { this.changeButton() });
 	}
 
 	changeButton() {
@@ -74,6 +80,20 @@ class PostComment extends Component {
 
 	render() {
 		const { classes } = this.props;
+
+		if (localStorage.getItem("access_token") === null) {
+			return (
+				<div>
+					<Typography>
+						Post a comment
+					</Typography>
+					<br />
+					<Typography variant="h5body2">
+						<Link href="/login" className={classes.links}>Log in</Link> to post a comment
+					</Typography>
+				</div>
+			)
+		}
 
 		return (
 			<div>

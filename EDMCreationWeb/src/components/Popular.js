@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
 import Compositions from "./Compositions";
-import dummyCompositions from "../dummy-data/dummy-compositions.json";
+import axios from "axios";
 
 const styles = theme => ({
 	title: {
@@ -13,6 +13,19 @@ const styles = theme => ({
 });
 
 class Popular extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			compositions: {}
+		}
+	}
+
+	componentDidMount() {
+		axios.get("http://localhost:5000/api/testcompositions")
+			.then(res => this.setState({ compositions: res.data }));
+	}
+
 	render() {
 		const { classes } = this.props;
 
@@ -21,7 +34,7 @@ class Popular extends Component {
 				<Typography variant="h5" className={classes.title}>
 					Popular
                 </Typography>
-				<Compositions compositions={dummyCompositions} />
+				<Compositions compositions={this.state.compositions} />
 			</div>
 		)
 	}

@@ -29,6 +29,12 @@ const usersRouter = require('./routes/users');
 
 app.use('', usersRouter);
 
+// Server
+app.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
+});
+
+// Test Routes
 app.use("/api/testlogin", (req, res) => {
     res.send(
         {
@@ -37,7 +43,95 @@ app.use("/api/testlogin", (req, res) => {
     );
 });
 
-// Server
-app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
+app.use("/api/testuser", (req, res) => {
+    res.send(
+        {
+            "username": "edmguy",
+            "description": "Love EDM",
+            "total_plays": "50",
+            "uploads": "3"
+        }
+    );
 });
+
+app.use("/api/testcompositions", (req, res) => {
+    res.send(
+        [
+            {
+                "title": "EDM Composition #1",
+                "username": "edmguy",
+                "date": "Jan. 1, 2021",
+                "likes": "10",
+                "listens": "132",
+                "num_comments": "3",
+                "comments": [
+                    {
+                        "username": "user1",
+                        "comment": "Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great Great",
+                        "date": "Jan. 3, 2021"
+                    },
+                    {
+                        "username": "user2",
+                        "comment": "Good",
+                        "date": "Jan. 2, 2021"
+                    },
+                    {
+                        "username": "user1",
+                        "comment": "Good Good Good Good Good Good Good Good Good Good Good Good Good Good Good Good Good Good",
+                        "date": "Jan. 2, 2021"
+                    },
+                    {
+                        "username": "user2",
+                        "comment": "Good",
+                        "date": "Jan. 1, 2021"
+                    },
+                    {
+                        "username": "user1",
+                        "comment": "Great ",
+                        "date": "Jan. 1, 2021"
+                    },
+                    {
+                        "username": "user2",
+                        "comment": "Good",
+                        "date": "Jan. 1, 2021"
+                    }
+                ]
+            },
+            {
+                "title": "EDM Composition #2",
+                "username": "edmguy",
+                "date": "Jan. 3, 2021",
+                "likes": "11",
+                "listens": "101",
+                "num_comments": "5",
+                "comments": [
+                    {
+                        "username": "user1",
+                        "comment": "Good",
+                        "date": "Jan. 3, 2021"
+                    },
+                    {
+                        "username": "user2",
+                        "comment": "Good",
+                        "date": "Jan. 1, 2021"
+                    }
+                ]
+            },
+            {
+                "title": "EDM Composition #3",
+                "username": "edmguy",
+                "date": "Jan. 2, 2021",
+                "likes": "3",
+                "listens": "35",
+                "num_comments": "1"
+            }
+        ]
+    );
+});
+
+// Swagger
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./edmcreationweb.yaml');
+
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

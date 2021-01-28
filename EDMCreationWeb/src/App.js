@@ -9,8 +9,11 @@ import Random from "./components/Random";
 import LogIn from "./components/LogIn";
 import LogOut from "./components/LogOut";
 import EditProfile from "./components/EditProfile";
+import Register from "./components/Register";
+import RegisterCompleted from "./components/RegisterCompleted";
+import Search from "./components/Search";
+import Profile from "./components/Profile";
 
-// Custom theme
 const theme = createMuiTheme({
 	palette: {
 		type: "dark",
@@ -52,6 +55,10 @@ class App extends Component {
 					<Route path="/login" component={LogIn} />
 					<Route path="/logout" component={LogOut} />
 					<Route path="/editprofile" component={EditProfile} />
+					<Route path="/register" component={Register} />
+					<Route path="/registercompleted" component={RegisterCompleted} />
+					<Route path="/search" component={Search} />
+					<Route path="/profile" component={Profile} />
 				</ThemeProvider>
 			</Router>
 		);
