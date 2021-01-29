@@ -1,0 +1,151 @@
+openapi: 3.0.0
+
+info:
+  title: EDM Creation Web API
+  version: '1.0'
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /api/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Registration/Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                confirmation_password:
+                  type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/login:
+    post:
+      summary: Log in a user
+      tags:
+        - Registration/Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  access-token:
+                    type: string
+                  verified:
+                    type: boolean
+        '401':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '403':
+          description: Not verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  verified:
+                    type: boolean
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
