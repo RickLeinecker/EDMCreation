@@ -26,4 +26,4 @@ yarn-error.log*
 /backend/.env
 
 # cache
-.eslintcache
+.eslintcache*
