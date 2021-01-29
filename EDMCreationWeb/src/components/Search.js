@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
-import Compositions from "./Compositions";
-import dummyCompositions from "../dummy-data/dummy-compositions.json";
+import Songs from "./Songs";
 import qs from "query-string";
+import axios from "axios";
 
 const styles = theme => ({
     title: {
@@ -14,6 +14,19 @@ const styles = theme => ({
 });
 
 class Search extends Component {
+    constructor(props) {
+		super(props);
+
+		this.state = {
+			songs: {}
+		}
+	}
+
+	componentDidMount() {
+		axios.get("http://localhost:5000/api/testsongs")
+			.then(res => this.setState({ songs: res.data }));
+    }
+    
     render() {
         const { classes } = this.props;
         const paramaters = qs.parse(this.props.location.search);
@@ -23,7 +36,7 @@ class Search extends Component {
                 <Typography variant="h5" className={classes.title}>
                     Search results for "{paramaters.query}"
                 </Typography>
-                <Compositions compositions={dummyCompositions} />
+                <Songs songs={this.state.songs} />
             </div>
         )
     }

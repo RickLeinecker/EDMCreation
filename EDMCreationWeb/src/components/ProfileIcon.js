@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Typography, withStyles, Link, IconButton, Menu, MenuItem } from "@material-ui/core";
 import { Link as RouterLink } from "react-router-dom";
 import { AccountCircle } from '@material-ui/icons/';
-import LogOut from "./LogOut";
+import axios from "axios";
 
 const styles = theme => ({
     loginLink: {
@@ -21,10 +21,16 @@ class ProfileIcon extends Component {
 
         this.state = {
             anchorEl: null,
+            username: ""
         };
 
         this.handleClick = this.handleClick.bind(this);
         this.handleClose = this.handleClose.bind(this);
+    }
+
+    componentDidMount() {
+        axios.get("http://localhost:5000/api/testuser")
+            .then(res => this.setState({ username: res.data.username }));
     }
 
     handleClick(e) {
@@ -37,12 +43,6 @@ class ProfileIcon extends Component {
 
     render() {
         const { classes } = this.props;
-        const options = [
-            "Upload song",
-            "View profile",
-            "Edi profile",
-            "Log out"
-        ];
 
         if (localStorage.getItem("access_token") === null) {
             return (
@@ -58,13 +58,16 @@ class ProfileIcon extends Component {
 
         return (
             <div>
-                <IconButton
-                    aria-controls="menu"
-                    aria-haspopup="true"
-                    onClick={this.handleClick}
-                >
-                    <AccountCircle className={classes.mediumIcon} />
-                </IconButton>
+                <Typography>
+                    {this.state.username}
+                    <IconButton
+                        aria-controls="menu"
+                        aria-haspopup="true"
+                        onClick={this.handleClick}
+                    >
+                        <AccountCircle className={classes.mediumIcon} />
+                    </IconButton>
+                </Typography>
                 <Menu
                     id="menu"
                     anchorEl={this.state.anchorEl}

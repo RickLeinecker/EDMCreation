@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
-import Compositions from "./Compositions";
-import dummyCompositions from "../dummy-data/dummy-compositions.json";
+import Compositions from "./Songs";
 
 const styles = theme => ({
 	title: {

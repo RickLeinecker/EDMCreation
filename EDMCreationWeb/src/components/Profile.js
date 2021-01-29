@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Typography, withStyles, Grid, Paper, Tabs, Tab, Box } from "@material-ui/core";
 import PropTypes from "prop-types";
 import { AccountBox, PlayArrow, MusicNote } from '@material-ui/icons/';
-import Compositions from "./Compositions";
+import Compositions from "./Songs";
 import axios from "axios";
 
 const styles = theme => ({
@@ -70,7 +70,7 @@ class Profile extends Component {
 
         this.state = {
             value: 0,
-            compositions: {},
+            songs: {},
             user: {}
         }
 
@@ -78,8 +78,8 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testcompositions")
-            .then(res => this.setState({ compositions: res.data }));
+        axios.get("http://localhost:5000/api/testsongs")
+            .then(res => this.setState({ songs: res.data }));
 
         axios.get("http://localhost:5000/api/testuser")
             .then(res => this.setState({ user: res.data }));
@@ -141,7 +141,7 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Compositions compositions={this.state.compositions} />
+                    <Compositions songs={this.state.songs} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
                     Favorites

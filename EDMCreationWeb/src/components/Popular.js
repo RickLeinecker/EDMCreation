@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
-import Compositions from "./Compositions";
+import Songs from "./Songs";
 import axios from "axios";
 
 const styles = theme => ({
@@ -17,13 +17,13 @@ class Popular extends Component {
 		super(props);
 
 		this.state = {
-			compositions: {}
+			songs: {}
 		}
 	}
 
 	componentDidMount() {
-		axios.get("http://localhost:5000/api/testcompositions")
-			.then(res => this.setState({ compositions: res.data }));
+		axios.get("http://localhost:5000/api/testsongs")
+			.then(res => this.setState({ songs: res.data }));
 	}
 
 	render() {
@@ -34,7 +34,7 @@ class Popular extends Component {
 				<Typography variant="h5" className={classes.title}>
 					Popular
                 </Typography>
-				<Compositions compositions={this.state.compositions} />
+				<Songs songs={this.state.songs} />
 			</div>
 		)
 	}

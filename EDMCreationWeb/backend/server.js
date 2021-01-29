@@ -54,7 +54,19 @@ app.use("/api/testuser", (req, res) => {
     );
 });
 
-app.use("/api/testcompositions", (req, res) => {
+app.use("/api/testuserprivate", (req, res) => {
+    res.send(
+        {
+            "username": "edmguy",
+            "description": "Love EDM",
+            "total_plays": "50",
+            "uploads": "3",
+            "email": "edmguy@gmail.com"
+        }
+    );
+});
+
+app.use("/api/testsongs", (req, res) => {
     res.send(
         [
             {
