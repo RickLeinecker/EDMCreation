@@ -17,12 +17,15 @@ const styles = theme => ({
         marginBottom: 10,
     },
     comment: {
-        marginBottom: 13
+        marginBottom: 13,
     },
     commentsBox: {
         backgroundColor: "#333333",
         maxHeight: 250,
-        overflow: "auto"
+        overflow: "auto",
+        "&::-webkit-scrollbar": {
+            display: "none"
+        }
     }
 });
 
@@ -52,7 +55,7 @@ class Comments extends Component {
                 <br />
                 <Paper elevation={0} className={classes.commentsBox}>
                     {this.props.comments.map(comment => (
-                        <Grid container spacing={2} className={classes.comment}>
+                        <Grid container className={classes.comment}>
                             <Grid item>
                                 <Typography variant="body2">
                                     <AccountCircle className={classes.mediumIcon} />

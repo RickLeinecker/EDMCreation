@@ -32,6 +32,10 @@
 }
 
 /* Custom visualizer style */
+.player midi-visualizer .piano-roll-visualizer::-webkit-scrollbar {
+  display: none;
+}
+
 .player midi-visualizer .piano-roll-visualizer {
   background: #333333;
   border: none;
@@ -41,6 +45,7 @@
   overflow: auto;
   max-width: 525px;
 }
+
 
 .player midi-visualizer svg rect.note {
   opacity: 0.7;
