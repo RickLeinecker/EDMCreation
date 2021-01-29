@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Paper, withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
+import { Paper, withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
 import axios from "axios";
 
 const styles = theme => ({
@@ -102,7 +102,7 @@ class Register extends Component {
             return (
                 <div>
                     <Typography>
-                        You're already logged in
+                        Please log out first to register
 					</Typography>
                 </div>
             )

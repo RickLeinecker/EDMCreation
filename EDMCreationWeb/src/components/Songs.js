@@ -4,7 +4,6 @@ import {
 	Typography,
 	withStyles,
 	Paper,
-	IconButton,
 	Accordion,
 	AccordionSummary,
 	AccordionDetails,
@@ -70,7 +69,7 @@ const styles = theme => ({
 	innerCommentsSection: {
 		marginBottom: 45,
 	},
-	compositionSection: {
+	songSection: {
 		marginBottom: 5,
 	},
 	statsSection: {
@@ -84,11 +83,11 @@ const styles = theme => ({
 	},
 });
 
-class Compositions extends Component {
+class Songs extends Component {
 	render() {
 		const { classes } = this.props;
 
-		if (Object.keys(this.props.compositions).length === 0) {
+		if (Object.keys(this.props.songs).length === 0) {
 			return (
 				<div className={classes.root}>
 					<Typography variant="body2">
@@ -101,12 +100,12 @@ class Compositions extends Component {
 		return (
 			<div className={classes.root}>
 				{
-					this.props.compositions.map((composition, i) => (
+					this.props.songs.map((song, i) => (
 						<Paper className={classes.paper}>
-							<Grid item xs container direction="column" className={classes.compositionSection}>
+							<Grid item xs container direction="column" className={classes.songSection}>
 								<Grid item>
 									<Typography variant="subtitle1">
-										{composition.title}
+										{song.title}
 									</Typography>
 								</Grid>
 								<Grid container spacing={2}>
@@ -114,7 +113,7 @@ class Compositions extends Component {
 										<Grid item xs container direction="column">
 											<Grid item xs>
 												<Typography variant="body2" className={classes.composer}>
-													by <Link href="/profile" color="inherit"> {composition.username} </Link>
+													by <Link href="/profile" color="inherit"> {song.username} </Link>
 												</Typography>
 											</Grid>
 											<Grid item align="center">
@@ -122,7 +121,7 @@ class Compositions extends Component {
 											</Grid>
 											<Grid item xs>
 												<Typography variant="body2" className={classes.date}>
-													Uploaded on {composition.date}
+													Uploaded on {song.date}
 												</Typography>
 											</Grid>
 										</Grid>
@@ -140,13 +139,13 @@ class Compositions extends Component {
 											<Grid item container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
 													<span className={classes.statItem}>
-														<Favorite className={classes.smallIcon} /> {composition.likes}
+														<Favorite className={classes.smallIcon} /> {song.likes}
 													</span>
 													<span className={classes.statItem}>
-														<Visibility className={classes.smallIcon} /> {composition.listens}
+														<Visibility className={classes.smallIcon} /> {song.listens}
 													</span>
 													<span className={classes.statItem}>
-														<ModeComment className={classes.smallIcon} /> {composition.num_comments}
+														<ModeComment className={classes.smallIcon} /> {song.num_comments}
 													</span>
 												</Typography>
 											</Grid>
@@ -159,7 +158,7 @@ class Compositions extends Component {
 									<AccordionDetails className={classes.innerCommentsSection}>
 										<Grid container spacing={10}>
 											<Grid item xs={6}>
-												<Comments comments={composition.comments} />
+												<Comments comments={song.comments} />
 											</Grid>
 											<Grid item xs={6}>
 												<PostComment />
@@ -176,4 +175,4 @@ class Compositions extends Component {
 	}
 }
 
-export default withStyles(styles)(Compositions);
+export default withStyles(styles)(Songs);
