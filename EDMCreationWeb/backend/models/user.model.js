@@ -25,7 +25,8 @@ const userSchema = new Schema(
                     {
                         comment_id: { type: mongoose.Types.ObjectId },
                         user_id: { type: mongoose.Types.ObjectId },
-                        last_modified: { type: Date }
+                        last_modified: { type: Date },
+                        comment:{ type: String }
                     }
                 ],
                 created_on: { type: Date },

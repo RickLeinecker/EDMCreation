@@ -8,25 +8,29 @@ servers:
   - url: http://localhost:5000
 
 paths:
-  /api/register:
+  /api/users/signup:
     post:
-      summary: Register a new user
+      summary: test registration
       tags:
-        - Registration/Login
+        - test endpoints 
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                email:
-                  type: string
                 username:
                   type: string
+                  example: "Treven"                 
+                email:
+                  type: string
+                  example: "treven@treven.com" 
                 password:
                   type: string
-                confirmation_password:
+                  example: "treven123"
+                description:
                   type: string
+                  example: "this is me"
       responses:
         '200':
           description: Successful
@@ -72,21 +76,23 @@ paths:
                           type: string
                         location:
                           type: string
-  /api/login:
+  /api/users/login:
     post:
-      summary: Log in a user
+      summary: test login
       tags:
-        - Registration/Login
+        - test endpoints 
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                email:
+                username:
                   type: string
+                  example: "Treven"                 
                 password:
                   type: string
+                  example: "treven123"
       responses:
         '200':
           description: Successful
@@ -99,11 +105,7 @@ paths:
                     type: boolean
                   message:
                     type: string
-                  access-token:
-                    type: string
-                  verified:
-                    type: boolean
-        '401':
+        '400':
           description: Failed
           content:
             application/json:
@@ -114,8 +116,54 @@ paths:
                     type: boolean
                   message:
                     type: string
-        '403':
-          description: Not verified
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/compositions/upload:
+    post:
+      summary: auth check
+      tags:
+        - test endpoints 
+      parameters:
+        - in: header
+          name: x-auth-token
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWNjMzk5NzNjMTg0ZDEwMGRlY2JlIiwiRXhwaXJlcyI6MTYxMzIzNTg5NzE3N30.0mjYavOz0-cn5yJOHiojrfG-T-hav6T2A2MgKD9W9qlSqVGaYpbfaKVAwgscan264CwqzfB5mZIKnGiWa4oO-w"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "Treven's song"    
+                description:
+                  type: string
+                  example: "This is a lovely song"              
+      responses:
+        '200':
+          description: Successful
           content:
             application/json:
               schema:
@@ -125,8 +173,17 @@ paths:
                     type: boolean
                   message:
                     type: string
-                  verified:
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
                     type: boolean
+                  message:
+                    type: string
         '422':
           description: Input errors
           content:
