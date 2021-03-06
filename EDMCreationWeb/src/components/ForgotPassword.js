@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
 import axios from "axios";
+import { Redirect } from "react-router-dom";
 
 const styles = theme => ({
-    registerForm: {
+    form: {
         justifyContent: "center",
         marginTop: 75,
         marginBottom: 75,
@@ -21,7 +22,7 @@ const styles = theme => ({
         paddingLeft: "25px",
         paddingRight: "25px",
     },
-    registerBackground: {
+    background: {
         justifyContent: "center",
         minWidth: "55vh",
         paddingTop: "50px",
@@ -53,15 +54,12 @@ const styles = theme => ({
     }
 });
 
-class Register extends Component {
+class ForgotPassword extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             email: "",
-            username: "",
-            password: "",
-            confirmationPassword: "",
             disableButton: true
         };
 
@@ -75,10 +73,7 @@ class Register extends Component {
     }
 
     changeButton() {
-        if (this.state.email !== "" &&
-            this.state.username !== "" &&
-            this.state.password !== "" &&
-            this.state.confirmationPassword !== "") {
+        if (this.state.email !== "") {
             this.setState({ disableButton: false });
         }
         else {
@@ -91,12 +86,9 @@ class Register extends Component {
 
         const claims = {
             email: this.state.email,
-            username: this.state.username,
-            password: this.state.password,
-            confirmationPassword: this.state.confirmationPassword
         };
 
-        window.location.href = "/registercompleted";
+        window.location.href = "/resetrequested";
     }
 
     render() {
@@ -104,7 +96,7 @@ class Register extends Component {
 
         if (localStorage.getItem("access_token") !== null) {
             return (
-                window.location.href = "/login"
+                <Redirect to="/" />
             )
         }
 
@@ -117,12 +109,18 @@ class Register extends Component {
                             direction="column"
                             justify="center"
                             spacing={2}
-                            className={classes.registerForm}
+                            className={classes.form}
                         >
-                            <Paper elevation={0} className={classes.registerBackground}>
+                            <Paper elevation={0} className={classes.background}>
                                 <Grid item align="center">
                                     <Typography component="h1" variant="h5">
-                                        Make an account
+                                        Forgot password?
+                                    </Typography>
+                                    <br />
+                                </Grid>
+                                <Grid item align="center">
+                                    <Typography>
+                                        Enter your email to receive a password reset link.
                                     </Typography>
                                     <br />
                                 </Grid>
@@ -143,49 +141,13 @@ class Register extends Component {
                                                 />
                                             </Grid>
                                             <Grid item>
-                                                <TextField
-                                                    type="text"
-                                                    fullWidth
-                                                    name="username"
-                                                    variant="filled"
-                                                    label="Username"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                />
+                                                <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
                                             </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="password"
-                                                    fullWidth
-                                                    name="password"
-                                                    variant="filled"
-                                                    label="Password"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="password"
-                                                    fullWidth
-                                                    name="confirmationPassword"
-                                                    variant="filled"
-                                                    label="Comfirm password"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
-											</Grid>
                                             <Grid item>
                                                 <Grid container justify="center">
                                                     <Grid item>
                                                         <Button disabled={this.state.disableButton} type="submit" className={classes.buttonBlock}>
-                                                            Sign up
+                                                            Send
 														</Button>
                                                     </Grid>
                                                 </Grid>
@@ -202,4 +164,4 @@ class Register extends Component {
     }
 }
 
-export default withStyles(styles)(Register);
+export default withStyles(styles)(ForgotPassword);

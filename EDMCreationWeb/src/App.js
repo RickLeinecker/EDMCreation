@@ -13,6 +13,16 @@ import Register from "./components/Register";
 import RegisterCompleted from "./components/RegisterCompleted";
 import Search from "./components/Search";
 import Profile from "./components/Profile";
+import EditSong from "./components/EditSong";
+import UploadSong from "./components/UploadSong";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import ResetRequested from "./components/ResetRequested";
+import PasswordReset from "./components/PasswordReset";
+import SongUpdated from "./components/SongUpdated";
+import SongUploaded from "./components/SongUploaded";
+import ProfileUpdated from "./components/ProfileUpdated";
+import ProfileEmailUpdated from "./components/ProfileEmailUpdated";
 
 const theme = createMuiTheme({
 	palette: {
@@ -59,6 +69,16 @@ class App extends Component {
 					<Route path="/registercompleted" component={RegisterCompleted} />
 					<Route path="/search" component={Search} />
 					<Route path="/profile" component={Profile} />
+					<Route path="/editsong" component={EditSong} />
+					<Route path="/uploadsong" component={UploadSong} />
+					<Route path="/forgotpassword" component={ForgotPassword} />
+					<Route path="/resetpassword" component={ResetPassword} />
+					<Route path="/resetrequested" component={ResetRequested} />
+					<Route path="/passwordreset" component={PasswordReset} />
+					<Route path="/songupdated" component={SongUpdated} />
+					<Route path="/songuploaded" component={SongUploaded} />
+					<Route path="/profileupdated" component={ProfileUpdated} />
+					<Route path="/profileemailupdated" component={ProfileEmailUpdated} />
 				</ThemeProvider>
 			</Router>
 		);

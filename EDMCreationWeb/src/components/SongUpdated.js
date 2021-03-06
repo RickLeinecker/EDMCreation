@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
-import LogIn from "./LogIn";
+import Profile from "./Profile";
 
 const styles = theme => ({
 	message: {
@@ -10,19 +10,19 @@ const styles = theme => ({
 	},
 });
 
-class RegisterCompleted extends Component {
+class SongUpdated extends Component {
 	render() {
 		const { classes } = this.props;
 
 		return (
 			<div>
 				<Typography className={classes.message}>
-					You are now registered! Check your email for a verification link.
+					Song has been updated.
                 </Typography>
-				<LogIn />
+				<Profile />
 			</div>
 		)
 	}
 }
 
-export default withStyles(styles)(RegisterCompleted);
+export default withStyles(styles)(SongUpdated);

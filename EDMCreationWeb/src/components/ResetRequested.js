@@ -10,14 +10,14 @@ const styles = theme => ({
 	},
 });
 
-class RegisterCompleted extends Component {
+class ResetRequested extends Component {
 	render() {
 		const { classes } = this.props;
 
 		return (
 			<div>
 				<Typography className={classes.message}>
-					You are now registered! Check your email for a verification link.
+					Password reset link sent. Check your email for the link.
                 </Typography>
 				<LogIn />
 			</div>
@@ -25,4 +25,4 @@ class RegisterCompleted extends Component {
 	}
 }
 
-export default withStyles(styles)(RegisterCompleted);
+export default withStyles(styles)(ResetRequested);

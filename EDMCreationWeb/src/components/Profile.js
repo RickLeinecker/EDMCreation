@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { Typography, withStyles, Grid, Paper, Tabs, Tab, Box } from "@material-ui/core";
+import { Typography, withStyles, Grid, Paper, Tabs, Tab, Box, Button } from "@material-ui/core";
 import PropTypes from "prop-types";
 import { AccountBox, PlayArrow, MusicNote } from '@material-ui/icons/';
-import Compositions from "./Songs";
+import Songs from "./Songs";
+import Following from "./Following";
 import axios from "axios";
 
 const styles = theme => ({
@@ -10,16 +11,6 @@ const styles = theme => ({
         margin: "auto",
         maxWidth: 800,
         marginTop: 50,
-    },
-    paper: {
-        paddingTop: 15,
-        paddingBottom: 0,
-        paddingLeft: 40,
-        paddingRight: 40,
-        margin: "auto",
-        marginBottom: 20,
-        backgroundColor: "#333333",
-        borderRadius: theme.shape.borderRadius,
     },
     largeIcon: {
         fontSize: "16em",
@@ -34,13 +25,15 @@ const styles = theme => ({
     },
     statsSection: {
         display: "flex",
-        marginBottom: 10,
     },
     statItem: {
         display: "flex",
         alignItems: "center",
         flexWrap: "wrap",
         marginRight: theme.spacing(2),
+    },
+    statsLine: {
+        marginBottom: 10,
     },
     description: {
         fontStyle: "italic",
@@ -61,7 +54,19 @@ const styles = theme => ({
     },
     user: {
         marginBottom: 5
-    }
+    },
+    buttonBlock: {
+        backgroundColor: "#219653",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#219653"
+        },
+        "&:disabled": {
+            backgroundColor: "#BDBDBD"
+        },
+        paddingLeft: "25px",
+        paddingRight: "25px",
+    },
 });
 
 class Profile extends Component {
@@ -70,19 +75,29 @@ class Profile extends Component {
 
         this.state = {
             value: 0,
-            songs: {},
-            user: {}
+            songs: [],
+            user: {},
+            loggedInUser: "",
+            currentUser: [localStorage.getItem("username")]
         }
 
         this.handleChange = this.handleChange.bind(this);
+        this.fetchSongs = this.fetchSongs.bind(this);
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testsongs")
-            .then(res => this.setState({ songs: res.data }));
-
         axios.get("http://localhost:5000/api/testuser")
             .then(res => this.setState({ user: res.data }));
+
+        axios.get("http://localhost:5000/api/testuser")
+            .then(res => this.setState({ loggedInUser: res.data }));
+
+        this.fetchSongs();
+    }
+
+    fetchSongs() {
+        axios.get("http://localhost:5000/api/testsongs")
+            .then(res => this.setState({ songs: res.data }));
     }
 
     handleChange(e, newValue) {
@@ -91,6 +106,18 @@ class Profile extends Component {
 
     render() {
         const { classes } = this.props;
+
+        if (Object.keys(this.state.user).length === 0) {
+            return (
+                null
+            );
+        }
+
+        if (Object.keys(this.state.loggedInUser).length === 0) {
+            return (
+                null
+            );
+        }
 
         return (
             <div className={classes.profile}>
@@ -112,15 +139,22 @@ class Profile extends Component {
                             </Grid>
                         </Grid>
                         <Grid container direction="column">
-                            <Grid item>
-                                <Typography variant="body1" className={classes.statsSection}>
-                                    <span className={classes.statItem}>
-                                        <PlayArrow className={classes.smallIcon} /> Total Plays: {this.state.user.total_plays}
-                                    </span>
-                                    <span className={classes.statItem}>
-                                        <MusicNote className={classes.smallIcon} /> Uploads: {this.state.user.uploads}
-                                    </span>
-                                </Typography>
+                            <Grid container className={classes.statsLine} alignItems="center">
+                                <Grid item style={{ flexGrow: 1 }}>
+                                    <Typography variant="body1" className={classes.statsSection}>
+                                        <span className={classes.statItem}>
+                                            <PlayArrow className={classes.smallIcon} /> Total plays: {this.state.user.total_plays}
+                                        </span>
+                                        <span className={classes.statItem}>
+                                            <MusicNote className={classes.smallIcon} /> Uploads: {this.state.user.uploads}
+                                        </span>
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Button className={classes.buttonBlock}>
+                                        Follow
+									</Button>
+                                </Grid>
                             </Grid>
                             <Grid item>
                                 <Paper square>
@@ -141,13 +175,13 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Compositions songs={this.state.songs} />
+                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser == this.state.user.username} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    Favorites
+                    <Songs songs={this.state.songs} deletable={this.state.currentUser == this.state.user.username} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
-                    Following
+                    <Following user={this.state.user} />
                 </TabPanel>
             </div >
         )

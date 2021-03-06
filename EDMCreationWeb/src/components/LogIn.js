@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
 import axios from "axios";
+import { Redirect } from "react-router-dom";
 
 const styles = theme => ({
 	loginForm: {
 		justifyContent: "center",
 		marginTop: 75,
+		marginBottom: 75,
 		borderRadius: theme.shape.borderRadius,
 	},
 	buttonBlock: {
@@ -59,6 +61,9 @@ const styles = theme => ({
 			color: "#BDBDBD"
 		},
 	},
+	errorMessage: {
+		color: "#EB5757",
+	},
 });
 
 class LogIn extends Component {
@@ -98,7 +103,10 @@ class LogIn extends Component {
 		};
 
 		axios.post("http://localhost:5000/api/testlogin")
-			.then(res => localStorage.setItem("access_token", res.access_token));
+			.then(res => {
+				localStorage.setItem("access_token", res.data.access_token);
+				localStorage.setItem("username", res.data.username);
+			});
 
 		if (this.props.originPath) {
 			window.location.href = this.props.originPath;
@@ -113,11 +121,7 @@ class LogIn extends Component {
 
 		if (localStorage.getItem("access_token") !== null) {
 			return (
-				<div>
-					<Typography>
-						You're already logged in
-					</Typography>
-				</div>
+				<Redirect to="/" />
 			)
 		}
 
@@ -168,7 +172,9 @@ class LogIn extends Component {
 												/>
 											</Grid>
 											<Grid item>
-												<br />
+												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+											</Grid>
+											<Grid item>
 												<Grid container direction="row" justify="space-between" alignItems="center">
 													<Grid item>
 														<Button disabled={this.state.disableButton} type="submit" className={classes.buttonBlock}>
@@ -187,8 +193,8 @@ class LogIn extends Component {
 								</Grid>
 								<Grid item align="center">
 									<br />
-									<Link href="#" className={classes.forgotPasswordLink}>
-										Forgot Password?
+									<Link href="/forgotpassword" className={classes.forgotPasswordLink}>
+										Forgot password?
                                     </Link>
 								</Grid>
 							</Paper>

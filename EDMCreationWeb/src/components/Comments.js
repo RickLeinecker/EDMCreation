@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography, Grid, withStyles, Paper } from "@material-ui/core";
+import { Typography, Grid, withStyles, Paper, Link } from "@material-ui/core";
 import { AccountCircle } from "@material-ui/icons";
 
 const styles = theme => ({
@@ -26,6 +26,9 @@ const styles = theme => ({
         "&::-webkit-scrollbar": {
             display: "none"
         }
+    },
+    profilePicture: {
+        marginRight: 5
     }
 });
 
@@ -56,7 +59,7 @@ class Comments extends Component {
                 <Paper elevation={0} className={classes.commentsBox}>
                     {this.props.comments.map(comment => (
                         <Grid container className={classes.comment}>
-                            <Grid item>
+                            <Grid item className={classes.profilePicture}>
                                 <Typography variant="body2">
                                     <AccountCircle className={classes.mediumIcon} />
                                 </Typography>
@@ -65,7 +68,7 @@ class Comments extends Component {
                                 <Grid item container>
                                     <Grid item className={classes.userSection}>
                                         <Typography variant="body2" className={classes.username}>
-                                            {comment.username}
+                                            <Link href="#" color="inherit">{comment.username}</Link>
                                         </Typography>
                                     </Grid>
                                     <Grid item>
