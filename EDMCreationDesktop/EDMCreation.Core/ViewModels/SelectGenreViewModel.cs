@@ -15,12 +15,20 @@ namespace EDMCreation.Core.ViewModels
         {
             _navigationService = navigationService;
             BackCommand = new MvxAsyncCommand(GoBack);
+            ShowSongGenerationViewCommand = new MvxAsyncCommand(ShowSongGenerationView);
         }
         public MvxAsyncCommand BackCommand { get; set; }
 
         public async Task GoBack()
         {
             await _navigationService.Close(this);
+        }
+
+        public MvxAsyncCommand ShowSongGenerationViewCommand { get; set; }
+
+        public async Task ShowSongGenerationView()
+        {
+            await _navigationService.Navigate<SongGenerationViewModel>();
         }
     }
 }
