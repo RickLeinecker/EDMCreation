@@ -128,10 +128,10 @@ class EditProfile extends Component {
         // }
 
         if (this.state.email === this.state.currentEmail) {
-            window.location.href = "/profileupdated";
+            window.location.href = "/accountupdated";
         }
         else {
-            window.location.href = "profileemailupdated";
+            window.location.href = "/accountemailupdated";
         }
     }
 

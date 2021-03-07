@@ -10,7 +10,7 @@ const styles = theme => ({
     profile: {
         margin: "auto",
         maxWidth: 800,
-        marginTop: 50,
+        marginTop: 30,
     },
     largeIcon: {
         fontSize: "16em",

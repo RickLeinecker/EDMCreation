@@ -1,24 +1,32 @@
 import React, { Component } from "react";
-import { Typography, withStyles } from "@material-ui/core";
+import { withStyles } from "@material-ui/core";
 import LogIn from "./LogIn";
+import Message from "./Message";
 
 const styles = theme => ({
+	root: {},
 	message: {
-		margin: "auto",
-		marginTop: 75,
-		textAlign: "center"
-	},
+		marginBottom: -20
+	}
 });
 
 class ResetRequested extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			showMessage: true,
+		}
+	}
+
 	render() {
 		const { classes } = this.props;
 
 		return (
 			<div>
-				<Typography className={classes.message}>
-					Password reset link sent. Check your email for the link.
-                </Typography>
+				<div className={classes.message}>
+					<Message message="A password reset link was sent. Check your email for the link." />
+				</div>
 				<LogIn />
 			</div>
 		)
