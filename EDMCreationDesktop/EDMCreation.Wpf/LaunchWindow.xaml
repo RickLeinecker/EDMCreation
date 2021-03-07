@@ -5,18 +5,14 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:local="clr-namespace:EDMCreation.Wpf"
                  xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
-                 xmlns:vw="clr-namespace:EDMCreation.Wpf.Views"
-                 xmlns:vm="clr-namespace:EDMCreation.Core.ViewModels;assembly=EDMCreation.Core"
                  mc:Ignorable="d"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    TextElement.FontWeight="Medium"
+                    TextElement.FontSize="14"
+                    FontFamily="{materialDesign:MaterialDesignFont}"
         Title="EDM Creation" Height="450" Width="800">
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type vm:CreateAccountViewModel}">
-            <vw:CreateAccountView DataContext="{Binding}" />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
-            <vw:LoginView DataContext="{Binding}" />
-        </DataTemplate>
-    </Window.Resources>
     <Grid>
     </Grid>
 </views:MvxWindow>

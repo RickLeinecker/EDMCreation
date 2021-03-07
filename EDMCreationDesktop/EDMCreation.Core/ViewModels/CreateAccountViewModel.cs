@@ -1,4 +1,5 @@
-﻿using MvvmCross.Commands;
+﻿using EDMCreation.Core.Models;
+using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace EDMCreation.Core.ViewModels
 
         public override void Prepare()
         {
+            base.Prepare();
         }
 
         public override async Task Initialize()

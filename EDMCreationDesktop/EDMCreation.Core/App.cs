@@ -4,6 +4,8 @@ using EDMCreation.Core.Models;
 using EDMCreation.Core.Services;
 using EDMCreation.Core.ViewModels;
 using MvvmCross.IoC;
+using MongoDB.Driver;
+using EDMCreation.Core.Utilities;
 
 namespace EDMCreation.Core
 {
@@ -16,7 +18,11 @@ namespace EDMCreation.Core
                 .AsInterfaces()
                 .RegisterAsLazySingleton();
 
-            RegisterAppStart<LaunchPageViewModel>();
+            Mvx.IoCProvider.RegisterSingleton<IMongoClient>(new MongoClient(@"mongodb+srv://admin:LeineckerGroup16@cluster0.ttjwc.mongodb.net"));
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IDataAccess, MongoDataAccess>();
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IAuthenticationService, AuthenticationService>();
+
+            RegisterCustomAppStart<AppStart>();
         }
     }
 }

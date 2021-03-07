@@ -1,6 +1,7 @@
 ﻿<views:MvxWpfView  x:Class="EDMCreation.Wpf.Views.LaunchPageView"
              xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
              xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:EDMCreation.Core.ViewModels;assembly=EDMCreation.Core"
              xmlns:vw="clr-namespace:EDMCreation.Wpf.Views"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -15,6 +16,7 @@
             <ColumnDefinition Width="20" />
             <ColumnDefinition />
             <ColumnDefinition />
+            <ColumnDefinition />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="20" />
         </Grid.ColumnDefinitions>
@@ -24,24 +26,16 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Source="{Binding LogoUri}" Margin="5" />
-        <Button mvx:Bi.nd="Command TestCommand" Grid.Row="2" Grid.Column="2" Content="New Project" Margin="20" MinHeight="30" />
-        <Button Grid.Row="3" Grid.Column="2" Content="Load Project" Margin="20" MinHeight="30" />
-        <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="2" Margin="20" MinHeight="30">
-            <TextBlock >
-                <Hyperlink Command="{Binding ShowCreateAccountViewCommand}">Create Account</Hyperlink>
-            </TextBlock>
-            <TextBlock Text=" or " />
-            <TextBlock>
-                <Hyperlink Command="{Binding ShowLoginViewCommand}">Sign In</Hyperlink>
-            </TextBlock>
-        </StackPanel>
-        
-
+        <Button Style="{DynamicResource MaterialDesignIconButton}" Grid.Row="1" Grid.Column="3">
+            <materialDesign:PackIcon Kind="Gear" />
+        </Button>
+        <Button mvx:Bi.nd="Command ShowSelectGenreViewCommand" Grid.Row="2" Grid.Column="2" Content="New Project" Margin="20" MinHeight="30" />
+        <Button mvx:Bi.nd="Command ShowLoadDataViewCommand" Grid.Row="3" Grid.Column="2" Content="Load Project" Margin="20" MinHeight="30" />
 
     </Grid>
 </views:MvxWpfView>
