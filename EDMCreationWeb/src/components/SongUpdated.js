@@ -1,24 +1,27 @@
 import React, { Component } from "react";
-import { Typography, withStyles } from "@material-ui/core";
+import { withStyles } from "@material-ui/core";
 import Profile from "./Profile";
+import Message from "./Message";
 
 const styles = theme => ({
-	message: {
-		margin: "auto",
-		marginTop: 75,
-		textAlign: "center"
-	},
+	root: {},
 });
 
 class SongUpdated extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			showMessage: true,
+		}
+	}
+
 	render() {
 		const { classes } = this.props;
 
 		return (
 			<div>
-				<Typography className={classes.message}>
-					Song has been updated.
-                </Typography>
+				<Message message="The song has been updated." />
 				<Profile />
 			</div>
 		)

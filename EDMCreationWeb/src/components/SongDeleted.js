@@ -7,7 +7,7 @@ const styles = theme => ({
 	root: {},
 });
 
-class SongUploaded extends Component {
+class SongDeleted extends Component {
 	constructor(props) {
 		super(props);
 
@@ -21,11 +21,11 @@ class SongUploaded extends Component {
 
 		return (
 			<div>
-				<Message message="Your song has been uploaded." />
+				<Message message="The song has been deleted." />
 				<Profile />
 			</div>
 		)
 	}
 }
 
-export default withStyles(styles)(SongUploaded);
+export default withStyles(styles)(SongDeleted);

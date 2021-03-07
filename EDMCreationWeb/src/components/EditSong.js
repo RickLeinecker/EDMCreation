@@ -9,6 +9,11 @@ import {
 	Select,
 	MenuItem,
 	InputLabel,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle
 } from "@material-ui/core";
 import Songs from "./Songs";
 import axios from "axios";
@@ -104,12 +109,16 @@ class EditSong extends Component {
 			currentTitle: "",
 			currentGenre: "",
 			songs: [],
-			disableButton: true
+			disableButton: true,
+			openDialog: false,
 		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.changeButton = this.changeButton.bind(this);
+		this.handleClickOpen = this.handleClickOpen.bind(this);
+		this.handleCancel = this.handleCancel.bind(this);
+		this.handleDelete = this.handleDelete.bind(this);
 	}
 
 	componentDidMount() {
@@ -148,6 +157,22 @@ class EditSong extends Component {
 		};
 
 		window.location.href = "/songupdated";
+	}
+
+	handleClickOpen() {
+		this.setState({ openDialog: true });
+	}
+
+	handleCancel() {
+		this.setState({ openDialog: false });
+	}
+
+	handleDelete() {
+		const claims = {
+			title: this.state.title,
+		};
+
+		window.location.href = "/songdeleted";
 	}
 
 	render() {
@@ -231,9 +256,35 @@ class EditSong extends Component {
 														</Button>
 													</Grid>
 													<Grid item xs align="right">
-														<Button className={classes.removeButton} variant="outlined">
+														<Button className={classes.removeButton} variant="outlined" onClick={this.handleClickOpen}>
 															Delete song
-                                                </Button>
+                                                		</Button>
+														<Dialog
+															open={this.state.openDialog}
+															onClose={this.handleClose}
+															aria-labelledby="alert-dialog-title"
+															aria-describedby="alert-dialog-description"
+															PaperProps={{
+																style: {
+																	backgroundColor: "#4f4f4f",
+																},
+															}}
+														>
+															<DialogTitle id="alert-dialog-title" style={{ color: "#EB5757" }}>{"Delete song?"}</DialogTitle>
+															<DialogContent>
+																<DialogContentText id="alert-dialog-description" color="textPrimary">
+																	Do you want to permanently delete the song from the site?
+          														</DialogContentText>
+															</DialogContent>
+															<DialogActions>
+																<Button onClick={this.handleCancel} color="textPrimary">
+																	Cancel
+          														</Button>
+																<Button onClick={this.handleDelete} style={{ color: "#EB5757" }} autoFocus>
+																	Yes, delete
+          														</Button>
+															</DialogActions>
+														</Dialog>
 													</Grid>
 												</Grid>
 											</Grid>
