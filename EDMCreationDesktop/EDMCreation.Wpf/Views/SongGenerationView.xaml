@@ -1,6 +1,7 @@
 ﻿<views:MvxWpfView x:Class="EDMCreation.Wpf.Views.SongGenerationView"
              xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
              xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
+             xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -26,22 +27,16 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="1">
-            <StackPanel Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command PlayCommand">
-                    <materialDesign:PackIcon Kind="Play" />
-                </Button>
-                <Label Content="[seekbar]" />
-                <Label Content="Song 1" />
-                <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command LikeCommand">
-                    <materialDesign:PackIcon Kind="Like" />
-                </Button>
-                <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command DislikeCommand">
-                    <materialDesign:PackIcon Kind="Dislike" />
-                </Button>
-                <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command SaveCommand">
-                    <materialDesign:PackIcon Kind="Floppy" />
-                </Button>
-            </StackPanel>
+            <components:SongContainer SongNumber="Song 1" />
+            <components:SongContainer SongNumber="Song 2" />
+            <components:SongContainer SongNumber="Song 3" />
+            <components:SongContainer SongNumber="Song 4" />
+            <components:SongContainer SongNumber="Song 5" />
+            <components:SongContainer SongNumber="Song 6" />
+            <components:SongContainer SongNumber="Song 7" />
+            <components:SongContainer SongNumber="Song 8" />
+            <components:SongContainer SongNumber="Song 9" />
+            <components:SongContainer SongNumber="Song 10" />
         </StackPanel>
 
     </Grid>

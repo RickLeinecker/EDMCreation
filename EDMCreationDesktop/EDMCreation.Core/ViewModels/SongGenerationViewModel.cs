@@ -14,8 +14,16 @@ namespace EDMCreation.Core.ViewModels
 {
     public class SongGenerationViewModel :MvxViewModel
     {
-        IMvxNavigationService _navigationService;
+        public override Task Initialize()
+        {
+            return base.Initialize();
+        }
+
+        private IMvxNavigationService _navigationService;
         private static Playback _playback;
+        private static List<string> _midiFiles = new List<string>();
+
+
         public SongGenerationViewModel(IMvxNavigationService navigationService)
         {
             _navigationService = navigationService;
