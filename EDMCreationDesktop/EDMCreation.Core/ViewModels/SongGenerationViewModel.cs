@@ -21,20 +21,35 @@ namespace EDMCreation.Core.ViewModels
 
         private IMvxNavigationService _navigationService;
         private static Playback _playback;
-        private static List<string> _midiFiles = new List<string>();
+        private readonly List<string> _midiFiles;
+        public List<string> MidiFiles { get { return _midiFiles; } }
 
 
         public SongGenerationViewModel(IMvxNavigationService navigationService)
         {
             _navigationService = navigationService;
-            PlayCommand = new MvxAsyncCommand(PlayAsync);
+            PlayCommand = new MvxAsyncCommand<string>(fileName => PlayAsync(fileName));
+            BackCommand = new MvxAsyncCommand(GoBack);
+            _midiFiles = new List<string>()
+            {
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test2.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test3.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test2.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test3.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test2.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test3.mid",
+                @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid"
+            };
         }
 
-        public MvxAsyncCommand PlayCommand { get; set; }
+        public MvxAsyncCommand<string> PlayCommand { get; set; }
 
-        public async Task PlayAsync()
+        public async Task PlayAsync(string fileName)
         {
-            var midiFile = MidiFile.Read(@"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid");
+            var midiFile = MidiFile.Read(fileName);
             var outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
             _playback = midiFile.GetPlayback(outputDevice);
 
@@ -46,6 +61,13 @@ namespace EDMCreation.Core.ViewModels
 
             outputDevice.Dispose();
             _playback.Dispose();
+        }
+
+        public MvxAsyncCommand BackCommand { get; set; }
+
+        public async Task GoBack()
+        {
+            await _navigationService.Close(this);
         }
 
     }

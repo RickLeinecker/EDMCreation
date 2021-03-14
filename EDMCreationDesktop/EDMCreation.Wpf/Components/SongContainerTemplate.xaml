@@ -7,8 +7,11 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:SongContainer">
+                    <ControlTemplate.Resources>
+                        <local:MidiFileToPlayButtonParameterConverter x:Key="MidiFileToPlayButtonParameterConverter" />
+                    </ControlTemplate.Resources>
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="playButton" mvx:Bi.nd="Command PlayCommand" Style="{DynamicResource MaterialDesignIconButton}">
+                        <Button x:Name="playButton" mvx:Bi.nd="{TemplateBinding MidiFile, Converter={StaticResource MidiFileToPlayButtonParameterConverter}}" Style="{DynamicResource MaterialDesignIconButton}">
                             <materialDesign:PackIcon Kind="Play" />
                         </Button>
                         <local:SeekBar x:Name="seekBar" />

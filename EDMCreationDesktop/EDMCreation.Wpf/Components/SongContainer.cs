@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,8 @@ namespace EDMCreation.Wpf.Components
 {
     public class SongContainer : Control
     {
+        private Button playButton;
+
         public static DependencyProperty SongNumberProperty = DependencyProperty.Register("SongNumber", typeof(string), typeof(SongContainer));
         public string SongNumber
         {
@@ -29,5 +32,18 @@ namespace EDMCreation.Wpf.Components
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SongContainer), new FrameworkPropertyMetadata(typeof(SongContainer)));
         }
 
+    }
+
+    internal class MidiFileToPlayButtonParameterConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return $"Command PlayCommand, CommandParameter={value}";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

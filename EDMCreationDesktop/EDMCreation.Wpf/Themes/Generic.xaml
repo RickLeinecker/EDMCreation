@@ -4,4 +4,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Components/SongContainerTemplate.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+
 </ResourceDictionary>
