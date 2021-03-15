@@ -35,7 +35,7 @@
         <Button Style="{DynamicResource MaterialDesignIconButton}" VerticalAlignment="Bottom" mvx:Bi.nd="Command BackCommand" Grid.Row="1" Grid.Column="1">
             <materialDesign:PackIcon Kind="ArrowBack" />
         </Button>
-        <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="2">
+        <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="2">
             Select a genre:
         </TextBlock>
 

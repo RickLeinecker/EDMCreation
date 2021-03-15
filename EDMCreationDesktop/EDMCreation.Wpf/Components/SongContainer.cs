@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,13 +8,6 @@ namespace EDMCreation.Wpf.Components
 {
     public class SongContainer : Control
     {
-        public static DependencyProperty IsPlayingProperty = DependencyProperty.Register("IsPlaying", typeof(bool), typeof(SongContainer));
-        public bool IsPlaying 
-        {
-            get { return (bool)GetValue(IsPlayingProperty); }
-            set { SetValue(IsPlayingProperty, value); }
-        }
-
         public static DependencyProperty SongNumberProperty = DependencyProperty.Register("SongNumber", typeof(string), typeof(SongContainer));
         public string SongNumber
         {

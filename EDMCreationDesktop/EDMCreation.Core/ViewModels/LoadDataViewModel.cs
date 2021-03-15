@@ -4,7 +4,6 @@ using System.Text;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
-using MvvmCross.Commands;
 
 using System.Threading.Tasks;
 

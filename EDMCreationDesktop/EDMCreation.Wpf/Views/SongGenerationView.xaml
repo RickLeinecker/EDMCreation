@@ -13,7 +13,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
-            <ColumnDefinition />
+            <ColumnDefinition Width="3*" />
             <ColumnDefinition />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="20" />
@@ -26,18 +26,46 @@
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
-        <components:SongPanel CurrentFile="{Binding CurrentFile}"  Orientation="Vertical" Grid.Row="2" Grid.Column="1">
-            <components:SongContainer MidiFile="{Binding MidiFiles[0]}" SongNumber="Song 1" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[1]}" SongNumber="Song 2" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[2]}" SongNumber="Song 3" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[3]}" SongNumber="Song 4" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[4]}" SongNumber="Song 5" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[5]}" SongNumber="Song 6" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[6]}" SongNumber="Song 7" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[7]}" SongNumber="Song 8" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[8]}" SongNumber="Song 9" />
-            <components:SongContainer MidiFile="{Binding MidiFiles[9]}" SongNumber="Song 10" />
-        </components:SongPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+            <Button Style="{DynamicResource MaterialDesignToolButton}">
+                <materialDesign:PackIcon Kind="CodeLessThan" />
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignToolButton}">
+                <materialDesign:PackIcon Kind="CodeGreaterThan" />
+            </Button>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">
+            <Button Style="{DynamicResource MaterialDesignToolButton}">
+                <materialDesign:PackIcon Kind="Gear" />
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignToolButton}">
+                <materialDesign:PackIcon Kind="About"/>
+            </Button>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" Grid.Column="1">
+            <components:SongPanel CurrentFile="{Binding CurrentFile}"  Orientation="Vertical">
+                <components:SongContainer MidiFile="{Binding MidiFiles[0]}" SongNumber="Song 1" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[1]}" SongNumber="Song 2" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[2]}" SongNumber="Song 3" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[3]}" SongNumber="Song 4" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[4]}" SongNumber="Song 5" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[5]}" SongNumber="Song 6" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[6]}" SongNumber="Song 7" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[7]}" SongNumber="Song 8" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[8]}" SongNumber="Song 9" />
+                <components:SongContainer MidiFile="{Binding MidiFiles[9]}" SongNumber="Song 10" />
+            </components:SongPanel>
+        </ScrollViewer>
+
+        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
+            <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="GENERATE" Margin="20" />
+            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="SAVE TRAINING" Margin="20" />
+        </StackPanel>
+
+        <Button mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignRaisedLightButton}"
+                VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="2" Margin="20" Content="LEAVE TRAINING" />
 
     </Grid>
 </views:MvxWpfView>
