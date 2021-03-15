@@ -10,7 +10,12 @@ namespace EDMCreation.Wpf.Components
 {
     public class SongContainer : Control
     {
-        private Button playButton;
+        public static DependencyProperty IsPlayingProperty = DependencyProperty.Register("IsPlaying", typeof(bool), typeof(SongContainer));
+        public bool IsPlaying 
+        {
+            get { return (bool)GetValue(IsPlayingProperty); }
+            set { SetValue(IsPlayingProperty, value); }
+        }
 
         public static DependencyProperty SongNumberProperty = DependencyProperty.Register("SongNumber", typeof(string), typeof(SongContainer));
         public string SongNumber
@@ -46,4 +51,5 @@ namespace EDMCreation.Wpf.Components
             throw new NotImplementedException();
         }
     }
+
 }

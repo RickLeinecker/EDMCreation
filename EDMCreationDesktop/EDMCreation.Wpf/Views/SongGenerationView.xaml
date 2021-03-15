@@ -26,7 +26,7 @@
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="2" Grid.Column="1">
+        <components:SongPanel CurrentFile="{Binding CurrentFile}"  Orientation="Vertical" Grid.Row="2" Grid.Column="1">
             <components:SongContainer MidiFile="{Binding MidiFiles[0]}" SongNumber="Song 1" />
             <components:SongContainer MidiFile="{Binding MidiFiles[1]}" SongNumber="Song 2" />
             <components:SongContainer MidiFile="{Binding MidiFiles[2]}" SongNumber="Song 3" />
@@ -37,7 +37,7 @@
             <components:SongContainer MidiFile="{Binding MidiFiles[7]}" SongNumber="Song 8" />
             <components:SongContainer MidiFile="{Binding MidiFiles[8]}" SongNumber="Song 9" />
             <components:SongContainer MidiFile="{Binding MidiFiles[9]}" SongNumber="Song 10" />
-        </StackPanel>
+        </components:SongPanel>
 
     </Grid>
 </views:MvxWpfView>
