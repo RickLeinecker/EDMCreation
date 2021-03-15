@@ -10,6 +10,7 @@ using System.Text;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EDMCreation.Core.Services;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -21,17 +22,11 @@ namespace EDMCreation.Core.ViewModels
         }
 
         private IMvxNavigationService _navigationService;
-        private static Playback _playback;
-        private static OutputDevice _outputDevice;
-        private readonly List<string> _midiFiles;
-        public List<string> MidiFiles { get { return _midiFiles; } }
+        private IMidiPlayerService _midiPlayer;
 
-        private static bool _isPlaying;
-
-        public bool IsPlaying 
+        public IMidiPlayerService MidiPlayer
         {
-            get { return _isPlaying; }
-            set { SetProperty(ref _isPlaying, value); }
+            get { return _midiPlayer; }
         }
 
         private static string _currentFile;
@@ -42,13 +37,18 @@ namespace EDMCreation.Core.ViewModels
             set { SetProperty(ref _currentFile, value); }
         }
 
-        public SongGenerationViewModel(IMvxNavigationService navigationService)
+        private readonly List<string> _midiFiles;
+        public List<string> MidiFiles { get { return _midiFiles; } }
+
+        public SongGenerationViewModel(IMvxNavigationService navigationService, IMidiPlayerService midiPlayerService)
         {
-            Debug.WriteLine("Enter song gen view");
             _navigationService = navigationService;
-            PlayCommand = new MvxAsyncCommand<string>(fileName => PlayAsync(fileName));
+            _midiPlayer = midiPlayerService;
+
+            PlayCommand = new MvxAsyncCommand<string>(fileName => PlayFileAsync(fileName));
             StopCommand = new MvxCommand(Stop);
             BackCommand = new MvxAsyncCommand(GoBack);
+
             _midiFiles = new List<string>()
             {
                 @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\test.mid",
@@ -66,43 +66,16 @@ namespace EDMCreation.Core.ViewModels
 
         public MvxAsyncCommand<string> PlayCommand { get; set; }
 
-        public async Task PlayAsync(string fileName)
+        public async Task PlayFileAsync(string fileName)
         {
-            Stop();
-
-            CurrentFile = fileName;
-            var midiFile = MidiFile.Read(fileName);
-            _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
-            _playback = midiFile.GetPlayback(_outputDevice);
-            _playback.Finished += PlaybackEnded;
-            _playback.Stopped += PlaybackEnded;
-
-
-            await Task.Run(() =>
-            {
-                IsPlaying = true;
-                _playback.Start();
-            });
-
-           
-        }
-
-
-        public void PlaybackEnded(object sender, EventArgs e)
-        {
-            IsPlaying = false;
-            _outputDevice.Dispose();
-            _playback.Dispose();
+            await _midiPlayer.PlayAsync(fileName);
         }
 
         public MvxCommand StopCommand { get; set; }
 
         public void Stop()
         {
-            if (_playback != null && _playback.IsRunning)
-            {
-                _playback.Stop();
-            }
+            _midiPlayer.Stop();
         }
 
         public MvxAsyncCommand BackCommand { get; set; }

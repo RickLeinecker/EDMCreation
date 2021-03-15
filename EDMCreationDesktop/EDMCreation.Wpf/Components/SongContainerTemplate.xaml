@@ -14,7 +14,7 @@
                         <Button x:Name="playButton" mvx:Bi.nd="{TemplateBinding MidiFile, Converter={StaticResource MidiFileToPlayButtonParameterConverter}}" Style="{DynamicResource MaterialDesignIconButton}">
                             <materialDesign:PackIcon Kind="Play" />
                         </Button>
-                        <Button x:Name="stopButton" mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding IsPlaying}">
+                        <Button x:Name="stopButton" mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding MidiPlayer.IsPlaying, Mode=OneWay}">
                             <materialDesign:PackIcon Kind="Stop" />
                         </Button>
                         <local:SeekBar x:Name="seekBar" />
