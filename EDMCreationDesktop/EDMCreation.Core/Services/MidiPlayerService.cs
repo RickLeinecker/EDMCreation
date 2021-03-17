@@ -11,17 +11,36 @@ namespace EDMCreation.Core.Services
 {
     public class MidiPlayerService : IMidiPlayerService
     {
-        private static Playback _playback;
         private static OutputDevice _outputDevice;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool IsPlaying { get { return (_playback == null) ? false : _playback.IsRunning; } }
+        private static Playback _playback;
+        public Playback Playback
+        {
+            get { return _playback; } 
+            set { _playback = value; } 
+        }
+
+        private static string _currentFile;
+        public string CurrentFile
+        {
+            get { return _currentFile; } 
+            set 
+            {
+                _currentFile = value;
+            }
+        }
+
+        public bool IsPlaying 
+        { 
+            get { return (_playback == null) ? false : _playback.IsRunning; } 
+        }
 
         public async Task PlayAsync(string fileName)
         {
             Stop();
 
+            CurrentFile = fileName;
             var midiFile = MidiFile.Read(fileName);
             _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
             _playback = midiFile.GetPlayback(_outputDevice);
@@ -34,7 +53,6 @@ namespace EDMCreation.Core.Services
                 _playback.Start();
             });
 
-            OnPropertyChanged("IsPlaying");
         }
 
         public void Stop()
@@ -49,7 +67,6 @@ namespace EDMCreation.Core.Services
         {
             _outputDevice.Dispose();
             _playback.Dispose();
-            OnPropertyChanged("IsPlaying");
         }
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)

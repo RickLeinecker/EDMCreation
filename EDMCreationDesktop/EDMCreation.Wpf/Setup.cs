@@ -7,6 +7,9 @@ namespace EDMCreation.Wpf
 {
     public class Setup : MvxWpfSetup<Core.App>
     {
-        
+        protected override IMvxWpfViewPresenter CreateViewPresenter(ContentControl root)
+        {
+            return base.CreateViewPresenter(root);
+        }
     }
 }

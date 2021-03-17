@@ -3,6 +3,7 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
                  xmlns:local="clr-namespace:EDMCreation.Wpf"
                  xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
                  mc:Ignorable="d"
@@ -13,6 +14,7 @@
                     TextElement.FontSize="14"
                     FontFamily="{materialDesign:MaterialDesignFont}"
         Title="EDM Creation" Height="450" Width="800">
+
     <Grid>
     </Grid>
 </views:MvxWindow>

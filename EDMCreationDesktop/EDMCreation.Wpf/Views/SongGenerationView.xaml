@@ -2,6 +2,7 @@
              xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
              xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
              xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
+             xmlns:vm="clr-namespace:EDMCreation.Core.ViewModels;assembly=EDMCreation.Core"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,6 +11,7 @@
              xmlns:local="clr-namespace:EDMCreation.Wpf.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
@@ -27,36 +29,31 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-            <Button Style="{DynamicResource MaterialDesignToolButton}">
+            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation">
                 <materialDesign:PackIcon Kind="CodeLessThan" />
             </Button>
-            <Button Style="{DynamicResource MaterialDesignToolButton}">
+            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation">
                 <materialDesign:PackIcon Kind="CodeGreaterThan" />
             </Button>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">
-            <Button Style="{DynamicResource MaterialDesignToolButton}">
+            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Settings">
                 <materialDesign:PackIcon Kind="Gear" />
             </Button>
-            <Button Style="{DynamicResource MaterialDesignToolButton}">
+            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="About">
                 <materialDesign:PackIcon Kind="About"/>
             </Button>
         </StackPanel>
 
         <ScrollViewer Grid.Row="2" Grid.Column="1">
-            <components:SongPanel CurrentFile="{Binding CurrentFile}"  Orientation="Vertical">
-                <components:SongContainer MidiFile="{Binding MidiFiles[0]}" SongNumber="Song 1" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[1]}" SongNumber="Song 2" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[2]}" SongNumber="Song 3" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[3]}" SongNumber="Song 4" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[4]}" SongNumber="Song 5" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[5]}" SongNumber="Song 6" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[6]}" SongNumber="Song 7" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[7]}" SongNumber="Song 8" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[8]}" SongNumber="Song 9" />
-                <components:SongContainer MidiFile="{Binding MidiFiles[9]}" SongNumber="Song 10" />
-            </components:SongPanel>
+            <ItemsControl ItemsSource="{Binding SongContainers}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:SongViewModel}">
+                        <local:SongView/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
 
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">

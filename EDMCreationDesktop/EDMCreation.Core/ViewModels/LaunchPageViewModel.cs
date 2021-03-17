@@ -33,6 +33,6 @@ namespace EDMCreation.Core.ViewModels
             await _navigationService.Navigate<SelectGenreViewModel>();
         }
 
-
+        
     }
 }
