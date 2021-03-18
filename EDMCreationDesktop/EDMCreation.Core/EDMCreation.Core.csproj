@@ -10,8 +10,4 @@
     <PackageReference Include="MvvmCross" Version="7.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ValueConverters\" />
-  </ItemGroup>
-
 </Project>

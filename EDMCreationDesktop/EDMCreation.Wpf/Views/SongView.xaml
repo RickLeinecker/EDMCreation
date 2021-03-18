@@ -5,25 +5,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:valueConverters="clr-namespace:EDMCreation.Wpf.ValueConverters"
              xmlns:local="clr-namespace:EDMCreation.Wpf.Views" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
                   mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <views:MvxWpfView.Resources>
+        <valueConverters:IntegerToSongNumberValueConverter x:Key="IntegerToSongNumberValueConverter"/>
+        <valueConverters:SeekBarValueConverter x:Key="SeekBarValueConverter"/>
+    </views:MvxWpfView.Resources>
     <StackPanel Orientation="Horizontal">
-        <Button x:Name="playButton" mvx:Bi.nd="Command PlayCommand, CommandParameter=MidiFile" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="Play">
-            <materialDesign:PackIcon Kind="Play" />
+        <Label Content="{Binding SongNumber, Converter={StaticResource IntegerToSongNumberValueConverter}}"/>
+        <Button mvx:Bi.nd="Command PlayPauseCommand" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="{Binding PlayPauseToolTip}">
+            <materialDesign:PackIcon Kind="{Binding PlayPauseIcon}" />
         </Button>
-        <Button x:Name="stopButton" mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding IsPlaying}" ToolTip="Stop">
+        <Button mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding HasStarted}" ToolTip="Stop">
             <materialDesign:PackIcon Kind="Stop" />
         </Button>
-        <components:SeekBar x:Name="seekBar" />
-        <Label x:Name="songLabel" Content="{Binding SongNumber}" />
-        <CheckBox IsChecked="{Binding IsSelected}" x:Name="addRemoveButton" Style="{DynamicResource MaterialDesignFilterChipPrimaryOutlineCheckBox}">
+        <Slider Style="{DynamicResource MaterialDesignSlider}" Width="200" 
+                Value="{Binding SeekValue, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}" 
+                VerticalAlignment="Center" />
+        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" x:Name="addRemoveButton"
+                  Style="{DynamicResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
+                  ToolTip="{Binding AddRemoveToolTip}">
             <materialDesign:PackIcon Kind="Plus" />
         </CheckBox>
-        <Button x:Name="saveButton" mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignIconButton}">
+        <Button x:Name="saveButton" mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="Save as midi file">
             <materialDesign:PackIcon Kind="Floppy" />
         </Button>
+        <TextBlock Text="{Binding TotalTime, Mode=OneWay}"/>
+        <TextBlock Text="{Binding CurrentTime, Mode=OneWay}"/>
     </StackPanel>
 </views:MvxWpfView>

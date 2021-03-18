@@ -1,4 +1,6 @@
-﻿using EDMCreation.Core.Services;
+﻿using EDMCreation.Core.Utilities;
+using Melanchall.DryWetMidi.Devices;
+using Melanchall.DryWetMidi.Interaction;
 using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using System;
@@ -8,11 +10,18 @@ namespace EDMCreation.Core.ViewModels
 {
     public class SongViewModel : MvxViewModel
     {
-        private string _midiFile;
         public string MidiFile
         {
-            get { return _midiFile; }
-            set { SetProperty(ref _midiFile, value); }
+            get { return _midiPlayer.MidiFilePath; }
+        }
+
+        public string PlayPauseIcon
+        {
+            get { return IsPlaying ? "Pause" : "Play"; }
+        }
+        public string PlayPauseToolTip
+        { 
+            get { return IsPlaying ? "Pause" : "Play"; }
         }
 
         private int _songNumber;
@@ -24,41 +33,118 @@ namespace EDMCreation.Core.ViewModels
 
         public bool IsPlaying
         {
-            get { return _midiPlayer == null ? false : _midiPlayer.IsPlaying && _midiPlayer.CurrentFile == _midiFile; }
+            get { return _midiPlayer == null ? false : _midiPlayer.IsPlaying; }
+        }
+
+        private bool _hasStarted = false;
+        public bool HasStarted
+        {
+            get { return _hasStarted; }
+            set { SetProperty(ref _hasStarted, value); }
         }
 
         private bool _isSelected;
         public bool IsSelected 
         {
             get { return _isSelected; }
-            set { SetProperty(ref _isSelected, value); }
+            set 
+            { 
+                SetProperty(ref _isSelected, value); 
+                RaisePropertyChanged(nameof(AddRemoveToolTip));
+            }
         }
 
-        private IMidiPlayerService _midiPlayer;
-
-        public SongViewModel(IMidiPlayerService midiPlayerService)
+        public string AddRemoveToolTip
         {
-            _midiPlayer = midiPlayerService;
-            PlayCommand = new MvxAsyncCommand(PlayFileAsync);
+            get { return IsSelected ? "Deselect" : "Select"; }
+        }
+
+        public ITimeSpan TotalTime
+        {
+            get { return _midiPlayer.Duration; }
+        }
+
+        public ITimeSpan CurrentTime
+        {
+            get { return _midiPlayer.CurrentTime; }
+            set { _midiPlayer.CurrentTime = value; }            
+        }
+
+        // floating point value between 0 and 1
+        public float SeekValue
+        {
+            get { return ConvertToSeekValue(TotalTime, CurrentTime); }
+            set 
+            {
+                CurrentTime = ConvertToCurrentTime(TotalTime, value);
+                RaisePropertyChanged(nameof(CurrentTime));
+            }
+        }
+
+        private IMidiPlayer _midiPlayer;
+
+        public SongViewModel(IMidiPlayer midiPlayer, int songNumber)
+        {
+            _midiPlayer = midiPlayer;
+            _songNumber = songNumber;
+
+            _midiPlayer.PlaybackStarted += OnStarted;
+            _midiPlayer.PlaybackEnded += OnEnded;
+            _midiPlayer.PlaybackPaused += OnPaused;
+            PlaybackCurrentTimeWatcher.Instance.CurrentTimeChanged += OnCurrentTimeChanged;
+
+            PlayPauseCommand = new MvxCommand(PlayPause);
             StopCommand = new MvxCommand(Stop);
         }
 
-        public MvxAsyncCommand PlayCommand { get; set; }
-
-        public async Task PlayFileAsync()
-        {
-            await _midiPlayer.PlayAsync(MidiFile);
-            _midiPlayer.Playback.Finished += (object sender, EventArgs e) => { RaisePropertyChanged("IsPlaying"); };
-            _midiPlayer.Playback.Stopped += (object sender, EventArgs e) => { RaisePropertyChanged("IsPlaying"); };
-            await RaisePropertyChanged("IsPlaying");
-        }
-
+        public MvxCommand PlayPauseCommand { get; set; }
         public MvxCommand StopCommand { get; set; }
 
-        public void Stop()
+        public void PlayPause()
         {
-            _midiPlayer.Stop();
-            RaisePropertyChanged("IsPlaying");
+            if (IsPlaying)
+                Pause();
+            else
+                Play();
+        }
+
+        public void Play() { _midiPlayer.Play(); }
+        public void Pause() { _midiPlayer.Pause(); }
+        public void Stop() { _midiPlayer.Stop(); }
+
+        private void OnStarted(object sender, EventArgs e)
+        {
+            _hasStarted = true;
+            RaiseAllPropertiesChanged();
+        }
+
+        private void OnEnded(object sender, EventArgs e)
+        {
+            _hasStarted = false;
+            RaiseAllPropertiesChanged();
+        }
+
+        private void OnPaused(object sender, EventArgs e)
+        {
+            RaiseAllPropertiesChanged();
+        }
+
+        private void OnCurrentTimeChanged(object sender, EventArgs e)
+        {
+            RaisePropertyChanged(nameof(SeekValue));
+        }
+
+        private float ConvertToSeekValue(ITimeSpan totalT, ITimeSpan currentT)
+        {
+            long total = TimeConverter.ConvertFrom(totalT, TempoMap.Default);
+            long current = TimeConverter.ConvertFrom(currentT, TempoMap.Default);
+
+            return (float)current / total;
+        }
+
+        private ITimeSpan ConvertToCurrentTime(ITimeSpan totalT, float seekValue)
+        {
+            return totalT.Multiply(seekValue);
         }
 
     }

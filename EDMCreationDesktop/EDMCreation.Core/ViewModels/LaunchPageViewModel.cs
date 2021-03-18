@@ -6,6 +6,9 @@ using System;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using EDMCreation.Core.Models;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Devices;
+using System.Threading;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -19,7 +22,9 @@ namespace EDMCreation.Core.ViewModels
             
             ShowLoadDataViewCommand = new MvxAsyncCommand(ShowLoadDataView);
             ShowSelectGenreViewCommand = new MvxAsyncCommand(ShowSelectGenreView);
+            BackCommand = new MvxAsyncCommand(GoBack);
         }
+
         public MvxAsyncCommand ShowLoadDataViewCommand { get; set; }
 
         public async Task ShowLoadDataView()
@@ -33,6 +38,13 @@ namespace EDMCreation.Core.ViewModels
             await _navigationService.Navigate<SelectGenreViewModel>();
         }
 
-        
+        public MvxAsyncCommand BackCommand { get; set; }
+
+        public async Task GoBack()
+        {
+            await _navigationService.Close(this);
+        }
+
+
     }
 }

@@ -31,10 +31,13 @@
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
+        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Text}"/>
+
         <Button Style="{DynamicResource MaterialDesignIconButton}" Grid.Row="1" Grid.Column="3">
             <materialDesign:PackIcon Kind="Gear" />
         </Button>
         <Button mvx:Bi.nd="Command ShowSelectGenreViewCommand" Grid.Row="2" Grid.Column="2" Content="New Project" Margin="20" MinHeight="30" />
-        <Button mvx:Bi.nd="Command ShowLoadDataViewCommand" Grid.Row="3" Grid.Column="2" Content="Load Project" Margin="20" MinHeight="30" />        
+        <Button mvx:Bi.nd="Command ShowLoadDataViewCommand" Grid.Row="3" Grid.Column="2" Content="Load Project" Margin="20" MinHeight="30" />
+
     </Grid>
 </views:MvxWpfView>

@@ -29,10 +29,10 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation">
+            <Button mvx:Bi.nd="Command Command1" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation">
                 <materialDesign:PackIcon Kind="CodeLessThan" />
             </Button>
-            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation">
+            <Button mvx:Bi.nd="Command Command2" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation">
                 <materialDesign:PackIcon Kind="CodeGreaterThan" />
             </Button>
         </StackPanel>
@@ -46,18 +46,21 @@
             </Button>
         </StackPanel>
 
-        <ScrollViewer Grid.Row="2" Grid.Column="1">
-            <ItemsControl ItemsSource="{Binding SongContainers}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:SongViewModel}">
-                        <local:SongView/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <!-- SongsContainer -->
+        <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding CurrentContainer}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate DataType="{x:Type vm:SongsContainerViewModel}">
+                    <local:SongsContainerView />
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
+
+
+
+
 
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
-            <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="GENERATE" Margin="20" />
+            <Button mvx:Bi.nd="Command ShowCommand" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="GENERATE" Margin="20" />
             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="SAVE TRAINING" Margin="20" />
         </StackPanel>
 
