@@ -6,6 +6,7 @@ const styles = theme => ({
     registerForm: {
         justifyContent: "center",
         marginTop: 75,
+        marginBottom: 75,
         borderRadius: theme.shape.borderRadius,
     },
     buttonBlock: {
@@ -22,7 +23,7 @@ const styles = theme => ({
     },
     registerBackground: {
         justifyContent: "center",
-        minWidth: "60vh",
+        minWidth: "55vh",
         paddingTop: "50px",
         paddingBottom: "90px",
         paddingLeft: "70px",
@@ -47,6 +48,9 @@ const styles = theme => ({
             color: "#828282",
         },
     },
+    errorMessage: {
+        color: "#EB5757",
+    }
 });
 
 class Register extends Component {
@@ -100,11 +104,7 @@ class Register extends Component {
 
         if (localStorage.getItem("access_token") !== null) {
             return (
-                <div>
-                    <Typography>
-                        Please log out first to register
-					</Typography>
-                </div>
+                window.location.href = "/login"
             )
         }
 
@@ -179,7 +179,9 @@ class Register extends Component {
                                                 />
                                             </Grid>
                                             <Grid item>
-                                                <br />
+												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+											</Grid>
+                                            <Grid item>
                                                 <Grid container justify="center">
                                                     <Grid item>
                                                         <Button disabled={this.state.disableButton} type="submit" className={classes.buttonBlock}>

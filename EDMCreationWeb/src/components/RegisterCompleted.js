@@ -1,24 +1,32 @@
 import React, { Component } from "react";
-import { Typography, withStyles } from "@material-ui/core";
+import { withStyles } from "@material-ui/core";
 import LogIn from "./LogIn";
+import Message from "./Message";
 
 const styles = theme => ({
+	root: {},
 	message: {
-		margin: "auto",
-		marginTop: 75,
-		textAlign: "center"
-	},
+		marginBottom: -20
+	}
 });
 
 class RegisterCompleted extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			showMessage: true,
+		}
+	}
+
 	render() {
 		const { classes } = this.props;
 
 		return (
 			<div>
-				<Typography variant="h5" className={classes.message}>
-					You are now registered! Check your email for verification link.
-                </Typography>
+				<div className={classes.message}>
+					<Message message="You are now registered. Check your email for a verification link." />
+				</div>
 				<LogIn />
 			</div>
 		)

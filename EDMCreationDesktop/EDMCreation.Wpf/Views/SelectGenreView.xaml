@@ -1,0 +1,58 @@
+﻿<views:MvxWpfView x:Class="EDMCreation.Wpf.Views.SelectGenreView"
+             xmlns:views="clr-namespace:MvvmCross.Platforms.Wpf.Views;assembly=MvvmCross.Platforms.Wpf"
+             xmlns:mvx="clr-namespace:MvvmCross.Platforms.Wpf.Binding;assembly=MvvmCross.Platforms.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EDMCreation.Wpf.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="20" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+
+        <!-- Row 1 -->
+        <Button Style="{DynamicResource MaterialDesignIconButton}" VerticalAlignment="Bottom" mvx:Bi.nd="Command BackCommand" Grid.Row="1" Grid.Column="1">
+            <materialDesign:PackIcon Kind="ArrowBack" />
+        </Button>
+        <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="2">
+            Select a genre:
+        </TextBlock>
+
+        <!-- Row 2 -->
+        <Button Grid.Row="2" Grid.Column="2" Content="{Binding Genres[0]}" Margin="20" MinHeight="30" mvx:Bi.nd="Command ShowSongGenerationViewCommand" />
+        <Button  Grid.Row="2" Grid.Column="3" Content="{Binding Genres[1]}" Margin="20" MinHeight="30" />
+
+        <!-- Row 3 -->
+        <Button Grid.Row="3" Grid.Column="2" Content="{Binding Genres[2]}" Margin="20" MinHeight="30" />
+        <Button  Grid.Row="3" Grid.Column="3" Content="{Binding Genres[3]}" Margin="20" MinHeight="30" />
+
+        <!-- Row 4 -->
+        <Button Grid.Row="4" Grid.Column="2" Content="{Binding Genres[4]}" Margin="20" MinHeight="30" />
+        <Button  Grid.Row="4" Grid.Column="3" Content="{Binding Genres[5]}" Margin="20" MinHeight="30" />
+
+        <!-- Row 5 -->
+        <Button Grid.Row="5" Grid.Column="2" Content="{Binding Genres[6]}" Margin="20" MinHeight="30" />
+
+    </Grid>
+</views:MvxWpfView>

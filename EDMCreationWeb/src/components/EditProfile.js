@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
+import { AccountBox } from '@material-ui/icons/';
 import axios from "axios";
 import LogIn from "./LogIn";
 import { withRouter } from "react-router-dom";
@@ -13,7 +14,8 @@ const styles = theme => ({
     },
     form: {
         justifyContent: "center",
-        marginTop: 75,
+        marginTop: 15,
+        marginBottom: 75,
         borderRadius: theme.shape.borderRadius,
     },
     buttonBlock: {
@@ -30,7 +32,7 @@ const styles = theme => ({
     },
     background: {
         justifyContent: "center",
-        minWidth: "60vh",
+        minWidth: 800,
         paddingTop: "50px",
         paddingBottom: "90px",
         paddingLeft: "70px",
@@ -55,6 +57,20 @@ const styles = theme => ({
             color: "#828282",
         },
     },
+    disabledInputBox: {
+        backgroundColor: "white",
+        borderRadius: theme.shape.borderRadius,
+        color: "black",
+    },
+    largeIcon: {
+        fontSize: "16em",
+    },
+    username: {
+        marginLeft: 25
+    },
+    errorMessage: {
+        color: "#EB5757",
+    }
 });
 
 class EditProfile extends Component {
@@ -64,8 +80,11 @@ class EditProfile extends Component {
         this.state = {
             email: "",
             username: "",
+            description: "",
             newPassword: "",
             confirmationNewPassword: "",
+            currentEmail: "",
+            currentDescription: "",
             disableButton: true
         };
 
@@ -81,10 +100,11 @@ class EditProfile extends Component {
     changeButton() {
         if (this.state.email !== "" &&
             this.state.username !== "" &&
-            this.state.description !== "") {
-                if( this.state.newPassword !== this.state.confirmationNewPassword) {
-                    document.getElementById("errors").value = "Passwords don't match"
-                }
+            (this.state.email !== this.state.currentEmail ||
+                this.state.description !== this.state.currentDescription ||
+                (this.state.currentPassword !== "" &&
+                    this.state.newPassword !== "" &&
+                    this.state.confirmationNewPassword !== ""))) {
             this.setState({ disableButton: false });
         }
         else {
@@ -103,7 +123,16 @@ class EditProfile extends Component {
             description: this.state.description,
         };
 
-        window.location.href = "/registercompleted";
+        // if (this.state.newPassword !== this.state.confirmationNewPassword) {
+        //     document.getElementById("errorMessage").innerHTML = "Error";
+        // }
+
+        if (this.state.email === this.state.currentEmail) {
+            window.location.href = "/accountupdated";
+        }
+        else {
+            window.location.href = "/accountemailupdated";
+        }
     }
 
     componentDidMount() {
@@ -111,7 +140,9 @@ class EditProfile extends Component {
             .then(res => this.setState({
                 email: res.data.email,
                 username: res.data.username,
-                description: res.data.description
+                description: res.data.description,
+                currentEmail: res.data.email,
+                currentDescription: res.data.description,
             }));
     }
 
@@ -120,14 +151,14 @@ class EditProfile extends Component {
 
         if (localStorage.getItem("access_token") === null) {
             return (
-                <LogIn originPath="/EditProfile" />
+                <LogIn originPath={window.location.pathname} />
             )
         }
 
         return (
             <div>
                 <Typography variant="h5" className={classes.title}>
-                    Edit Profile
+                    Your account
                 </Typography>
                 <Grid container spacing={0} justify="center" direction="row">
                     <Grid item>
@@ -141,94 +172,127 @@ class EditProfile extends Component {
                             <Paper elevation={0} className={classes.background}>
                                 <Grid item align="center">
                                     <Typography component="h1" variant="h5">
-                                        Edit your profile information
+                                        Edit your profile
                                     </Typography>
                                     <br />
+                                    <br />
                                 </Grid>
-                                    <div id="errors" />
-                                <Grid>
-                                </Grid>
-                                <Grid item>
-                                    <form onSubmit={this.handleSubmit}>
-                                        <Grid container direction="column" spacing={2}>
-                                            <Grid item>
-                                                <TextField
-                                                    type="email"
-                                                    fullWidth
-                                                    name="email"
-                                                    variant="filled"
-                                                    autoFocus
-                                                    label="Email"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                    value={this.state.email}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="text"
-                                                    fullWidth
-                                                    name="username"
-                                                    variant="filled"
-                                                    label="Username"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                    value={this.state.username}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="password"
-                                                    fullWidth
-                                                    name="newPassword"
-                                                    variant="filled"
-                                                    label="New password"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="password"
-                                                    fullWidth
-                                                    name="confirmationNewPassword"
-                                                    variant="filled"
-                                                    label="Comfirm new password"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <TextField
-                                                    type="text"
-                                                    fullWidth
-                                                    name="description"
-                                                    variant="filled"
-                                                    label="User description"
-                                                    multiline="true"
-                                                    rows="6"
-                                                    onChange={this.handleChange}
-                                                    InputProps={{ className: classes.inputBox, disableUnderline: true }}
-                                                    InputLabelProps={{ className: classes.inputBoxLabel }}
-                                                    value={this.state.description}
-                                                />
-                                            </Grid>
-                                            <Grid item>
-                                                <br />
-                                                <Grid container justify="center">
+                                <Grid container>
+                                    <Grid item xs container direction="column">
+                                        <Grid item>
+                                            <AccountBox className={classes.largeIcon} />
+                                        </Grid>
+                                    </Grid>
+                                    <Grid item container xs={12} sm direction="column">
+                                        <Grid item>
+                                            <form onSubmit={this.handleSubmit}>
+                                                <Grid container direction="column" spacing={2}>
                                                     <Grid item>
-                                                        <Button disabled={this.state.disableButton} type="submit" className={classes.buttonBlock}>
-                                                            Update
-														</Button>
+                                                        <Typography>
+                                                            User information
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="text"
+                                                            fullWidth
+                                                            name="username"
+                                                            variant="filled"
+                                                            autoFocus
+                                                            label="Username"
+                                                            InputProps={{ className: classes.disabledInputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                            value={this.state.username}
+                                                            disabled={true}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="email"
+                                                            fullWidth
+                                                            name="email"
+                                                            variant="filled"
+                                                            autoFocus
+                                                            label="Email"
+                                                            onChange={this.handleChange}
+                                                            InputProps={{ className: classes.inputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                            value={this.state.email}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="text"
+                                                            fullWidth
+                                                            name="description"
+                                                            variant="filled"
+                                                            label="User description"
+                                                            multiline="true"
+                                                            rows="6"
+                                                            onChange={this.handleChange}
+                                                            InputProps={{ className: classes.inputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                            value={this.state.description}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <br />
+                                                        <Typography>
+                                                            Change password
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="password"
+                                                            fullWidth
+                                                            name="currentPassword"
+                                                            variant="filled"
+                                                            label="Current password"
+                                                            onChange={this.handleChange}
+                                                            InputProps={{ className: classes.inputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="password"
+                                                            fullWidth
+                                                            name="newPassword"
+                                                            variant="filled"
+                                                            label="New password"
+                                                            onChange={this.handleChange}
+                                                            InputProps={{ className: classes.inputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <TextField
+                                                            type="password"
+                                                            fullWidth
+                                                            name="confirmationNewPassword"
+                                                            variant="filled"
+                                                            label="Comfirm new password"
+                                                            onChange={this.handleChange}
+                                                            InputProps={{ className: classes.inputBox, disableUnderline: true }}
+                                                            InputLabelProps={{ className: classes.inputBoxLabel }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Grid container justify="center">
+                                                            <Grid item>
+                                                                <Button disabled={this.state.disableButton} type="submit" className={classes.buttonBlock}>
+                                                                    Save changes
+														        </Button>
+                                                            </Grid>
+                                                        </Grid>
                                                     </Grid>
                                                 </Grid>
-                                            </Grid>
+                                            </form>
                                         </Grid>
-                                    </form>
+                                    </Grid>
                                 </Grid>
                             </Paper>
                         </Grid>

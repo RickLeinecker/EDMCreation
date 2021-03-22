@@ -59,7 +59,7 @@ class ProfileIcon extends Component {
         return (
             <div>
                 <Typography>
-                    {this.state.username}
+                    <Link href="/profile" color="inherit">{this.state.username}</Link>
                     <IconButton
                         aria-controls="menu"
                         aria-haspopup="true"
@@ -83,10 +83,10 @@ class ProfileIcon extends Component {
                     anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                     transformOrigin={{ vertical: "top", horizontal: "center" }}
                 >
-                    <MenuItem component={RouterLink} to="#" onClick={this.handleClose}>
+                    <MenuItem component={RouterLink} to="/uploadsong" onClick={this.handleClose}>
                         Upload song
                     </MenuItem>
-                    <MenuItem component={RouterLink} to="#" onClick={this.handleClose}>
+                    <MenuItem component={RouterLink} to="/profile" onClick={this.handleClose}>
                         View profile
                     </MenuItem>
                     <MenuItem component={RouterLink} to="/editprofile" onClick={this.handleClose}>

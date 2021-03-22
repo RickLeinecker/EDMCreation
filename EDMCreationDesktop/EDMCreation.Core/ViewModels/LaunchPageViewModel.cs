@@ -5,6 +5,10 @@ using System.Reflection;
 using System;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
+using EDMCreation.Core.Models;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Devices;
+using System.Threading;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -15,35 +19,32 @@ namespace EDMCreation.Core.ViewModels
         public LaunchPageViewModel(IMvxNavigationService navigationService)
         {
             _navigationService = navigationService;
-            ShowCreateAccountViewCommand = new MvxCommand(ShowCreateAccountView);
-            ShowLoginViewCommand = new MvxCommand(ShowLoginView);
-        }
-        public override async Task Initialize()
-        {
-            await base.Initialize();
+            
+            ShowLoadDataViewCommand = new MvxAsyncCommand(ShowLoadDataView);
+            ShowSelectGenreViewCommand = new MvxAsyncCommand(ShowSelectGenreView);
+            BackCommand = new MvxAsyncCommand(GoBack);
         }
 
-        private string _solutionUri = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
-        private string _logoUri = "EDMCreation.Core\\Images\\temp_logo.png";
+        public MvxAsyncCommand ShowLoadDataViewCommand { get; set; }
 
-        public string LogoUri
+        public async Task ShowLoadDataView()
         {
-            get
-            {
-                return Path.Combine(_solutionUri, _logoUri);
-            }
+            await _navigationService.Navigate<LoadDataViewModel>();
+        }
+        public MvxAsyncCommand ShowSelectGenreViewCommand { get; set; }
+
+        public async Task ShowSelectGenreView()
+        {
+            await _navigationService.Navigate<SelectGenreViewModel>();
         }
 
-        public MvxCommand ShowCreateAccountViewCommand { get; set; }
-        public void ShowCreateAccountView()
+        public MvxAsyncCommand BackCommand { get; set; }
+
+        public async Task GoBack()
         {
-            _navigationService.Navigate<CreateAccountViewModel>();
+            await _navigationService.Close(this);
         }
-        public MvxCommand ShowLoginViewCommand { get; set; }
-        public void ShowLoginView()
-        {
-            _navigationService.Navigate<LoginViewModel>();
-        }
+
 
     }
 }

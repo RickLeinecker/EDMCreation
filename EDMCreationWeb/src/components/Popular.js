@@ -17,11 +17,17 @@ class Popular extends Component {
 		super(props);
 
 		this.state = {
-			songs: {}
+			songs: []
 		}
+
+		this.fetchSongs = this.fetchSongs.bind(this);
 	}
 
 	componentDidMount() {
+		this.fetchSongs();
+	}
+
+	fetchSongs() {
 		axios.get("http://localhost:5000/api/testsongs")
 			.then(res => this.setState({ songs: res.data }));
 	}
@@ -34,7 +40,7 @@ class Popular extends Component {
 				<Typography variant="h5" className={classes.title}>
 					Popular
                 </Typography>
-				<Songs songs={this.state.songs} />
+				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
 			</div>
 		)
 	}

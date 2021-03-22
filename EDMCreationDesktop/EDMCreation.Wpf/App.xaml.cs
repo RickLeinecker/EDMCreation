@@ -11,7 +11,12 @@ namespace EDMCreation.Wpf
     {
         protected override void RegisterSetup()
         {
-            this.RegisterSetupType<MvxWpfSetup<Core.App>>();
+            this.RegisterSetupType<Setup>();
+        }
+
+        private void MvxApplication_Startup(object sender, System.Windows.StartupEventArgs e)
+        {
+
         }
     }
 }

@@ -18,7 +18,7 @@ class Search extends Component {
 		super(props);
 
 		this.state = {
-			songs: {}
+			songs: []
 		}
 	}
 
