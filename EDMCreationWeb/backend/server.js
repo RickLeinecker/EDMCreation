@@ -1,25 +1,41 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
 require('dotenv').config();
-
 const app = express();
 const port = process.env.PORT || 5000;//file or 5000
 
+//for gridfs use
+const bodyParser = require('body-parser');
+const path = require('path');
+const crypto = require('crypto');
+const multer = require('multer');
+const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+const methodOverride = require('method-override');
+
+
 app.use(cors());
 app.use(express.json());
+//added for gridfs
+app.use(bodyParser.json());
+app.use(methodOverride('_method'));
 
 
 // MongoDB Database
 const uri = process.env.ATLAS_URI;//for connection
-mongoose.connect(uri, { 
+mongoose.connect(uri, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true }
+    useUnifiedTopology: true
+}
 );
 const connection = mongoose.connection;
+
+let gfs;
 connection.once('open', () => {
+    gfs = Grid(connection.db, mongoose.mongo);
+    gfs.collection('uploads');
     console.log("MongoDB database connection established successfully");
 });
 

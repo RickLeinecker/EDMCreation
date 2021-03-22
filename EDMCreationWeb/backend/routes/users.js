@@ -28,7 +28,9 @@ router.route('/signup').post([
               return res.status(400).json({ msg: "This Username has been taken" });
         } else {//no collisions
             //creating user
-            const newUser = new User({ username, email, password });
+            const listens_count = 0;
+            const upload_count = 0;
+            const newUser = new User({ username, email, password, listens_count, upload_count });
             // hashing password before storing it in database
             bcrypt.genSalt(10, (err, salt) => {
               bcrypt.hash(newUser.password, salt, (err, hash) => {

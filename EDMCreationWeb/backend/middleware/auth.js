@@ -3,7 +3,7 @@ require('dotenv').config();
 
 function auth(req, res, next){
     const token = req.header('x-auth-token');  //FOR WHEN I CAN FIGURE OUT HOW TO SWAGGER A HEADER
-   
+
     if(!token){//no token provided
         return res.status(401).json({ msg: 'No Auth token provided, access denied'});
     }
@@ -23,14 +23,20 @@ function auth(req, res, next){
         if(time>pClaim.Expires){//reject from expiration
             return res.status(401).json({ msg: 'Expired token provided, access denied'});
         }
-        
+
+        req.body.uName = pClaim.Username;
         req.body.ID = pClaim.ID;//Passing token User Id 
+        
         next();
 
 
     }else{//invalid token provided
         return res.status(401).json({ msg: 'Invalid token provided, access denied'});
     }
+
+
+
 }
+
 
 module.exports = auth;

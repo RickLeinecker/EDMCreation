@@ -12,7 +12,7 @@ paths:
     post:
       summary: test registration
       tags:
-        - test endpoints 
+        - account 
       requestBody:
         content:
           application/json:
@@ -80,7 +80,7 @@ paths:
     post:
       summary: test login
       tags:
-        - test endpoints 
+        - account 
       requestBody:
         content:
           application/json:
@@ -140,27 +140,25 @@ paths:
                           type: string
   /api/compositions/upload:
     post:
-      summary: auth check
+      summary: song upload
+      description: file and user id needed
       tags:
-        - test endpoints 
+        - compositions
       parameters:
         - in: header
           name: x-auth-token
           schema:
             type: string
-            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWNjMzk5NzNjMTg0ZDEwMGRlY2JlIiwiRXhwaXJlcyI6MTYxMzIzNTg5NzE3N30.0mjYavOz0-cn5yJOHiojrfG-T-hav6T2A2MgKD9W9qlSqVGaYpbfaKVAwgscan264CwqzfB5mZIKnGiWa4oO-w"
+            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
-                title:
+                file:
                   type: string
-                  example: "Treven's song"    
-                description:
-                  type: string
-                  example: "This is a lovely song"              
+                  format: binary
       responses:
         '200':
           description: Successful
@@ -206,3 +204,69 @@ paths:
                           type: string
                         location:
                           type: string
+  /api/compositions/play/c0a8c417b9a23eade6573acfe8d77f3c.mid:
+    get:
+      summary: load file and increment play
+      tags:
+        - compositions
+      parameters:
+        - in: header
+          name: x-auth-token
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/popular/2:
+    get:
+      summary: load page amount
+      tags:
+        - compositions
+      parameters:
+        - in: header
+          name: x-auth-token
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
