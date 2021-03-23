@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Melanchall.DryWetMidi.Interaction;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -6,16 +7,16 @@ using System.Windows.Data;
 
 namespace EDMCreation.Wpf.ValueConverters
 {
-    public class SeekBarValueConverter : BaseValueConverter<float, float>, IValueConverter
+    public class SeekBarValueConverter : BaseValueConverter<ITimeSpan, long>, IValueConverter
     {
-        protected override float Convert(float value, Type TargetType, object parameter, System.Globalization.CultureInfo cultureInfo)
+        protected override long Convert(ITimeSpan value, Type TargetType, object parameter, System.Globalization.CultureInfo cultureInfo)
         {
-            return value * 10;
+            return TimeConverter.ConvertFrom(value, TempoMap.Default);
         }
 
-        protected override float ConvertBack(float value, Type targetType, object parameter, CultureInfo culture)
+        protected override ITimeSpan ConvertBack(long value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value / 10;
+            return TimeConverter.ConvertTo(value, TimeSpanType.Midi, TempoMap.Default);
         }
     }
 }

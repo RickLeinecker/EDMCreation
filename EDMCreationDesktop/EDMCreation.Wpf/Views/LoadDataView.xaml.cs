@@ -10,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EDMCreation.Core.ViewModels;
+using Microsoft.Win32;
 using MvvmCross.Platforms.Wpf.Views;
 
 namespace EDMCreation.Wpf.Views
@@ -22,6 +24,17 @@ namespace EDMCreation.Wpf.Views
         public LoadDataView()
         {
             InitializeComponent();
+        }
+
+        private void OnOpenDialogButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+                var viewModel = (LoadDataViewModel)DataContext;
+                viewModel.HandleFileCommand.Execute(dialog.FileName);
+            }
         }
     }
 }

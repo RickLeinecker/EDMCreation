@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EDMCreation.Core.Services
+namespace EDMCreation.Core.Services.Interfaces
 {
     public interface ITrainingService
     {

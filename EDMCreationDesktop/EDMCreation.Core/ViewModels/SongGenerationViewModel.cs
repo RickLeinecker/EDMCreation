@@ -9,8 +9,8 @@ using System.Diagnostics;
 using MvvmCross.Presenters.Hints;
 using MvvmCross;
 using System;
-using EDMCreation.Core.Services;
 using Melanchall.DryWetMidi.Devices;
+using EDMCreation.Core.Services.Interfaces;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -51,6 +51,12 @@ namespace EDMCreation.Core.ViewModels
         private int _totalGens;
         public int TotalGens { get { return _totalGens; } set { SetProperty(ref _totalGens, value); } }
 
+        private bool _notOnFirstGen;
+        public bool NotOnFirstGen { get { return _notOnFirstGen; } set { SetProperty(ref _notOnFirstGen, value); } }
+
+        private bool _notOnLastGen;
+        public bool NotOnLastGen { get { return _notOnLastGen; } set { SetProperty(ref _notOnLastGen, value); } }
+
         private List<SongViewModel> _currentSongPanels;
         public List<SongViewModel> CurrentSongPanels { get { return _currentSongPanels; } }
 
@@ -63,8 +69,8 @@ namespace EDMCreation.Core.ViewModels
             _trainingService = trainingService;
 
             BackCommand = new MvxAsyncCommand(GoBack);
-            PrevGenCommand = new MvxAsyncCommand(PreviousGeneration);
-            NextGenCommand = new MvxAsyncCommand(NextGeneration);
+            PrevGenCommand = new MvxCommand(PreviousGeneration);
+            NextGenCommand = new MvxCommand(NextGeneration);
             ShowCommand = new MvxCommand(Show);
 
             // use training file to check for progress
@@ -126,8 +132,17 @@ namespace EDMCreation.Core.ViewModels
 
         public void ShowGeneration(int gen)
         {
+            NotOnFirstGen = true;
+            NotOnLastGen = true;
+
             _currentGen = gen;
             _currentContainer = _songsContainers[gen];
+
+            if (_currentGen == 0)
+                NotOnFirstGen = false;
+            if (_currentGen + 1 == _totalGens)
+                NotOnLastGen = false;
+
             RaisePropertyChanged(nameof(CurrentContainer));
         }
 
@@ -144,17 +159,18 @@ namespace EDMCreation.Core.ViewModels
             await _navigationService.Close(this);
         }
 
-        public MvxAsyncCommand PrevGenCommand { get; set; }
+        public MvxCommand PrevGenCommand { get; set; }
 
-        public MvxAsyncCommand NextGenCommand { get; set; }
+        public MvxCommand NextGenCommand { get; set; }
 
-        public async Task PreviousGeneration()
+        public void PreviousGeneration()
         {
-            ShowGeneration(_currentGen - 1);
+            if (NotOnFirstGen)
+                ShowGeneration(_currentGen - 1);
         }
-        public async Task NextGeneration()
+        public void NextGeneration()
         {
-            if (_currentGen + 1 < _totalGens)
+            if (NotOnLastGen)
                 ShowGeneration(_currentGen + 1);
         }
 

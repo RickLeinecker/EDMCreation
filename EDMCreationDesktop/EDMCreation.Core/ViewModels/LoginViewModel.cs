@@ -1,5 +1,5 @@
 ﻿using EDMCreation.Core.Models;
-using EDMCreation.Core.Services;
+using EDMCreation.Core.Services.Interfaces;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;

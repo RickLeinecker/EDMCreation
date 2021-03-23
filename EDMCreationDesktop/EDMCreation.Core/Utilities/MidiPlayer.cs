@@ -32,7 +32,12 @@ namespace EDMCreation.Core.Utilities
         public ITimeSpan CurrentTime
         {
             get { return playback.GetCurrentTime(TimeSpanType.Midi); }
-            set { playback.MoveToTime(value); }
+            set 
+            {
+                if (value != null)
+                    playback.MoveToTime(value);
+                    
+            }
         }
 
         public event EventHandler PlaybackStarted;

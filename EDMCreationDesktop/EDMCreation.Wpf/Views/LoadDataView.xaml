@@ -32,8 +32,18 @@
         <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command BackCommand" Grid.Row="1" Grid.Column="1">
             <materialDesign:PackIcon Kind="ArrowBack" />
         </Button>
-        <Button Grid.Row="2" Grid.Column="2" Content="Load from PC" Margin="20" MinHeight="30" />
-        <Button mvx:Bi.nd="Command ShowLoginViewCommand" Grid.Row="3" Grid.Column="2" Content="Load from Account" Margin="20" MinHeight="30" />
+        <Button Style="{DynamicResource MaterialDesignRaisedButton}" Grid.Row="2" Grid.Column="2" Margin="20" MinHeight="30" Click="OnOpenDialogButton_Click">
+            <StackPanel Orientation="Horizontal" >
+                <Label Content="Load from PC" />
+                <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center" Margin="10 0 0 0"/>
+            </StackPanel>
+        </Button>
+        <Button Style="{DynamicResource MaterialDesignRaisedButton}" mvx:Bi.nd="Command ShowLoginViewCommand" Grid.Row="3" Grid.Column="2" Margin="20" MinHeight="30">
+            <StackPanel Orientation="Horizontal" >
+                <Label Content="Load from Account" />
+                <materialDesign:PackIcon Kind="User" VerticalAlignment="Center" Margin="10 0 0 0"/>
+            </StackPanel>
+        </Button>
 
     </Grid>
 </views:MvxWpfView>

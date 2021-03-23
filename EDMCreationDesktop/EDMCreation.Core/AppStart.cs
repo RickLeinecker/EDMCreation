@@ -5,6 +5,7 @@ using MvvmCross.Views;
 using EDMCreation.Core.ViewModels;
 using System.Threading.Tasks;
 using MvvmCross.Exceptions;
+using EDMCreation.Core.Services.Interfaces;
 
 namespace EDMCreation.Core
 {

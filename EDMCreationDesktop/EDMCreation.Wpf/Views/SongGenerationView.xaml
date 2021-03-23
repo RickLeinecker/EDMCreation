@@ -29,10 +29,10 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-            <Button mvx:Bi.nd="Command Command1" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation">
+            <Button mvx:Bi.nd="Command NextGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation" IsEnabled="{Binding NotOnLastGen}">
                 <materialDesign:PackIcon Kind="CodeLessThan" />
             </Button>
-            <Button mvx:Bi.nd="Command Command2" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation">
+            <Button mvx:Bi.nd="Command PrevGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation" IsEnabled="{Binding NotOnFirstGen}">
                 <materialDesign:PackIcon Kind="CodeGreaterThan" />
             </Button>
         </StackPanel>

@@ -23,18 +23,17 @@
         <Button mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding HasStarted}" ToolTip="Stop">
             <materialDesign:PackIcon Kind="Stop" />
         </Button>
-        <Slider Style="{DynamicResource MaterialDesignSlider}" Width="200" 
-                Value="{Binding SeekValue, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}" 
+        <components:SeekBar Style="{DynamicResource MaterialDesignSlider}" Width="200" 
+                Value="{Binding CurrentTime, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}"
+                Maximum="{Binding TotalTime, Converter={StaticResource SeekBarValueConverter}, Mode=OneWay}"
                 VerticalAlignment="Center" />
         <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" x:Name="addRemoveButton"
                   Style="{DynamicResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
                   ToolTip="{Binding AddRemoveToolTip}">
             <materialDesign:PackIcon Kind="Plus" />
         </CheckBox>
-        <Button x:Name="saveButton" mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="Save as midi file">
+        <Button x:Name="saveButton" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="Save as midi file" Click="OnSaveButton_Click">
             <materialDesign:PackIcon Kind="Floppy" />
         </Button>
-        <TextBlock Text="{Binding TotalTime, Mode=OneWay}"/>
-        <TextBlock Text="{Binding CurrentTime, Mode=OneWay}"/>
     </StackPanel>
 </views:MvxWpfView>

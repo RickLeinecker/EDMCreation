@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using EDMCreation.Core.Models;
 
-namespace EDMCreation.Core.Services
+namespace EDMCreation.Core.Services.Interfaces
 {
     public interface IAuthenticationService
     {

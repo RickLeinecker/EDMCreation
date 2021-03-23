@@ -10,7 +10,7 @@ namespace EDMCreation.Core.ViewModels
 {
     public class SongViewModel : MvxViewModel
     {
-        public string MidiFile
+        public string MidiFilePath
         {
             get { return _midiPlayer.MidiFilePath; }
         }
@@ -67,18 +67,7 @@ namespace EDMCreation.Core.ViewModels
         public ITimeSpan CurrentTime
         {
             get { return _midiPlayer.CurrentTime; }
-            set { _midiPlayer.CurrentTime = value; }            
-        }
-
-        // floating point value between 0 and 1
-        public float SeekValue
-        {
-            get { return ConvertToSeekValue(TotalTime, CurrentTime); }
-            set 
-            {
-                CurrentTime = ConvertToCurrentTime(TotalTime, value);
-                RaisePropertyChanged(nameof(CurrentTime));
-            }
+            set { _midiPlayer.CurrentTime = value; }
         }
 
         private IMidiPlayer _midiPlayer;
@@ -95,11 +84,10 @@ namespace EDMCreation.Core.ViewModels
 
             PlayPauseCommand = new MvxCommand(PlayPause);
             StopCommand = new MvxCommand(Stop);
+            SaveCommand = new MvxCommand(Save);
         }
 
         public MvxCommand PlayPauseCommand { get; set; }
-        public MvxCommand StopCommand { get; set; }
-
         public void PlayPause()
         {
             if (IsPlaying)
@@ -107,10 +95,30 @@ namespace EDMCreation.Core.ViewModels
             else
                 Play();
         }
-
         public void Play() { _midiPlayer.Play(); }
         public void Pause() { _midiPlayer.Pause(); }
+
+        public MvxCommand StopCommand { get; set; }
         public void Stop() { _midiPlayer.Stop(); }
+
+        public MvxCommand SaveCommand { get; set; }
+        public void Save()
+        {
+
+        }
+
+        public void SetTimeHalf()
+        {
+            if (!IsPlaying)
+                CurrentTime = TotalTime.Divide(2.0);
+
+            else
+            {
+                Pause();
+                CurrentTime = TotalTime.Divide(2.0);
+                Play();
+            }
+        }
 
         private void OnStarted(object sender, EventArgs e)
         {
@@ -131,20 +139,7 @@ namespace EDMCreation.Core.ViewModels
 
         private void OnCurrentTimeChanged(object sender, EventArgs e)
         {
-            RaisePropertyChanged(nameof(SeekValue));
-        }
-
-        private float ConvertToSeekValue(ITimeSpan totalT, ITimeSpan currentT)
-        {
-            long total = TimeConverter.ConvertFrom(totalT, TempoMap.Default);
-            long current = TimeConverter.ConvertFrom(currentT, TempoMap.Default);
-
-            return (float)current / total;
-        }
-
-        private ITimeSpan ConvertToCurrentTime(ITimeSpan totalT, float seekValue)
-        {
-            return totalT.Multiply(seekValue);
+            RaisePropertyChanged(nameof(CurrentTime));
         }
 
     }
