@@ -65,31 +65,31 @@ namespace EDMCreation.Core.Utilities
         protected virtual void OnPlaybackStarted(EventArgs e)
         {
             EventHandler handler = PlaybackStarted;
-            handler.Invoke(this, e);
+            handler?.Invoke(this, e);
         }
 
         protected virtual void OnPlaybackEnded(EventArgs e)
         {
             EventHandler handler = PlaybackEnded;
-            handler.Invoke(this, e);
+            handler?.Invoke(this, e);
         }
 
         protected virtual void OnPlaybackPaused(EventArgs e)
         {
             EventHandler handler = PlaybackPaused;
-            handler.Invoke(this, e);
+            handler?.Invoke(this, e);
         }
 
         protected virtual void OnPlaybackStopped(EventArgs e)
         {
             EventHandler handler = PlaybackStopped;
-            handler.Invoke(this, e);
+            handler?.Invoke(this, e);
         }
 
         protected virtual void OnTimeSet(EventArgs e)
         {
             EventHandler handler = TimeSet;
-            handler.Invoke(this, e);
+            handler?.Invoke(this, e);
         }
 
         public MidiPlayer(string midiFilePath)
