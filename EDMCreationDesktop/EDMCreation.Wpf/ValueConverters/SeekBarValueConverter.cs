@@ -7,16 +7,16 @@ using System.Windows.Data;
 
 namespace EDMCreation.Wpf.ValueConverters
 {
-    public class SeekBarValueConverter : BaseValueConverter<ITimeSpan, long>, IValueConverter
+    public class SeekBarValueConverter : BaseValueConverter<ITimeSpan, double>, IValueConverter
     {
-        protected override long Convert(ITimeSpan value, Type TargetType, object parameter, System.Globalization.CultureInfo cultureInfo)
+        protected override double Convert(ITimeSpan value, Type TargetType, object parameter, System.Globalization.CultureInfo cultureInfo)
         {
-            return TimeConverter.ConvertFrom(value, TempoMap.Default);
+            return (double)TimeConverter.ConvertFrom(value, TempoMap.Default);
         }
 
-        protected override ITimeSpan ConvertBack(long value, Type targetType, object parameter, CultureInfo culture)
+        protected override ITimeSpan ConvertBack(double value, Type targetType, object parameter, CultureInfo culture)
         {
-            return TimeConverter.ConvertTo(value, TimeSpanType.Midi, TempoMap.Default);
+            return TimeConverter.ConvertTo((long)value, TimeSpanType.Midi, TempoMap.Default);
         }
     }
 }

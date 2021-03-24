@@ -20,13 +20,14 @@
         <Button mvx:Bi.nd="Command PlayPauseCommand" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="{Binding PlayPauseToolTip}">
             <materialDesign:PackIcon Kind="{Binding PlayPauseIcon}" />
         </Button>
-        <Button mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding HasStarted}" ToolTip="Stop">
+        <Button mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding IsStopButtonEnabled}" ToolTip="Stop">
             <materialDesign:PackIcon Kind="Stop" />
         </Button>
-        <components:SeekBar Style="{DynamicResource MaterialDesignSlider}" Width="200" 
-                Value="{Binding CurrentTime, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}"
+        <components:SeekBar Style="{DynamicResource MaterialDesignSlider}" Width="200" IsDragging="{Binding IsDragging, Mode=OneWayToSource}"
+                SeekValue="{Binding CurrentTime, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}"
                 Maximum="{Binding TotalTime, Converter={StaticResource SeekBarValueConverter}, Mode=OneWay}"
-                VerticalAlignment="Center" />
+                VerticalAlignment="Center" Cursor="Hand">
+        </components:SeekBar>
         <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" x:Name="addRemoveButton"
                   Style="{DynamicResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
                   ToolTip="{Binding AddRemoveToolTip}">

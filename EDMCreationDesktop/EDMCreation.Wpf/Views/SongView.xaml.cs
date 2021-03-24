@@ -18,12 +18,13 @@ namespace EDMCreation.Wpf.Views
         private void OnSaveButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var viewModel = (SongViewModel)DataContext;
-            SaveFileDialog dialog = new SaveFileDialog();
-
-            dialog.Filter = "midi files (*.mid)|*.mid";
-            dialog.FilterIndex = 1;
-            dialog.FileName = "midifile";
-            dialog.RestoreDirectory = true;
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Filter = "midi files (*.mid)|*.mid",
+                FilterIndex = 1,
+                FileName = "midifile",
+                RestoreDirectory = true
+            };
 
             if (dialog.ShowDialog() == true)
             {

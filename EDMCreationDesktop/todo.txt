@@ -1,0 +1,5 @@
+- dialog service for confirmation dialogs, options dialogs, etc.
+- song generator (interface and class)
+- hook up to database
+- login/authentication
+- session file/folder saving and loading

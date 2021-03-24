@@ -19,6 +19,7 @@ namespace EDMCreation.Core.ViewModels
         {
             get { return IsPlaying ? "Pause" : "Play"; }
         }
+
         public string PlayPauseToolTip
         { 
             get { return IsPlaying ? "Pause" : "Play"; }
@@ -33,14 +34,12 @@ namespace EDMCreation.Core.ViewModels
 
         public bool IsPlaying
         {
-            get { return _midiPlayer == null ? false : _midiPlayer.IsPlaying; }
+            get { return _midiPlayer != null && _midiPlayer.IsPlaying; }
         }
 
-        private bool _hasStarted = false;
-        public bool HasStarted
+        public bool IsStopButtonEnabled
         {
-            get { return _hasStarted; }
-            set { SetProperty(ref _hasStarted, value); }
+            get { return !_midiPlayer.IsAtStart; }
         }
 
         private bool _isSelected;
@@ -70,7 +69,33 @@ namespace EDMCreation.Core.ViewModels
             set { _midiPlayer.CurrentTime = value; }
         }
 
-        private IMidiPlayer _midiPlayer;
+
+        // feels like a scuffed way to pause while seeking, but oh well
+        private bool paused = false;
+        public bool IsDragging
+        {
+            set
+            { 
+                if (value)
+                {
+                    if (IsPlaying)
+                    {
+                        Pause();
+                        paused = true;
+                    }
+                }
+                else
+                {
+                    if (paused)
+                    {
+                        Play();
+                        paused = false;
+                    }
+                }
+            } 
+        }
+
+        private readonly IMidiPlayer _midiPlayer;
 
         public SongViewModel(IMidiPlayer midiPlayer, int songNumber)
         {
@@ -80,6 +105,7 @@ namespace EDMCreation.Core.ViewModels
             _midiPlayer.PlaybackStarted += OnStarted;
             _midiPlayer.PlaybackEnded += OnEnded;
             _midiPlayer.PlaybackPaused += OnPaused;
+            _midiPlayer.TimeSet += OnTimeSet;
             PlaybackCurrentTimeWatcher.Instance.CurrentTimeChanged += OnCurrentTimeChanged;
 
             PlayPauseCommand = new MvxCommand(PlayPause);
@@ -107,34 +133,24 @@ namespace EDMCreation.Core.ViewModels
 
         }
 
-        public void SetTimeHalf()
-        {
-            if (!IsPlaying)
-                CurrentTime = TotalTime.Divide(2.0);
-
-            else
-            {
-                Pause();
-                CurrentTime = TotalTime.Divide(2.0);
-                Play();
-            }
-        }
-
         private void OnStarted(object sender, EventArgs e)
         {
-            _hasStarted = true;
             RaiseAllPropertiesChanged();
         }
 
         private void OnEnded(object sender, EventArgs e)
         {
-            _hasStarted = false;
             RaiseAllPropertiesChanged();
         }
 
         private void OnPaused(object sender, EventArgs e)
         {
             RaiseAllPropertiesChanged();
+        }
+
+        private void OnTimeSet(object sender, EventArgs e)
+        {
+            RaisePropertyChanged(nameof(IsStopButtonEnabled));
         }
 
         private void OnCurrentTimeChanged(object sender, EventArgs e)

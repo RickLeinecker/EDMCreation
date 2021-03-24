@@ -11,10 +11,16 @@ namespace EDMCreation.Core.Utilities
         private static OutputDevice _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
         public static OutputDevice OutputDevice { set { _outputDevice = value; } }
 
-        private MidiFile midiFile;
-        private Playback playback;
-        private bool reachedEnd = true;
-        private string midiFilePath;
+        private readonly MidiFile midiFile;
+        private readonly Playback playback;
+        private bool _reachedEnd = false;
+        private bool _isAtStart = true;
+        private readonly string midiFilePath;
+
+        public bool IsAtStart
+        {
+            get { return _isAtStart; }
+        }
         public string MidiFilePath
         {
             get { return midiFilePath; }
@@ -32,17 +38,29 @@ namespace EDMCreation.Core.Utilities
         public ITimeSpan CurrentTime
         {
             get { return playback.GetCurrentTime(TimeSpanType.Midi); }
-            set 
+            set
             {
-                if (value != null)
-                    playback.MoveToTime(value);
-                    
+                _reachedEnd = false;
+                _isAtStart = false;
+
+                playback.MoveToTime(value);
+
+                if (value.CompareTo(Duration) == 0)
+                    _reachedEnd = true;
+
+                if (TimeConverter.ConvertFrom(value, TempoMap.Default) == 0 && !IsPlaying)
+                    _isAtStart = true;
+
+
+                OnTimeSet(new EventArgs());
             }
         }
 
         public event EventHandler PlaybackStarted;
         public event EventHandler PlaybackEnded;
         public event EventHandler PlaybackPaused;
+        public event EventHandler PlaybackStopped;
+        public event EventHandler TimeSet;
 
         protected virtual void OnPlaybackStarted(EventArgs e)
         {
@@ -62,6 +80,18 @@ namespace EDMCreation.Core.Utilities
             handler.Invoke(this, e);
         }
 
+        protected virtual void OnPlaybackStopped(EventArgs e)
+        {
+            EventHandler handler = PlaybackStopped;
+            handler.Invoke(this, e);
+        }
+
+        protected virtual void OnTimeSet(EventArgs e)
+        {
+            EventHandler handler = TimeSet;
+            handler.Invoke(this, e);
+        }
+
         public MidiPlayer(string midiFilePath)
         {
             this.midiFilePath = midiFilePath;
@@ -75,11 +105,13 @@ namespace EDMCreation.Core.Utilities
 
         public void Play()
         {
-            if (reachedEnd)
+            _isAtStart = false;
+
+            if (_reachedEnd)
                 playback.MoveToStart();
 
             playback.Start();
-            reachedEnd = false;
+            _reachedEnd = false;
             OnPlaybackStarted(new EventArgs());
         }
 
@@ -87,7 +119,11 @@ namespace EDMCreation.Core.Utilities
         {
             playback.Stop();
             playback.MoveToStart();
-            OnPlaybackEnded(new EventArgs());
+            _isAtStart = true;
+
+            EventArgs args = new EventArgs();
+            OnPlaybackStopped(args);
+            OnPlaybackEnded(args);
         }
 
         public void Pause()
@@ -104,7 +140,7 @@ namespace EDMCreation.Core.Utilities
 
         private void PlaybackFinished(object sender, EventArgs e)
         {
-            reachedEnd = true;
+            _reachedEnd = true;
             OnPlaybackEnded(new EventArgs());
         }
 

@@ -14,7 +14,7 @@ namespace EDMCreation.Core.ViewModels
     {
         public string Test { get; set; }
 
-        IMvxNavigationService _navigationService;
+        private readonly IMvxNavigationService _navigationService;
         public LoadDataViewModel(IMvxNavigationService navigationService)
         {
             _navigationService = navigationService;
