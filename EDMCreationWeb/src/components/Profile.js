@@ -75,14 +75,19 @@ class Profile extends Component {
     constructor(props) {
         super(props);
 
-        this.parameters = qs.parse(this.props.location.search);
-
         this.state = {
             value: 0,
             songs: [],
             user: [],
-            userId: this.parameters.userid,
             currentUser: [localStorage.getItem("username")]
+        }
+
+        if (qs.parse(this.props.location).stringify !== undefined) {
+            this.parameters = qs.parse(this.props.location.search);
+            this.state.userId = this.parameters.userid;
+        }
+        else {
+            this.state.userId = [localStorage.getItem("user_id")];
         }
 
         this.handleChange = this.handleChange.bind(this);

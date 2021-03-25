@@ -107,6 +107,7 @@ class LogIn extends Component {
 			.then(res => {
 				localStorage.setItem("access_token", res.data.sJWT);
 				localStorage.setItem("username", res.data.username);
+				localStorage.setItem("user_id", res.data.user_id);
 
 				if (this.props.originPath) {
 					window.location.href = this.props.originPath;
