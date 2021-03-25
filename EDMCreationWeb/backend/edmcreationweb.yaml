@@ -7,6 +7,16 @@ info:
 servers:
   - url: http://localhost:5000
 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+security:
+  - bearerAuth: []
+
 paths:
   /api/users/signup:
     post:
@@ -26,6 +36,9 @@ paths:
                   type: string
                   example: "treven@treven.com" 
                 password:
+                  type: string
+                  example: "treven123"
+                confirmationPassword:
                   type: string
                   example: "treven123"
                 description:
@@ -144,12 +157,6 @@ paths:
       description: file and user id needed
       tags:
         - compositions
-      parameters:
-        - in: header
-          name: x-auth-token
-          schema:
-            type: string
-            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
       requestBody:
         content:
           multipart/form-data:
@@ -159,6 +166,10 @@ paths:
                 file:
                   type: string
                   format: binary
+                title:
+                  type: string
+                genre:
+                  type: string
       responses:
         '200':
           description: Successful
@@ -204,50 +215,21 @@ paths:
                           type: string
                         location:
                           type: string
-  /api/compositions/play/c0a8c417b9a23eade6573acfe8d77f3c.mid:
-    get:
-      summary: load file and increment play
-      tags:
-        - compositions
-      parameters:
-        - in: header
-          name: x-auth-token
-          schema:
-            type: string
-            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
-      responses:
-        '200':
-          description: Successful
-          content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-        '400':
-          description: Failed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-  /api/compositions/popular/2:
+  /api/compositions/popular:
     get:
       summary: load page amount
       tags:
         - compositions
       parameters:
-        - in: header
-          name: x-auth-token
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: user
           schema:
             type: string
-            example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJVc2VybmFtZSI6IlRyZXZlbiIsIklEIjoiNjAxZWVhNzg3YjIyODAzNDMwNDg0MzhjIiwiRXhwaXJlcyI6MTYxNjk0MDgwODg3OH0.ahlR5rzx8ZTaIrv5cxpjQSkFlDvaCbxCbNYAo2RoGJYg1Ha2DaR5z-s3fQr-9Fhb7EYd-dQ38JKGrDeen4cShw"
       responses:
         '200':
           description: Successful

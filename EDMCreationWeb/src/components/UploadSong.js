@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import { DropzoneArea } from "material-ui-dropzone";
 import LogIn from "./LogIn";
+import { url } from "./URL";
 
 const styles = theme => ({
     title: {
@@ -180,14 +181,27 @@ class UploadSong extends Component {
     handleSubmit(e) {
         e.preventDefault();
 
-        const claims = {
-            email: this.state.email,
-            username: this.state.username,
-            password: this.state.password,
-            confirmationPassword: this.state.confirmationPassword
+        const formData = new FormData();
+        formData.append("title", this.state.title);
+        formData.append("genre", this.state.genre);
+        formData.append("file", this.state.file);
+
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
         };
 
-        window.location.href = "/songuploaded";
+        axios.post(url + "/api/compositions/upload", formData, config)
+            .then(res => {
+                alert("The file is successfully uploaded");
+            })
+            .catch(err => {
+                alert(err);
+            });
+
+        // window.location.href = "/songuploaded";
     }
 
     render() {

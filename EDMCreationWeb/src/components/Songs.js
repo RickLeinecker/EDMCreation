@@ -194,15 +194,15 @@ class Songs extends Component {
 										</Grid>
 										<Grid item xs>
 											<Typography variant="body2" className={classes.date}>
-												Uploaded on {song.date}
+												Uploaded on {(new Date(song.date)).toDateString().substr(3)}
 											</Typography>
 										</Grid>
 									</Grid>
 									<Grid item xs={12} sm container direction="column" spacing={2}>
 										<Grid item xs>
 											<section className="player" id={"section" + i}>
-												<midi-visualizer src={sample} />
-												<midi-player src={sample}
+												<midi-visualizer src={song.path} />
+												<midi-player src={song.path}
 													visualizer={"#section" + i + " midi-visualizer"}
 													sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus" />
 											</section>

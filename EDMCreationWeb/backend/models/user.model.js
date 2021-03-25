@@ -25,6 +25,7 @@ const userSchema = new Schema(
                 image_id: { type: mongoose.Types.ObjectId },
                 file_id: { type: mongoose.Types.ObjectId },
                 filename: { type: String },
+                path: { type: String },
                 listens: { type: Number },
                 favorites: { type: Number },
                 comment_count: { type: Number },

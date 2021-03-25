@@ -29,8 +29,7 @@ class ProfileIcon extends Component {
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testuser")
-            .then(res => this.setState({ username: res.data.username }));
+        this.setState({ username: [localStorage.getItem("username")] });
     }
 
     handleClick(e) {

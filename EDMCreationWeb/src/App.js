@@ -59,7 +59,7 @@ class App extends Component {
 					<CssBaseline /> {/* For background color */}
 					<NavBar />
 					<Route path="/" exact component={Popular} />
-					<Route path="/popular" component={Popular} />
+					<Route path="/popular" render={(props) => <Popular {...props} key={Date.now()}/>} />
 					<Route path="/topfavorites" component={TopFavorites} />
 					<Route path="/browsegenres" component={BrowseGenres} />
 					<Route path="/random" component={Random} />

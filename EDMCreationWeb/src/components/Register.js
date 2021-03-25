@@ -96,7 +96,25 @@ class Register extends Component {
             confirmationPassword: this.state.confirmationPassword
         };
 
-        window.location.href = "/registercompleted";
+
+        axios.post("http://localhost:5000/api/users/signup", claims)
+            .then(res => {
+                window.location.href = "/registercompleted";
+            })
+            .catch(err => {
+                if (err.response.data.errors !== undefined) {
+                    var errMsg = "";
+
+                    err.response.data.errors.map(validationErr => {
+                        errMsg += (validationErr.msg + "<br />");
+                    })
+
+                    document.getElementById("errorMessage").innerHTML = errMsg;
+                }
+                else {
+                    document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+                }
+            });
     }
 
     render() {
@@ -179,7 +197,7 @@ class Register extends Component {
                                                 />
                                             </Grid>
                                             <Grid item>
-												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+												<div id="errorMessage" className={classes.errorMessage}></div>
 											</Grid>
                                             <Grid item>
                                                 <Grid container justify="center">

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
+import { url } from "./URL";
 
 const styles = theme => ({
 	loginForm: {
@@ -102,18 +103,21 @@ class LogIn extends Component {
 			password: this.state.password
 		};
 
-		axios.post("http://localhost:5000/api/testlogin")
+		axios.post(url + "/api/users/login", claims)
 			.then(res => {
-				localStorage.setItem("access_token", res.data.access_token);
+				localStorage.setItem("access_token", res.data.sJWT);
 				localStorage.setItem("username", res.data.username);
-			});
 
-		if (this.props.originPath) {
-			window.location.href = this.props.originPath;
-		}
-		else {
-			window.location.href = "/";
-		}
+				if (this.props.originPath) {
+					window.location.href = this.props.originPath;
+				}
+				else {
+					window.location.href = "/";
+				}
+			})
+			.catch(err => {
+				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+			});
 	}
 
 	render() {
@@ -172,7 +176,7 @@ class LogIn extends Component {
 												/>
 											</Grid>
 											<Grid item>
-												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+												<div id="errorMessage" className={classes.errorMessage}></div>
 											</Grid>
 											<Grid item>
 												<Grid container direction="row" justify="space-between" alignItems="center">
