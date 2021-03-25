@@ -254,7 +254,7 @@ paths:
                     type: string
   /api/compositions/user/{user_id}:
     get:
-      summary: Popular songs
+      summary: user compositions
       tags:
         - compositions
       parameters:
@@ -313,6 +313,38 @@ paths:
                     type: boolean
                   message:
                     type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/info/{user_id}:
+    get:
+      summary: Popular songs
+      tags:
+        - compositions
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
         '400':
           description: Failed
           content:

@@ -106,13 +106,13 @@ router.route('/upload').post(auth, parser.single("file"), auth, (req, res) => {
 
 //     //if fields are missing, need to add error here for it and remove song that was just uploaded?
 
-//     const file_id = req.file.id; //id from file being stored
-//     const filename = req.file.filename;
-//     listens = 0; //0 listens
-//     favorites = 0; // 0 favorites
-//     comment_count = 0;
-//     user_id = ID; //for finding accoun
-//     username = uName;
+//    const file_id = req.file.id; //id from file being stored
+//    const filename = req.file.filename;
+//    listens = 0; //0 listens
+//    favorites = 0; // 0 favorites
+//    comment_count = 0;
+//    user_id = ID; //for finding accoun
+//    username = uName;
 
 //     const newComp = new Composition({ title, description, genre, image_id, user_id, username, file_id, listens, favorites, comment_count, filename });//just drop this line for only user upload?
 
