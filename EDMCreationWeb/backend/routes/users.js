@@ -122,7 +122,7 @@ router.route('/login').post(
 
                             const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, key); //token creation
 
-                            res.status(200).json({ sJWT, username: user.username, msg: 'Login successful!' }); //return token in body for log in      
+                            res.status(200).json({ sJWT, username: user.username, user_id: user_id, msg: 'Login successful!' }); //return token in body for log in      
                         } else {
                             return res.status(400).json({ msg: "Incorrect password" });
                         } //end password checking
