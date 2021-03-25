@@ -20,7 +20,7 @@ security:
 paths:
   /api/users/signup:
     post:
-      summary: test registration
+      summary: Registration
       tags:
         - account 
       requestBody:
@@ -91,7 +91,7 @@ paths:
                           type: string
   /api/users/login:
     post:
-      summary: test login
+      summary: Login
       tags:
         - account 
       requestBody:
@@ -153,7 +153,7 @@ paths:
                           type: string
   /api/compositions/upload:
     post:
-      summary: song upload
+      summary: Song upload
       description: file and user id needed
       tags:
         - compositions
@@ -217,7 +217,7 @@ paths:
                           type: string
   /api/compositions/popular:
     get:
-      summary: load page amount
+      summary: Popular songs
       tags:
         - compositions
       parameters:
@@ -228,6 +228,38 @@ paths:
             example: "1"
         - in: query
           name: user
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/user/{user_id}:
+    get:
+      summary: Popular songs
+      tags:
+        - compositions
+      parameters:
+        - in: path
+          name: user_id
           schema:
             type: string
       responses:

@@ -5,6 +5,8 @@ import { AccountBox, PlayArrow, MusicNote } from '@material-ui/icons/';
 import Songs from "./Songs";
 import Following from "./Following";
 import axios from "axios";
+import qs from "query-string";
+import { url } from "./URL";
 
 const styles = theme => ({
     profile: {
@@ -73,11 +75,13 @@ class Profile extends Component {
     constructor(props) {
         super(props);
 
+        this.parameters = qs.parse(this.props.location.search);
+
         this.state = {
             value: 0,
             songs: [],
-            user: {},
-            loggedInUser: "",
+            user: [],
+            userId: this.parameters.userid,
             currentUser: [localStorage.getItem("username")]
         }
 
@@ -89,14 +93,11 @@ class Profile extends Component {
         axios.get("http://localhost:5000/api/testuser")
             .then(res => this.setState({ user: res.data }));
 
-        axios.get("http://localhost:5000/api/testuser")
-            .then(res => this.setState({ loggedInUser: res.data }));
-
         this.fetchSongs();
     }
 
     fetchSongs() {
-        axios.get("http://localhost:5000/api/testsongs")
+        axios.get(url + "/api/compositions/user/" + this.state.userId)
             .then(res => this.setState({ songs: res.data }));
     }
 
@@ -108,12 +109,6 @@ class Profile extends Component {
         const { classes } = this.props;
 
         if (Object.keys(this.state.user).length === 0) {
-            return (
-                null
-            );
-        }
-
-        if (Object.keys(this.state.loggedInUser).length === 0) {
             return (
                 null
             );
@@ -175,10 +170,10 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser == this.state.user.username} />
+                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser === this.state.user.username} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.songs} deletable={this.state.currentUser == this.state.user.username} />
+                    <Songs songs={this.state.songs} deletable={this.state.currentUser === this.state.user.username} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                     <Following user={this.state.user} />

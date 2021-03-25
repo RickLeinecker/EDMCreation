@@ -162,9 +162,9 @@ router.route('/popular').get(async (req, res) => {
             { $unwind: "$compositions" },
             {
                 $project: {
-                    _id: 0,
+                    composition_id: "$compositions._id",
                     title: "$compositions.title",
-                    username: "$compositions.username",
+                    username: "$username",
                     likes: "$compositions.favorites",
                     listens: "$compositions.listens",
                     num_comments: "$compositions.comment_count",
@@ -184,8 +184,36 @@ router.route('/popular').get(async (req, res) => {
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
+});
 
-    //need to also pull images for associated songs?
+router.route('/user/:user_id').get(async (req, res) => {
+    try {
+        const items = await User.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(req.params.user_id) } },
+            { $unwind: "$compositions" },
+            {
+                $project: {
+                    user_id: "$_id",
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    likes: "$compositions.favorites",
+                    listens: "$compositions.listens",
+                    num_comments: "$compositions.comment_count",
+                    date: "$compositions.last_modified",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path"
+                },
+            },
+        ]);
+
+        if (!items) throw Error('No items');
+
+        res.status(200).json(items);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
 });
 
 module.exports = router;

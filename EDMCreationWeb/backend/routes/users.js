@@ -49,7 +49,7 @@ router.route('/signup').post(
                             if (err) return res.status(400).json('Error: ' + err);
                             newUser.password = hash;
                             newUser.save()
-                                //.then(() => res.json('Registration successful!'))
+                                .then(() => res.status(200).json('Registration successful!'))
                                 .catch(err => res.status(400).json('Error: ' + err));
                         });
                     });

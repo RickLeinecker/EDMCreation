@@ -4,6 +4,7 @@ import Songs from "./Songs";
 import axios from "axios";
 import qs from "query-string";
 import PageButtons from "./PageButtons";
+import { url } from "./URL";
 
 const styles = theme => ({
 	title: {
@@ -45,7 +46,7 @@ class Popular extends Component {
 	}
 
 	fetchSongs() {
-		axios.get("http://localhost:5000/api/compositions/popular?page=" + this.state.page)
+		axios.get(url + "/api/compositions/popular?page=" + this.state.page)
 			.then(res => this.setState({ songs: res.data }));
 	}
 
