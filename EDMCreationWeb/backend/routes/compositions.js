@@ -232,10 +232,5 @@ router.route('/postcomment').post(auth, (req, res) => {
         .catch(err => res.status(400).json('Error: ' + err)); 
 });
 
-/*
-router.route('/user/:filename').get((req, res) => {
-    
-});
-*/
 
 module.exports = router;

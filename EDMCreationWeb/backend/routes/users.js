@@ -132,6 +132,15 @@ router.route('/login').post(
                     return res.status(400).json({ msg: "Invalid username" });
                 }
             }); //end user search
-    }); //end login
+}); //end login
+
+
+
+router.route('/info/:user_id').get((req, res) => {
+    
+});
+
+
+
 
 module.exports = router;
