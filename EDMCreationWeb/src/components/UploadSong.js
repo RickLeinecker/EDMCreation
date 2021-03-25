@@ -164,13 +164,13 @@ class UploadSong extends Component {
     }
 
     handleFileUpload(file) {
-        this.setState({ file: file }, function () { this.changeButton() });
+        this.setState({ file: file[0] }, function () { this.changeButton() });
     }
 
     changeButton() {
         if (this.state.title !== "" &&
             this.state.genre !== "" &&
-            this.state.file.length !== 0) {
+            this.state.file !== undefined) {
             this.setState({ disableButton: false });
         }
         else {
@@ -195,13 +195,11 @@ class UploadSong extends Component {
 
         axios.post(url + "/api/compositions/upload", formData, config)
             .then(res => {
-                alert("The file is successfully uploaded");
+                window.location.href = "/songuploaded";
             })
             .catch(err => {
-                alert(err);
+                document.getElementById("errorMessage").innerHTML = "Upload failed";
             });
-
-        // window.location.href = "/songuploaded";
     }
 
     render() {
@@ -294,7 +292,7 @@ class UploadSong extends Component {
                                                 </MuiThemeProvider>
                                             </Grid>
                                             <Grid item>
-                                                <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+                                                <div id="errorMessage" className={classes.errorMessage}></div>
                                             </Grid>
                                             <Grid item>
                                                 <Grid container justify="center">

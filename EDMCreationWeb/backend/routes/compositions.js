@@ -79,8 +79,6 @@ const parser = multer({ storage: fileStorage });
 
 //upload new composition
 router.route('/upload').post(auth, parser.single("file"), auth, (req, res) => {
-    console.log(req.file)
-    res.send("Test");
     const { title, genre } = req.body;
     const path = req.file.path;
 
