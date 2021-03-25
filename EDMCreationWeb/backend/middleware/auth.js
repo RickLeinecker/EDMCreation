@@ -2,12 +2,13 @@ const JSRSASign = require("jsrsasign");
 require('dotenv').config();
 
 function auth(req, res, next) {
-    // const token = req.header('x-auth-token');  //FOR WHEN I CAN FIGURE OUT HOW TO SWAGGER A HEADER
-    const token = req.headers.authorization.split(" ")[1];
 
-    if (!token) {//no token provided
+    if (!req.headers.authorization) {//no token provided
         return res.status(401).json({ msg: 'No Auth token provided, access denied' });
     }
+
+    // const token = req.header('x-auth-token');  //FOR WHEN I CAN FIGURE OUT HOW TO SWAGGER A HEADER
+    const token = req.headers.authorization.split(" ")[1];
 
     if (JSRSASign.jws.JWS.verifyJWT(token, process.env.JWT_KEY, { alg: ["HS512"] })) {//valid token provided
 

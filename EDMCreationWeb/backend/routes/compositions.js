@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Composition = require('../models/compositions.model');
 const User = require('../models/user.model');
+const Comment = require('../models/comment.model');
 const { check, validationResult } = require('express-validator');
 const bcrypt = require("bcryptjs");
 const mongoose = require('mongoose');
@@ -95,7 +96,7 @@ router.route('/upload').post(auth, parser.single("file"), auth, (req, res) => {
         .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
 });
 
-// //upload new composition
+// EDIT UPLOAD FOR TRAINING FILE ZIP TO MONGO DB
 // router.route('/upload').post(auth, upload.single('file'), auth, (req, res) => {
 
 //     //'file' for field name from front end  
@@ -152,8 +153,7 @@ router.route('/play/:filename').get((req, res) => {
 //load multiple composition infos for pages
 //REQUIRES PAGE NUMBER IN ROUTE, STARTING ON 1
 router.route('/popular').get(async (req, res) => {
-    //need to pull page amounts of entries sorted by a specific value
-    //splice can be used for selective returns including skipping
+ 
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
 
@@ -186,6 +186,7 @@ router.route('/popular').get(async (req, res) => {
     }
 });
 
+
 router.route('/user/:user_id').get(async (req, res) => {
     try {
         const items = await User.aggregate([
@@ -215,5 +216,26 @@ router.route('/user/:user_id').get(async (req, res) => {
         res.status(400).json({ msg: e.message });
     }
 });
+
+
+//upload comment for a given song
+router.route('/postcomment').post(auth, (req, res) => {
+    const comment = req.body.comment;
+    const song = req.body.song_id;
+    const username = req.body.uName;
+    const user_id = req.body.ID; 
+
+    const newComment = new Comment({ username,user_id, comment}); 
+
+    User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song)}, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
+        .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
+        .catch(err => res.status(400).json('Error: ' + err)); 
+});
+
+/*
+router.route('/user/:filename').get((req, res) => {
+    
+});
+*/
 
 module.exports = router;
