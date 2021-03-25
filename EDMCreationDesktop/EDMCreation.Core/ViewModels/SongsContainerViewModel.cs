@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EDMCreation.Core.ViewModels
 {
-    public class SongsContainerViewModel : MvxViewModel
+    public class SongsContainerViewModel : MvxViewModel, IDisposable
     {
         private int _genNum;
         public int GenNum { get { return _genNum; } set { SetProperty(ref _genNum, value); } }
@@ -19,6 +19,15 @@ namespace EDMCreation.Core.ViewModels
         {
             _genNum = genNum;
             _songs = songs;
+        }
+        public void Dispose()
+        {
+            foreach (SongViewModel song in _songs)
+            {
+                song.Dispose();
+            }
+            _songs.Clear();
+            RaisePropertyChanged(nameof(Songs));
         }
     }
 }

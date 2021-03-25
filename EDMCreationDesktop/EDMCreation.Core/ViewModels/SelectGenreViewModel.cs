@@ -10,7 +10,7 @@ namespace EDMCreation.Core.ViewModels
 {
     public class SelectGenreViewModel : MvxViewModel
     {
-        private IMvxNavigationService _navigationService;
+        private readonly IMvxNavigationService _navigationService;
 
         private readonly List<string> _genres;
         public List<string> Genres { get { return _genres; } }

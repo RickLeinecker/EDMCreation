@@ -13,7 +13,8 @@
                     TextElement.FontWeight="Medium"
                     TextElement.FontSize="14"
                     FontFamily="{materialDesign:MaterialDesignFont}"
-        Title="EDM Creation" Height="450" Width="800">
+        Title="EDM Creation" Height="450" Width="800"
+                 WindowStartupLocation="CenterScreen">
 
     <Grid>
     </Grid>

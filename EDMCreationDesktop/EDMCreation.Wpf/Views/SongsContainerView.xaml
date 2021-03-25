@@ -11,10 +11,10 @@
              d:DesignHeight="450" d:DesignWidth="800">
     
     <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding Songs}">
+        <ItemsControl Margin="20 5 5 0" ItemsSource="{Binding Songs, Mode=TwoWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:SongViewModel}">
-                    <local:SongView/>
+                    <local:SongView Margin="0 5 0 0"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

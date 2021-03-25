@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EDMCreation.Core.ViewModels
 {
-    public class SongViewModel : MvxViewModel
+    public class SongViewModel : MvxViewModel, IDisposable
     {
         public string MidiFilePath
         {
@@ -131,6 +131,21 @@ namespace EDMCreation.Core.ViewModels
         public void Save()
         {
 
+        }
+
+        public void Dispose()
+        {
+            _midiPlayer.Dispose();
+        }
+
+        public void StartWatching()
+        {
+            _midiPlayer.AddToPlaybackWatcher();
+        }
+
+        public void StopWatching()
+        {
+            _midiPlayer.RemoveFromPlaybackWatcher();
         }
 
         private void OnStarted(object sender, EventArgs e)

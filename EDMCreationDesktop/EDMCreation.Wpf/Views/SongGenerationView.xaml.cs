@@ -10,5 +10,6 @@ namespace EDMCreation.Wpf.Views
         {
             InitializeComponent();
         }
+
     }
 }

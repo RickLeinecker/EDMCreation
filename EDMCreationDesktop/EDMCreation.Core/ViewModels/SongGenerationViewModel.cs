@@ -3,14 +3,12 @@ using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MvvmCross.Presenters;
 using EDMCreation.Core.Utilities;
-using System.Diagnostics;
-using MvvmCross.Presenters.Hints;
-using MvvmCross;
-using System;
 using Melanchall.DryWetMidi.Devices;
 using EDMCreation.Core.Services.Interfaces;
+using EDMCreation.Core.ViewModels.Dialogs;
+using System.Linq;
+using System;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -34,22 +32,23 @@ namespace EDMCreation.Core.ViewModels
             return base.Initialize();
         }
 
-        private IMvxNavigationService _navigationService;
-        private ITrainingService _trainingService;
+        private readonly IMvxNavigationService _navigationService;
+        private readonly ITrainingService _trainingService;
+        private readonly IDialogService _dialogService;
 
         private string _trainingFile;
 
-        private List<string> _currentSongs;
-        public List<string> CurrentSongs { get { return _currentSongs; } }
+        private readonly List<string> _currentSongFiles;
+        private List<SongViewModel> _currentSongPanels;
+        private int _totalGens;
 
-        private SongsContainerViewModel _currentContainer;
-        public SongsContainerViewModel CurrentContainer { get { return _currentContainer; } }
+        public EmptyContainerViewModel EmptyContainer;
+
+        private MvxViewModel _currentContainer;
+        public MvxViewModel CurrentContainer { get { return _currentContainer; } }
 
         private int _currentGen;
-        public int CurrentGen { get { return _currentGen; } set { SetProperty(ref _currentGen, value); } }
-
-        private int _totalGens;
-        public int TotalGens { get { return _totalGens; } set { SetProperty(ref _totalGens, value); } }
+        public int CurrentGen { get { return _currentGen; } }
 
         private bool _notOnFirstGen;
         public bool NotOnFirstGen { get { return _notOnFirstGen; } set { SetProperty(ref _notOnFirstGen, value); } }
@@ -57,32 +56,60 @@ namespace EDMCreation.Core.ViewModels
         private bool _notOnLastGen;
         public bool NotOnLastGen { get { return _notOnLastGen; } set { SetProperty(ref _notOnLastGen, value); } }
 
-        private List<SongViewModel> _currentSongPanels;
-        public List<SongViewModel> CurrentSongPanels { get { return _currentSongPanels; } }
 
-        private List<SongsContainerViewModel> _songsContainers;
-        public List<SongsContainerViewModel> SongsContainers { get { return _songsContainers; } }
+        private readonly List<SongsContainerViewModel> _songsContainers;
 
-        public SongGenerationViewModel(IMvxNavigationService navigationService, ITrainingService trainingService)
+        public SongGenerationViewModel(IMvxNavigationService navigationService, ITrainingService trainingService, IDialogService dialogService)
         {
             _navigationService = navigationService;
             _trainingService = trainingService;
+            _dialogService = dialogService;
 
             BackCommand = new MvxAsyncCommand(GoBack);
             PrevGenCommand = new MvxCommand(PreviousGeneration);
             NextGenCommand = new MvxCommand(NextGeneration);
-            ShowCommand = new MvxCommand(Show);
+            GenerateCommand = new MvxCommand(Generate);
+
+            EmptyContainer = new EmptyContainerViewModel();
 
             // use training file to check for progress
             // if new project, generate 10 songs, otherwise load the latest generation
 
             // assumes initial entry with no prior training
             _songsContainers = new List<SongsContainerViewModel>();
+            _currentSongPanels = new List<SongViewModel>();
+            _currentSongFiles = new List<string>();
             _totalGens = 0;
             _currentGen = -1;
-            GenerateAndShowNext();
+            _currentContainer = EmptyContainer;
+
             PlaybackCurrentTimeWatcher.Instance.Start(); // remember to stop this at some point, and reassign playbacks when the view switches
 
+        }
+
+        public MvxCommand GenerateCommand { get; set; }
+        public void Generate()
+        {
+            PauseAll();
+
+            if (_currentGen + 1 != _totalGens)
+            {
+                string question = "You are on a previous generation. This will overwrite any future generations. Generate?";
+                YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
+                bool? result = _dialogService.ShowDialog(dialog);
+
+                if (result.HasValue)
+                {
+                    if (result.Value) // yes, delete future generations
+                    {
+                        DestroyFutureGenerations(_currentGen);
+                    }
+                    else
+                        return;
+                }
+            }
+
+            GenerateAndShowNext();
         }
 
         public void GenerateAndShowNext()
@@ -94,35 +121,26 @@ namespace EDMCreation.Core.ViewModels
 
         public void GenerateNext()
         {
-            // user has returned to previous generation and is going to overwrite later generations
-            if (_currentGen + 1 != _totalGens)
-            {
-                // ...
-            }
+            // generates the next generation without updating view
+            var songFiles = _trainingService.GenerateSongs(_currentSongFiles); // uses test files for now
 
-            else // user is using the youngest generation
-            {
-                _currentSongs = _trainingService.GenerateSongs(_currentSongs); // uses test files for now
+            var songPanels = GenerateSongPanels(songFiles);
 
-                _currentSongPanels = GenerateSongPanels();
+            SongsContainerViewModel container = new SongsContainerViewModel(_currentGen + 1, songPanels);
+            _songsContainers.Add(container);
+            _totalGens++;
 
-                _currentContainer = new SongsContainerViewModel(_currentGen + 1, _currentSongPanels);
-                _songsContainers.Add(_currentContainer);
-                _totalGens++;
-            }
-            
         }
 
-        public List<SongViewModel> GenerateSongPanels()
+        public List<SongViewModel> GenerateSongPanels(List<string> songFiles)
         {
             int i = 0;
             List<SongViewModel> songPanels = new List<SongViewModel>();
 
-            foreach (string s in _currentSongs)
+            foreach (string s in songFiles)
             {
                 IMidiPlayer midiPlayer = new MidiPlayer(s);
                 SongViewModel songPanel = new SongViewModel(midiPlayer, i);
-                midiPlayer.AddToPlaybackWatcher();
                 songPanels.Add(songPanel);
                 i++;
             }
@@ -130,13 +148,46 @@ namespace EDMCreation.Core.ViewModels
             return songPanels;
         }
 
-        public void ShowGeneration(int gen)
+        private void PauseAll()
+        {
+            foreach(SongViewModel song in _currentSongPanels)
+            {
+                if (song.IsPlaying)
+                    song.Pause();
+            }
+        }
+
+        private void StopAll()
+        {
+            foreach(SongViewModel song in _currentSongPanels)
+            {
+                if (song.IsPlaying)
+                    song.Stop();
+            }
+        }
+
+        // Datacontext related properties are updated only in this function
+        private void ShowGeneration(int gen)
         {
             NotOnFirstGen = true;
             NotOnLastGen = true;
 
+            foreach (SongViewModel s in _currentSongPanels)
+            {
+                s.StopWatching();
+            }
+
             _currentGen = gen;
             _currentContainer = _songsContainers[gen];
+            _currentSongPanels = _songsContainers[gen].Songs;
+
+            _currentSongFiles.Clear();
+
+            foreach (SongViewModel s in _currentSongPanels)
+            {
+                _currentSongFiles.Add(s.MidiFilePath);
+                s.StartWatching();
+            }
 
             if (_currentGen == 0)
                 NotOnFirstGen = false;
@@ -144,10 +195,11 @@ namespace EDMCreation.Core.ViewModels
                 NotOnLastGen = false;
 
             RaisePropertyChanged(nameof(CurrentContainer));
+            RaisePropertyChanged(nameof(CurrentGen));
         }
 
         // Does nothing right now
-        public string GenerateNewTrainingFile()
+        private string GenerateNewTrainingFile()
         {
             return "placeholder.txt";
         }
@@ -156,7 +208,58 @@ namespace EDMCreation.Core.ViewModels
 
         public async Task GoBack()
         {
-            await _navigationService.Close(this);
+            PauseAll();
+
+            string question = "Leave training? Any unsaved progress will be lost.";
+            YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
+            bool? result = _dialogService.ShowDialog(dialog);
+
+            if (result.HasValue)
+            {
+                if(result.Value)
+                {
+                    DestroyAllGenerations();
+                    await _navigationService.Close(this);
+                }
+            }
+        }
+
+        private void DestroyAllGenerations()
+        {
+            DestroyFutureGenerations(-1);
+            PlaybackCurrentTimeWatcher.Instance.Stop();
+            PlaybackCurrentTimeWatcher.Instance.RemoveAllPlaybacks();
+        }
+
+        private void DestroyGeneration(SongsContainerViewModel gen)
+        {
+            if (_totalGens <= 0)
+                return;
+
+            if (!_songsContainers.Contains(gen))
+                return;
+
+            gen.Dispose();
+            _songsContainers.Remove(gen);
+
+            _totalGens--;
+
+            RaisePropertyChanged(nameof(CurrentContainer));
+        }
+
+        private void DestroyFutureGenerations(int currentGen)
+        {
+            var total = _totalGens;
+            List<SongsContainerViewModel> gensToDestroy = new List<SongsContainerViewModel>();
+            for (int i = currentGen + 1; i < total; i++)
+            {
+                gensToDestroy.Add(_songsContainers[i]);
+            }
+
+            foreach(SongsContainerViewModel gen in gensToDestroy)
+            {
+                DestroyGeneration(gen);
+            }
         }
 
         public MvxCommand PrevGenCommand { get; set; }
@@ -166,20 +269,19 @@ namespace EDMCreation.Core.ViewModels
         public void PreviousGeneration()
         {
             if (NotOnFirstGen)
+            {
+                PauseAll();
                 ShowGeneration(_currentGen - 1);
+            }
         }
         public void NextGeneration()
         {
             if (NotOnLastGen)
+            {
+                PauseAll();
                 ShowGeneration(_currentGen + 1);
+            }
         }
 
-        // for testing purposed
-        public MvxCommand ShowCommand { get; set; }
-
-        public void Show()
-        {
-            ShowGeneration(0);
-        }
     }
 }

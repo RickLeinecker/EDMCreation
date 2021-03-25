@@ -11,30 +11,41 @@
              xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
                   mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <views:MvxWpfView.Resources>
         <valueConverters:IntegerToSongNumberValueConverter x:Key="IntegerToSongNumberValueConverter"/>
         <valueConverters:SeekBarValueConverter x:Key="SeekBarValueConverter"/>
     </views:MvxWpfView.Resources>
+    
     <StackPanel Orientation="Horizontal">
-        <Label Content="{Binding SongNumber, Converter={StaticResource IntegerToSongNumberValueConverter}}"/>
+        
+        <Label VerticalAlignment="Center" Content="{Binding SongNumber, Converter={StaticResource IntegerToSongNumberValueConverter}}"
+               Style="{DynamicResource MaterialDesignLabel}"/>
+        
         <Button mvx:Bi.nd="Command PlayPauseCommand" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="{Binding PlayPauseToolTip}">
             <materialDesign:PackIcon Kind="{Binding PlayPauseIcon}" />
         </Button>
+        
         <Button mvx:Bi.nd="Command StopCommand" Style="{DynamicResource MaterialDesignIconButton}" IsEnabled="{Binding IsStopButtonEnabled}" ToolTip="Stop">
             <materialDesign:PackIcon Kind="Stop" />
         </Button>
+        
         <components:SeekBar Style="{DynamicResource MaterialDesignSlider}" Width="200" IsDragging="{Binding IsDragging, Mode=OneWayToSource}"
                 SeekValue="{Binding CurrentTime, Converter={StaticResource SeekBarValueConverter}, Mode=TwoWay}"
                 Maximum="{Binding TotalTime, Converter={StaticResource SeekBarValueConverter}, Mode=OneWay}"
                 VerticalAlignment="Center" Cursor="Hand">
         </components:SeekBar>
+        
         <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" x:Name="addRemoveButton"
                   Style="{DynamicResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
                   ToolTip="{Binding AddRemoveToolTip}">
             <materialDesign:PackIcon Kind="Plus" />
         </CheckBox>
+        
         <Button x:Name="saveButton" Style="{DynamicResource MaterialDesignIconButton}" ToolTip="Save as midi file" Click="OnSaveButton_Click">
             <materialDesign:PackIcon Kind="Floppy" />
         </Button>
+        
     </StackPanel>
+    
 </views:MvxWpfView>

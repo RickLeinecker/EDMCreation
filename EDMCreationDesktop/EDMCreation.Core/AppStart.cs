@@ -11,11 +11,9 @@ namespace EDMCreation.Core
 {
 	public class AppStart : MvxAppStart<LaunchPageViewModel>
 	{
-		private readonly IAuthenticationService _authenticationService;
 
 		public AppStart(IMvxApplication application, IMvxNavigationService navigationService, IAuthenticationService authenticationService) : base(application, navigationService)
 		{
-			_authenticationService = authenticationService;
 		}
 	}
 }

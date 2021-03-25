@@ -7,7 +7,7 @@ namespace EDMCreation.Core.Utilities
 {
     public class MongoDataAccess : IDataAccess
     {
-        private IMongoDatabase _dataBase;
+        private readonly IMongoDatabase _dataBase;
         public MongoDataAccess(IMongoClient mongoClient)
         {
             _dataBase = mongoClient.GetDatabase("dbname");

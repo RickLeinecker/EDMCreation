@@ -132,12 +132,6 @@ namespace EDMCreation.Core.Utilities
             OnPlaybackPaused(new EventArgs());
         }
 
-        //more to be done here
-        public void Destroy()
-        {
-            PlaybackCurrentTimeWatcher.Instance.RemovePlayback(playback);
-        }
-
         private void PlaybackFinished(object sender, EventArgs e)
         {
             _reachedEnd = true;
@@ -152,6 +146,13 @@ namespace EDMCreation.Core.Utilities
         public void RemoveFromPlaybackWatcher()
         {
             PlaybackCurrentTimeWatcher.Instance.RemovePlayback(playback);
+        }
+
+        public void Dispose()
+        {
+            PlaybackCurrentTimeWatcher.Instance.RemovePlayback(playback);
+            playback.Stop();
+            playback.Dispose();
         }
     }
 }

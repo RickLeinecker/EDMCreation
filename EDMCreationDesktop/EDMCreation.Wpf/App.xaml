@@ -3,9 +3,18 @@
     x:Class="EDMCreation.Wpf.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:EDMCreation.Core.ViewModels;assembly=EDMCreation.Core"
+    xmlns:v="clr-namespace:EDMCreation.Wpf.Views"
     StartupUri="LaunchWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <DataTemplate DataType="{x:Type vm:SongsContainerViewModel}">
+                <v:SongsContainerView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:EmptyContainerViewModel}">
+                <v:EmptyContainerView/>
+            </DataTemplate>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />

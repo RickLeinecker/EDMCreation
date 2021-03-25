@@ -8,9 +8,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:valueConverters="clr-namespace:EDMCreation.Wpf.ValueConverters"
              xmlns:local="clr-namespace:EDMCreation.Wpf.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <views:MvxWpfView.Resources>
+        <valueConverters:IntegerToGenNumberValueConverter x:Key="IntegerToGenNumberValueConverter"/>
+    </views:MvxWpfView.Resources>
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -22,19 +26,22 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
-            <RowDefinition Height="auto" />
-            <RowDefinition />
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="auto" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-            <Button mvx:Bi.nd="Command NextGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation" IsEnabled="{Binding NotOnLastGen}">
+            <Button mvx:Bi.nd="Command PrevGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Previous Generation" IsEnabled="{Binding NotOnFirstGen}">
                 <materialDesign:PackIcon Kind="CodeLessThan" />
             </Button>
-            <Button mvx:Bi.nd="Command PrevGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation" IsEnabled="{Binding NotOnFirstGen}">
+            <Button mvx:Bi.nd="Command NextGenCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Next Generation" IsEnabled="{Binding NotOnLastGen}">
                 <materialDesign:PackIcon Kind="CodeGreaterThan" />
             </Button>
+            <TextBlock Style="{DynamicResource MaterialDesignHeadline6TextBlock}" 
+                       Text="{Binding CurrentGen, Converter={StaticResource IntegerToGenNumberValueConverter}}"
+                       VerticalAlignment="Center" Margin="20 0 0 0"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">
@@ -47,24 +54,16 @@
         </StackPanel>
 
         <!-- SongsContainer -->
-        <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding CurrentContainer}">
-            <ContentControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type vm:SongsContainerViewModel}">
-                    <local:SongsContainerView />
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
-        </ContentControl>
-
-
-
-
+        <Border Background="{DynamicResource AttentionToActionBrush}" Grid.Row="2" Grid.Column="1" >
+            <ContentControl Content="{Binding CurrentContainer}"/>
+        </Border>
 
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
-            <Button mvx:Bi.nd="Command ShowCommand" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="GENERATE" Margin="20" />
-            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="SAVE TRAINING" Margin="20" />
+            <Button mvx:Bi.nd="Command GenerateCommand" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="GENERATE" Margin="20" />
+            <Button mvx:Bi.nd="Command SaveComand" Style="{DynamicResource MaterialDesignFlatButton}" Content="SAVE TRAINING" Margin="20" />
         </StackPanel>
 
-        <Button mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignRaisedLightButton}"
+        <Button  mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignRaisedLightButton}"
                 VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="2" Margin="20" Content="LEAVE TRAINING" />
 
     </Grid>

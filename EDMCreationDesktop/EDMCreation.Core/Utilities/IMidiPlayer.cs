@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace EDMCreation.Core.Utilities
 {
-    public interface IMidiPlayer
+    public interface IMidiPlayer : IDisposable
     {
         string MidiFilePath { get; }
         bool IsAtStart { get; }
@@ -20,7 +20,6 @@ namespace EDMCreation.Core.Utilities
         void Play();
         void Stop();
         void Pause();
-        void Destroy();
         void AddToPlaybackWatcher();
         void RemoveFromPlaybackWatcher();
     }
