@@ -123,7 +123,7 @@ router.route('/login').post(
 
                             const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, key); //token creation
 
-                            res.status(200).json({ sJWT, username: user.username, user_id: user.user_id, msg: 'Login successful!' }); //return token in body for log in      
+                            res.status(200).json({ sJWT, username: user.username, user_id: user._id, msg: 'Login successful!' }); //return token in body for log in      
                         } else {
                             return res.status(400).json({ msg: "Incorrect password" });
                         } //end password checking
@@ -133,23 +133,44 @@ router.route('/login').post(
                     return res.status(400).json({ msg: "Invalid username" });
                 }
             }); //end user search
-}); //end login
+    }); //end login
 
 
 
 router.route('/info/:user_id').get((req, res) => {
-    User.findOne({ _id: mongoose.Types.ObjectId(req.params.user_id) })
-        .then(user => {
-            if (user) {//if user id found
-                res.status(200).json({ username: user.username,         
-                                       description: user.description,
-                                       upload_count: user.upload_count,
-                                       listens_count: user.listens_count, 
-                                       msg: 'Login successful!' }); //return token in body for log in      
-            } else {
-                return res.status(400).json({ msg: "Invalid username" });
+    // User.findOne({ _id: mongoose.Types.ObjectId(req.params.user_id) })
+    //     .then(user => {
+    //         if (user) {//if user id found
+    //             res.status(200).json({
+    //                 username: user.username,
+    //                 description: user.description,
+    //                 upload_count: user.upload_count,
+    //                 listens_count: user.listens_count,
+    //                 msg: 'Login successful!'
+    //             }); //return token in body for log in      
+    //         } else {
+    //             return res.status(400).json({ msg: "Invalid username" });
+    //         }
+    //     }); //end user search
+
+    User.aggregate(
+        [
+            { $match: { _id: mongoose.Types.ObjectId(req.params.user_id) } },
+            {
+                $project: {
+                    username: "$username",
+                    descript: "$description",
+                    listens_count: "$listens_count",
+                    upload_count: { $cond: { if: { $isArray: "$compositions" }, then: { $size: "$compositions" }, else: "NA" } }
+                },
             }
-        }); //end user search
+        ])
+        .then(user => {
+            res.status(200).json(user[0]);
+        })
+        .catch(err => {
+            return res.status(400).json({ msg: "Error" });
+        });
 });
 
 

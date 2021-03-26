@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Typography, Grid, withStyles, Paper, Link } from "@material-ui/core";
 import { AccountCircle } from "@material-ui/icons";
+import Moment from 'react-moment';
 
 const styles = theme => ({
     username: {
@@ -8,7 +9,9 @@ const styles = theme => ({
         color: "#219653"
     },
     date: {
-        color: "#828282"
+        color: "#828282",
+        fontSize: "9pt",
+        display: "inline-block",
     },
     mediumIcon: {
         fontSize: "3em",
@@ -73,7 +76,7 @@ class Comments extends Component {
                                     </Grid>
                                     <Grid item>
                                         <Typography variant="body2" className={classes.date}>
-                                            {comment.date}
+                                            <Moment fromNow ago>{(new Date(comment.last_modified))}</Moment> ago
                                         </Typography>
                                     </Grid>
                                 </Grid>

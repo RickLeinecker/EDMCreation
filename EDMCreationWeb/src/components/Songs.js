@@ -125,7 +125,10 @@ class Songs extends Component {
 		this.state = {
 			editable: false,
 			deletable: false,
+			triggerCommentRefresh: ""
 		}
+
+		this.refreshComments = this.refreshComments.bind(this);
 	}
 
 	componentDidMount() {
@@ -136,6 +139,10 @@ class Songs extends Component {
 		if (this.props.deletable !== undefined) {
 			this.setState({ deletable: this.props.deletable });
 		}
+	}
+
+	refreshComments() {
+		this.setState({ triggerCommentRefresh: Date.now() });
 	}
 
 	render() {
@@ -165,7 +172,7 @@ class Songs extends Component {
 									</Grid>
 									{this.state.editable === true &&
 										<Grid item xs align="right">
-											<Link href="/editsong" color="inherit">
+											<Link href={"/editsong?songid=" + song.composition_id} color="inherit">
 												<Tooltip title="Edit" placement="right">
 													<Edit className={classes.editIcon} />
 												</Tooltip>
@@ -251,10 +258,10 @@ class Songs extends Component {
 									<AccordionDetails className={classes.innerCommentsSection}>
 										<Grid container spacing={10}>
 											<Grid item xs={6}>
-												<Comments comments={song.comments} />
+												<Comments comments={song.comments} triggerRefresh={this.state.triggerCommentRefresh} />
 											</Grid>
 											<Grid item xs={6}>
-												<PostComment />
+												<PostComment songId={song.composition_id} triggerRefresh={this.refreshComments} />
 											</Grid>
 										</Grid>
 									</AccordionDetails>

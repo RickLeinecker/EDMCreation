@@ -153,7 +153,7 @@ router.route('/play/:filename').get((req, res) => {
 //load multiple composition infos for pages
 //REQUIRES PAGE NUMBER IN ROUTE, STARTING ON 1
 router.route('/popular').get(async (req, res) => {
- 
+
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
 
@@ -223,13 +223,13 @@ router.route('/postcomment').post(auth, (req, res) => {
     const comment = req.body.comment;
     const song = req.body.song_id;
     const username = req.body.uName;
-    const user_id = req.body.ID; 
+    const user_id = req.body.ID;
 
-    const newComment = new Comment({ username,user_id, comment}); 
+    const newComment = new Comment({ username, user_id, comment });
 
-    User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song)}, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
+    User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
         .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
-        .catch(err => res.status(400).json('Error: ' + err)); 
+        .catch(err => res.status(400).json('Error: ' + err));
 });
 
 

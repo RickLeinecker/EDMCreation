@@ -1,5 +1,8 @@
 import React, { Component } from "react";
-import { withStyles, Grid, TextField, Button, Typography, Link } from "@material-ui/core";
+import { withStyles, Grid, TextField, Button, Typography, Link, Snackbar, IconButton } from "@material-ui/core";
+import axios from "axios";
+import { url } from "./URL";
+import { Close } from '@material-ui/icons';
 
 const styles = theme => ({
 	buttonBlock: {
@@ -53,12 +56,15 @@ class PostComment extends Component {
 
 		this.state = {
 			comment: "",
-			disableButton: true
+			disableButton: true,
+			open: false
 		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.changeButton = this.changeButton.bind(this);
+		this.handleClick = this.handleClick.bind(this);
+		this.handleClose = this.handleClose.bind(this);
 	}
 
 	handleChange(e) {
@@ -76,6 +82,36 @@ class PostComment extends Component {
 
 	handleSubmit(e) {
 		e.preventDefault();
+
+		const claims = {
+			song_id: this.props.songId,
+			comment: this.state.comment
+		};
+
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.post(url + "/api/compositions/postcomment", claims, config)
+			.then(res => {
+				this.props.triggerRefresh();
+				this.setState({ open: true })
+				document.getElementById("commentBox").value = "";
+			});
+	}
+
+	handleClick() {
+		this.setState({ open: true })
+	}
+
+	handleClose(e, reason) {
+		if (reason === 'clickaway') {
+			return;
+		}
+
+		this.setState({ open: false })
 	}
 
 	render() {
@@ -107,6 +143,7 @@ class PostComment extends Component {
 							<Grid container direction="column" spacing={2}>
 								<Grid item>
 									<TextField
+										id="commentBox"
 										type="text"
 										placeholder="Comment"
 										fullWidth
@@ -133,6 +170,23 @@ class PostComment extends Component {
 						</form>
 					</Grid>
 				</Grid>
+				<Snackbar
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'left',
+					}}
+					open={this.state.open}
+					autoHideDuration={6000}
+					onClose={this.handleClose}
+					message="Comment posted"
+					action={
+						<React.Fragment>
+							<IconButton size="small" aria-label="close" color="inherit" onClick={this.handleClose}>
+								<Close fontSize="small" />
+							</IconButton>
+						</React.Fragment>
+					}
+				/>
 			</div>
 		);
 	}

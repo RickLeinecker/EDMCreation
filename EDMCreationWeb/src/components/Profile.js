@@ -82,12 +82,18 @@ class Profile extends Component {
             currentUser: [localStorage.getItem("username")]
         }
 
-        if (qs.parse(this.props.location).stringify !== undefined) {
+        if (Object.keys(qs.parse(this.props.location)).length !== 0) {
             this.parameters = qs.parse(this.props.location.search);
-            this.state.userId = this.parameters.userid;
+
+            if (this.parameters.userid !== undefined) {
+                this.state.userId = this.parameters.userid;
+            }
+            else {
+                this.state.userId = localStorage.getItem("user_id");
+            }
         }
         else {
-            this.state.userId = [localStorage.getItem("user_id")];
+            this.state.userId = localStorage.getItem("user_id");
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -95,7 +101,7 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testuser")
+        axios.get(url + "/api/users/info/" + this.state.userId)
             .then(res => this.setState({ user: res.data }));
 
         this.fetchSongs();
@@ -143,10 +149,10 @@ class Profile extends Component {
                                 <Grid item style={{ flexGrow: 1 }}>
                                     <Typography variant="body1" className={classes.statsSection}>
                                         <span className={classes.statItem}>
-                                            <PlayArrow className={classes.smallIcon} /> Total plays: {this.state.user.total_plays}
+                                            <PlayArrow className={classes.smallIcon} /> Total plays: {this.state.user.listens_count}
                                         </span>
                                         <span className={classes.statItem}>
-                                            <MusicNote className={classes.smallIcon} /> Uploads: {this.state.user.uploads}
+                                            <MusicNote className={classes.smallIcon} /> Uploads: {this.state.user.upload_count}
                                         </span>
                                     </Typography>
                                 </Grid>
@@ -175,10 +181,10 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser === this.state.user.username} />
+                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.songs} deletable={this.state.currentUser === this.state.user.username} />
+                    <Songs songs={this.state.songs} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                     <Following user={this.state.user} />
