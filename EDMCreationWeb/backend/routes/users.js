@@ -4,6 +4,7 @@ const { check, validationResult } = require('express-validator');
 const bcrypt = require("bcryptjs");
 const JSRSASign = require("jsrsasign");
 const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
 require('dotenv').config();
 
 //sign up 
@@ -174,6 +175,61 @@ router.route('/info/:username').get((req, res) => {
 });
 
 
+//toggle a user favorite for a song
+router.route('/liketoggle').post(auth, (req, res) => {
+    
+    //composition_id = req.body.song_id;
+    //user_id = req.body.ID;
+
+    User.findOne({$and: [{_id: req.body.ID} , {"favorites":{$elemMatch:{composition_id:mongoose.Types.ObjectId(req.body.song_id)}}}] })
+        .then(user=>{
+
+            if(user){//if present
+                //remove
+
+                User.findOneAndUpdate(
+                    { _id: req.body.ID },
+                    { $pull: { "favorites": { composition_id:mongoose.Types.ObjectId(req.body.song_id)} } },
+                    { new: true },
+                    function(err) {
+                        if (err) { console.log(err) }
+                    }
+                ).then(res.status(200).json({ msg: 'unfavorited' }));
+                   
+            }else{//if not present
+                //add
+                User.updateOne(
+                    {_id: req.body.ID},
+                    {
+                        $push:
+                        {
+                            favorites:
+                            [
+                                {
+                                    composition_id: mongoose.Types.ObjectId(req.body.song_id),
+                                }
+                            ]
+                        }
+                    },
+                    //{$push: {contacts: {$each: contact.contacts}}},
+                    {upsert: true}, 
+                    (err, result) =>
+                    {
+                        if (err)
+                        {
+                            res.status(400).json('Error: ' + err);
+                        }else
+                        {
+                            res.status(200).json({ msg: 'favorited' });
+                        }
+                    }
+                );
+            }//end add
+
+        });//end then
+
+
+});
 
 
 module.exports = router;
