@@ -158,7 +158,7 @@ router.route('/popular').get(async (req, res) => {
     const skip = songsPerPage * (req.query.page - 1);
 
     try {
-        const items = await User.aggregate([
+        const songs = await User.aggregate([
             { $unwind: "$compositions" },
             {
                 $project: {
@@ -167,20 +167,22 @@ router.route('/popular').get(async (req, res) => {
                     username: "$username",
                     likes: "$compositions.favorites",
                     listens: "$compositions.listens",
-                    num_comments: "$compositions.comment_count",
+                    num_comments: { $size: "$compositions.comments" },
                     date: "$compositions.last_modified",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path"
                 },
             },
+
             { $sort: { "listens": -1 } }, //descending values for listens
-            { $skip: skip }, { $limit: songsPerPage } //skip controls page number and limit controls output
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
-        if (!items) throw Error('No items');
+        if (!songs) throw Error('No items');
 
-        res.status(200).json(items);
+        res.status(200).json(songs);
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }

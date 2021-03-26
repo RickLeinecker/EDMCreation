@@ -41,8 +41,8 @@ router.route('/signup').post(
                 } else { //no collisions
                     //creating user
                     const listens_count = 0;
-                    const upload_count = 0;
-                    const newUser = new User({ username, email, password, listens_count, upload_count });
+                    //const upload_count = 0;
+                    const newUser = new User({ username, email, password, listens_count});
 
                     //hashing password before storing it in database
                     bcrypt.genSalt(10, (err, salt) => {
