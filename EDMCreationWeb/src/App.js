@@ -59,7 +59,7 @@ class App extends Component {
 					<CssBaseline /> {/* For background color */}
 					<NavBar />
 					<Route path="/" exact component={Popular} />
-					<Route path="/popular" render={(props) => <Popular {...props} key={Date.now()}/>} />
+					<Route path="/popular" render={(props) => <Popular {...props} key={Date.now()} />} />
 					<Route path="/topfavorites" component={TopFavorites} />
 					<Route path="/browsegenres" component={BrowseGenres} />
 					<Route path="/random" component={Random} />
@@ -69,7 +69,7 @@ class App extends Component {
 					<Route path="/register" component={Register} />
 					<Route path="/registercompleted" component={RegisterCompleted} />
 					<Route path="/search" component={Search} />
-					<Route path="/profile" component={Profile} />
+					<Route path="/profile" render={(props) => <Profile {...props} key={Date.now()} />} />
 					<Route path="/editsong" component={EditSong} />
 					<Route path="/uploadsong" component={UploadSong} />
 					<Route path="/forgotpassword" component={ForgotPassword} />

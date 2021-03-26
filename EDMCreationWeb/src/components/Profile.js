@@ -7,6 +7,7 @@ import Following from "./Following";
 import axios from "axios";
 import qs from "query-string";
 import { url } from "./URL";
+import PageButtons from "./PageButtons";
 
 const styles = theme => ({
     profile: {
@@ -79,21 +80,30 @@ class Profile extends Component {
             value: 0,
             songs: [],
             user: [],
+            page: 1,
             currentUser: [localStorage.getItem("username")]
         }
 
-        if (Object.keys(qs.parse(this.props.location)).length !== 0) {
+        if (Object.keys(qs.parse(this.props.location.search)).length !== 0) {
             this.parameters = qs.parse(this.props.location.search);
 
-            if (this.parameters.userid !== undefined) {
-                this.state.userId = this.parameters.userid;
+            if (this.parameters.username !== undefined) {
+                this.state.username = this.parameters.username;
             }
             else {
-                this.state.userId = localStorage.getItem("user_id");
+                this.state.username = localStorage.getItem("username");
+            }
+
+            if (this.parameters.tab !== undefined) {
+                this.state.value = parseInt(this.parameters.tab);
+            }
+
+            if (this.parameters.page !== undefined) {
+                this.state.page = this.parameters.page;
             }
         }
         else {
-            this.state.userId = localStorage.getItem("user_id");
+            this.state.username = localStorage.getItem("username");
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -101,19 +111,20 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        axios.get(url + "/api/users/info/" + this.state.userId)
+        axios.get(url + "/api/users/info/" + this.state.username)
             .then(res => this.setState({ user: res.data }));
 
         this.fetchSongs();
     }
 
-    fetchSongs() {
-        axios.get(url + "/api/compositions/user/" + this.state.userId)
+    fetchSongs(page) {
+        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + this.state.page)
             .then(res => this.setState({ songs: res.data }));
     }
 
     handleChange(e, newValue) {
         this.setState({ value: newValue });
+        // window.location.href = "/profile?username=" + this.state.username + "&tab=" + newValue;
     }
 
     render() {
@@ -182,9 +193,11 @@ class Profile extends Component {
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
                     <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=0&"} page={this.state.page} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.songs} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=1&"} page={this.state.page} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                     <Following user={this.state.user} />

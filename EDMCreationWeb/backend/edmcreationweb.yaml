@@ -252,14 +252,14 @@ paths:
                     type: boolean
                   message:
                     type: string
-  /api/compositions/user/{user_id}:
+  /api/compositions/user/{username}:
     get:
-      summary: user compositions
+      summary: User compositions
       tags:
         - compositions
       parameters:
         - in: path
-          name: user_id
+          name: username
           schema:
             type: string
       responses:
@@ -286,7 +286,7 @@ paths:
                     type: string
   /api/compositions/postcomment:
     post:
-      summary: post comment
+      summary: Post comment
       tags:
         - compositions 
       requestBody:
@@ -324,14 +324,14 @@ paths:
                     type: boolean
                   message:
                     type: string
-  /api/users/info/{user_id}:
+  /api/users/info/{username}:
     get:
-      summary: Popular songs
+      summary: User info
       tags:
         - compositions
       parameters:
         - in: path
-          name: user_id
+          name: username
           schema:
             type: string
       responses:

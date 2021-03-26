@@ -189,10 +189,13 @@ router.route('/popular').get(async (req, res) => {
 });
 
 
-router.route('/user/:user_id').get(async (req, res) => {
+router.route('/user/:username').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+
     try {
         const items = await User.aggregate([
-            { $match: { _id: mongoose.Types.ObjectId(req.params.user_id) } },
+            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
             { $unwind: "$compositions" },
             {
                 $project: {
@@ -209,6 +212,9 @@ router.route('/user/:user_id').get(async (req, res) => {
                     path: "$compositions.path"
                 },
             },
+            { $sort: { "listens": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
         if (!items) throw Error('No items');
