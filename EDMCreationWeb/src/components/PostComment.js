@@ -47,6 +47,10 @@ const styles = theme => ({
 		hover: {
 			color: "#219653"
 		},
+	},
+	snackbar: {
+		background: "#005ce6",
+		color: "white"
 	}
 });
 
@@ -96,9 +100,10 @@ class PostComment extends Component {
 
 		axios.post(url + "/api/compositions/postcomment", claims, config)
 			.then(res => {
-				this.props.triggerRefresh();
 				this.setState({ open: true })
-				document.getElementById("commentBox").value = "";
+				document.getElementById("commentBox" + this.props.songNumber).value = "";
+				this.setState({ disableButton: true });
+				this.props.fetchSongs();
 			});
 	}
 
@@ -143,7 +148,7 @@ class PostComment extends Component {
 							<Grid container direction="column" spacing={2}>
 								<Grid item>
 									<TextField
-										id="commentBox"
+										id={"commentBox" + this.props.songNumber}
 										type="text"
 										placeholder="Comment"
 										fullWidth
@@ -172,13 +177,18 @@ class PostComment extends Component {
 				</Grid>
 				<Snackbar
 					anchorOrigin={{
-						vertical: 'bottom',
-						horizontal: 'left',
+						vertical: 'top',
+						horizontal: 'center',
 					}}
 					open={this.state.open}
 					autoHideDuration={6000}
 					onClose={this.handleClose}
-					message="Comment posted"
+					message="Your comment has been posted."
+					ContentProps={{
+						classes: {
+							root: classes.snackbar
+						}
+					}}
 					action={
 						<React.Fragment>
 							<IconButton size="small" aria-label="close" color="inherit" onClick={this.handleClose}>

@@ -125,10 +125,7 @@ class Songs extends Component {
 		this.state = {
 			editable: false,
 			deletable: false,
-			triggerCommentRefresh: ""
 		}
-
-		this.refreshComments = this.refreshComments.bind(this);
 	}
 
 	componentDidMount() {
@@ -139,10 +136,6 @@ class Songs extends Component {
 		if (this.props.deletable !== undefined) {
 			this.setState({ deletable: this.props.deletable });
 		}
-	}
-
-	refreshComments() {
-		this.setState({ triggerCommentRefresh: Date.now() });
 	}
 
 	render() {
@@ -258,10 +251,10 @@ class Songs extends Component {
 									<AccordionDetails className={classes.innerCommentsSection}>
 										<Grid container spacing={10}>
 											<Grid item xs={6}>
-												<Comments comments={song.comments} triggerRefresh={this.state.triggerCommentRefresh} />
+												<Comments comments={song.comments} refresh={this.state.refreshComments} />
 											</Grid>
 											<Grid item xs={6}>
-												<PostComment songId={song.composition_id} triggerRefresh={this.refreshComments} />
+												<PostComment songId={song.composition_id} fetchSongs={this.props.fetchSongs} songNumber={i} />
 											</Grid>
 										</Grid>
 									</AccordionDetails>
