@@ -59,7 +59,7 @@ class Popular extends Component {
 					Popular
                 </Typography>
 				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
-				<PageButtons page={this.state.page} />
+				<PageButtons path={"/popular?"} page={this.state.page} />
 			</div>
 		)
 	}

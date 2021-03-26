@@ -186,7 +186,7 @@ class Songs extends Component {
 									<Grid item xs container direction="column">
 										<Grid item xs>
 											<Typography variant="body2" className={classes.composer}>
-												by <Link href={"/profile?userid=" + song._id} color="inherit"> {song.username} </Link>
+												by <Link href={"/profile?username=" + song.username} color="inherit"> {song.username} </Link>
 											</Typography>
 										</Grid>
 										<Grid item align="center">

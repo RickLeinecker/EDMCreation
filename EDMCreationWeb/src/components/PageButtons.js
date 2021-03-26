@@ -42,14 +42,14 @@ class PageButtons extends Component {
                             <Button disabled="true" className={classes.buttonBlock}>
                                 Previous
                             </Button> :
-                            <Link to={"/popular?page=" + (parseInt(this.props.page) - 1)} className={classes.buttonLink}>
+                            <Link to={this.props.path + "page=" + (parseInt(this.props.page) - 1)} className={classes.buttonLink}>
                                 <Button className={classes.buttonBlock}>
                                     Previous
 						        </Button>
                             </Link>}
                     </Grid>
                     <Grid item>
-                        <Link to={"/popular?page=" + (parseInt(this.props.page) + 1)} className={classes.buttonLink}>
+                        <Link to={this.props.path + "page=" + (parseInt(this.props.page) + 1)} className={classes.buttonLink}>
                             <Button className={classes.buttonBlock}>
                                 Next
 						    </Button>

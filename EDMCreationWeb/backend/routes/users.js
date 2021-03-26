@@ -43,7 +43,7 @@ router.route('/signup').post(
                     //creating user
                     const listens_count = 0;
                     //const upload_count = 0;
-                    const newUser = new User({ username, email, password, listens_count});
+                    const newUser = new User({ username, email, password, listens_count });
 
                     //hashing password before storing it in database
                     bcrypt.genSalt(10, (err, salt) => {
@@ -138,7 +138,7 @@ router.route('/login').post(
 
 
 
-router.route('/info/:user_id').get((req, res) => {
+router.route('/info/:username').get((req, res) => {
     // User.findOne({ _id: mongoose.Types.ObjectId(req.params.user_id) })
     //     .then(user => {
     //         if (user) {//if user id found
@@ -156,11 +156,11 @@ router.route('/info/:user_id').get((req, res) => {
 
     User.aggregate(
         [
-            { $match: { _id: mongoose.Types.ObjectId(req.params.user_id) } },
+            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
             {
                 $project: {
                     username: "$username",
-                    descript: "$description",
+                    description: "$description",
                     listens_count: "$listens_count",
                     upload_count: { $cond: { if: { $isArray: "$compositions" }, then: { $size: "$compositions" }, else: "NA" } }
                 },
