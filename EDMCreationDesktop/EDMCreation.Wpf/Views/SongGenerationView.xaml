@@ -65,10 +65,13 @@
                     <materialDesign:PackIcon DockPanel.Dock="Right" Kind="Dna" VerticalAlignment="Center" Height="20" Width="20"/>
                 </DockPanel>
             </Button>
-            <Button mvx:Bi.nd="Command SaveComand" Style="{DynamicResource MaterialDesignFlatButton}" Margin="20" Padding="0">
+            <Button mvx:Bi.nd="Command SaveComand" Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2">
                 <Button.Foreground>
                     <SolidColorBrush Color="{DynamicResource Primary200}"/>
                 </Button.Foreground>
+                <Button.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource Primary200}"/>
+                </Button.BorderBrush>
                 <DockPanel>
                     <TextBlock Text="SAVE TRAINING" DockPanel.Dock="Left" Margin="0 0 5 0" />
                     <materialDesign:PackIcon Kind="ContentSaveAll" DockPanel.Dock="Right" />
@@ -76,12 +79,15 @@
             </Button>
         </StackPanel>
 
-        <Button mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignIconButton}" Padding="0"
-                VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="2" Margin="20" HorizontalAlignment="Right">
+        <Button mvx:Bi.nd="Command BackCommand" Style="{DynamicResource MaterialDesignFlatButton}" Padding="0"
+                VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="2" Margin="20">
             <Button.Foreground>
                 <SolidColorBrush Color="{DynamicResource Primary100}"/>
             </Button.Foreground>
-            <materialDesign:PackIcon Kind="ExitRun"/>
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left" Text="LEAVE TRAINING" VerticalAlignment="Center" Margin="0 0 5 0" FontSize="15"/>
+                <materialDesign:PackIcon DockPanel.Dock="Right" Kind="ExitRun" VerticalAlignment="Center" Height="20" Width="20"/>
+            </DockPanel>
         </Button>
 
     </Grid>
