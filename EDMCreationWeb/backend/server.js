@@ -129,7 +129,7 @@ app.use("/api/testfollowing", (req, res) => {
             {
                 "username": "user",
                 "description": "Description",
-            }
+            },
         ]
     );
 });

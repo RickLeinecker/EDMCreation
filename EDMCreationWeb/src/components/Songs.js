@@ -130,10 +130,11 @@ class Songs extends Component {
 
 		this.fetchLiked = this.fetchLiked.bind(this);
 		this.playCount = this.playCount.bind(this);
+		this.setSongsState = this.setSongsState.bind(this);
+		this.toggleLike = this.toggleLike.bind(this);
 	}
 
 	playCount() {
-		alert("Test");
 	}
 
 	componentDidMount() {
@@ -148,17 +149,20 @@ class Songs extends Component {
 
 	async componentDidUpdate(prevProps) {
 		if (this.props.songs !== prevProps.songs) {
-			var songs = this.props.songs;
-
-			if (localStorage.getItem("access_token")) {
-				for (var x in songs) {
-					songs[x].liked = await this.fetchLiked(songs[x].composition_id);
-					// alert(songs[x].liked);
-				}
-			}
-
-			this.setState({ songs: songs })
+			this.setSongsState();
 		}
+	}
+
+	async setSongsState() {
+		var songs = this.props.songs;
+
+		if (localStorage.getItem("access_token")) {
+			for (var x in songs) {
+				songs[x].liked = await this.fetchLiked(songs[x].composition_id);
+			}
+		}
+
+		this.setState({ songs: songs })
 	}
 
 	async fetchLiked(songId) {
@@ -169,7 +173,23 @@ class Songs extends Component {
 		};
 
 		const res = await axios.get(url + "/api/users/isliked?song_id=" + songId, config);
+
 		return res.data.liked;
+	}
+
+	toggleLike(songId) {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		const claims = {
+			song_id: songId,
+		};
+
+		axios.post(url + "/api/users/liketoggle", claims, config)
+			.then(res => this.props.fetchSongs());
 	}
 
 	render() {
@@ -247,12 +267,12 @@ class Songs extends Component {
 											</Grid>
 											<Grid item xs container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
-													{song.liked ?
+													{/* {song.liked ?
 														(< Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
 														(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)
-													}
-													{/* {this.fetchLiked(song.composition_id) === true ?
-														<div onClick={this.props.fetchSongs}
+													} */}
+													{song.liked ?
+														<div onClick={() => this.toggleLike(song.composition_id)}
 															color="inherit" className={classes.statItem}>
 															<Tooltip title="Unlike" placement="top">
 																{<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />}
@@ -260,15 +280,15 @@ class Songs extends Component {
 														</div> :
 														<div onMouseEnter={() => this.setState({ ["favorite" + i]: true })}
 															onMouseLeave={() => this.setState({ ["favorite" + i]: false })}
-															color="inherit" className={classes.statItem}>
-															<Tooltip title="Like" placement="top"
-																onClick={this.props.fetchSongs}>
+															color="inherit" className={classes.statItem}
+															onClick={() => this.toggleLike(song.composition_id)}>
+															<Tooltip title="Like" placement="top">
 																{this.state["favorite" + i] ?
 																	(<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
 																	(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)}
 															</Tooltip>
 														</div>
-													} */}
+													}
 													<span className={classes.numLikes}>
 														{song.likes}
 													</span>
