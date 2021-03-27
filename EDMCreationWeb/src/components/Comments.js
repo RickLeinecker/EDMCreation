@@ -6,7 +6,8 @@ import Moment from 'react-moment';
 const styles = theme => ({
     username: {
         marginRight: 5,
-        color: "#219653"
+        color: "#219653",
+        display: "inline-block",
     },
     date: {
         color: "#828282",
@@ -71,7 +72,7 @@ class Comments extends Component {
                                 <Grid item container>
                                     <Grid item className={classes.userSection}>
                                         <Typography variant="body2" className={classes.username}>
-                                            <Link href="#" color="inherit">{comment.username}</Link>
+                                            <Link href={"/profile?username=" + comment.username} color="inherit">{comment.username}</Link>
                                         </Typography>
                                     </Grid>
                                     <Grid item>

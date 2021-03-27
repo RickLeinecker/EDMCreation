@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const JSRSASign = require("jsrsasign");
 const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
+const { json } = require('body-parser');
 require('dotenv').config();
 
 //sign up 
@@ -126,12 +127,12 @@ router.route('/login').post(
 
                             res.status(200).json({ sJWT, username: user.username, user_id: user._id, msg: 'Login successful!' }); //return token in body for log in      
                         } else {
-                            return res.status(400).json({ msg: "Incorrect password" });
+                            return res.status(400).json({ msg: "Incorrect ussername and/or password" });
                         } //end password checking
                     }); //exact match
                 } //end username match
                 else {
-                    return res.status(400).json({ msg: "Invalid username" });
+                    return res.status(400).json({ msg: "Invalid username and/or password" });
                 }
             }); //end user search
     }); //end login
@@ -177,49 +178,46 @@ router.route('/info/:username').get((req, res) => {
 
 //toggle a user favorite for a song
 router.route('/liketoggle').post(auth, (req, res) => {
-    
+
     //composition_id = req.body.song_id;
     //user_id = req.body.ID;
 
-    User.findOne({$and: [{_id: req.body.ID} , {"favorites":{$elemMatch:{composition_id:mongoose.Types.ObjectId(req.body.song_id)}}}] })
-        .then(user=>{
+    User.findOne({ $and: [{ _id: req.body.ID }, { "favorites": { $elemMatch: { composition_id: mongoose.Types.ObjectId(req.body.song_id) } } }] })
+        .then(user => {
 
-            if(user){//if present
+            if (user) {//if present
                 //remove
 
                 User.findOneAndUpdate(
                     { _id: req.body.ID },
-                    { $pull: { "favorites": { composition_id:mongoose.Types.ObjectId(req.body.song_id)} } },
+                    { $pull: { "favorites": { composition_id: mongoose.Types.ObjectId(req.body.song_id) } } },
                     { new: true },
-                    function(err) {
+                    function (err) {
                         if (err) { console.log(err) }
                     }
                 ).then(res.status(200).json({ msg: 'unfavorited' }));
-                   
-            }else{//if not present
+
+            } else {//if not present
                 //add
                 User.updateOne(
-                    {_id: req.body.ID},
+                    { _id: req.body.ID },
                     {
                         $push:
                         {
                             favorites:
-                            [
-                                {
-                                    composition_id: mongoose.Types.ObjectId(req.body.song_id),
-                                }
-                            ]
+                                [
+                                    {
+                                        composition_id: mongoose.Types.ObjectId(req.body.song_id),
+                                    }
+                                ]
                         }
                     },
                     //{$push: {contacts: {$each: contact.contacts}}},
-                    {upsert: true}, 
-                    (err, result) =>
-                    {
-                        if (err)
-                        {
+                    { upsert: true },
+                    (err, result) => {
+                        if (err) {
                             res.status(400).json('Error: ' + err);
-                        }else
-                        {
+                        } else {
                             res.status(200).json({ msg: 'favorited' });
                         }
                     }
@@ -231,5 +229,16 @@ router.route('/liketoggle').post(auth, (req, res) => {
 
 });
 
+router.route('/isliked').get(auth, (req, res) => {
+    User.findOne({ $and: [{ _id: req.body.ID }, { "favorites": { $elemMatch: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } } }] })
+        .then(user => {
+            if (user) {
+                res.status(200).json({ liked: true });
+            }
+            else {
+                res.status(200).json({ liked: false });
+            }
+        });
+});
 
 module.exports = router;

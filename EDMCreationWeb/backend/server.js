@@ -105,6 +105,30 @@ app.use("/api/testfollowing", (req, res) => {
             {
                 "username": "user",
                 "description": "Description",
+            },
+            {
+                "username": "edmguy",
+                "description": "Long long long long long long long long long long long long long long long long long long long long long long long long long description",
+            },
+            {
+                "username": "edm",
+                "description": "EDM",
+            },
+            {
+                "username": "user",
+                "description": "Description",
+            },
+            {
+                "username": "edmguy",
+                "description": "Long long long long long long long long long long long long long long long long long long long long long long long long long description",
+            },
+            {
+                "username": "edm",
+                "description": "EDM",
+            },
+            {
+                "username": "user",
+                "description": "Description",
             }
         ]
     );

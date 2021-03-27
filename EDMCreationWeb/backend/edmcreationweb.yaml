@@ -326,11 +326,7 @@ paths:
                     type: string
   /api/users/info/{username}:
     get:
-<<<<<<< HEAD
-      summary: profile page
-=======
       summary: User info
->>>>>>> 96af1c8afeb16021583aa6b3876e3536e0536971
       tags:
         - account
       parameters:
@@ -362,7 +358,7 @@ paths:
                     type: string
   /api/users/liketoggle:
     post:
-      summary: user favorite a song
+      summary: User favorite a song
       tags:
         - account 
       requestBody:
@@ -386,6 +382,38 @@ paths:
                     type: boolean
                   message:
                     type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/isliked:
+    get:
+      summary: Returns true if user favorited the song
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: song_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
         '400':
           description: Failed
           content:

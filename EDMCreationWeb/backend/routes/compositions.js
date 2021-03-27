@@ -153,7 +153,6 @@ router.route('/play/:filename').get((req, res) => {
 //load multiple composition infos for pages
 //REQUIRES PAGE NUMBER IN ROUTE, STARTING ON 1
 router.route('/popular').get(async (req, res) => {
-
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
 
@@ -174,8 +173,7 @@ router.route('/popular').get(async (req, res) => {
                     path: "$compositions.path"
                 },
             },
-
-            { $sort: { "listens": -1 } }, //descending values for listens
+            { $sort: { "composition_id": 1, "listens": -1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
@@ -187,7 +185,6 @@ router.route('/popular').get(async (req, res) => {
         res.status(400).json({ msg: e.message });
     }
 });
-
 
 router.route('/user/:username').get(async (req, res) => {
     const songsPerPage = 5;
@@ -225,26 +222,23 @@ router.route('/user/:username').get(async (req, res) => {
     }
 });
 
-
 //upload comment for a given song
 router.route('/postcomment').post(auth, (req, res) => {
     const comment = req.body.comment;
     const song = req.body.song_id;
-    const username = req.body.uName;
     const user_id = req.body.ID;
+    var newComment;
 
-    const newComment = new Comment({ username, user_id, comment });
-
-    User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
-        .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
-        .catch(err => res.status(400).json('Error: ' + err));
+    User.findOne({ "_id": user_id })
+        .then(user => {
+            const username = user.username;
+            newComment = new Comment({ username, user_id, comment });
+        })
+        .then(() => {
+            User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
+                .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
+                .catch(err => res.status(400).json('Error: ' + err));
+        });
 });
-
-
-
-
-
-
-
 
 module.exports = router;

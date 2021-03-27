@@ -7,7 +7,7 @@ import Following from "./Following";
 import axios from "axios";
 import qs from "query-string";
 import { url } from "./URL";
-import PageButtons from "./PageButtons";
+import ProfilePageButtons from "./ProfilePageButtons";
 
 const styles = theme => ({
     profile: {
@@ -78,9 +78,11 @@ class Profile extends Component {
 
         this.state = {
             value: 0,
-            songs: [],
+            uploads: [],
+            favorites: [],
             user: [],
-            page: 1,
+            uploadsPage: 1,
+            favoritesPage: 1,
             currentUser: [localStorage.getItem("username")]
         }
 
@@ -93,33 +95,36 @@ class Profile extends Component {
             else {
                 this.state.username = localStorage.getItem("username");
             }
-
-            if (this.parameters.tab !== undefined) {
-                this.state.value = parseInt(this.parameters.tab);
-            }
-
-            if (this.parameters.page !== undefined) {
-                this.state.page = this.parameters.page;
-            }
         }
         else {
             this.state.username = localStorage.getItem("username");
         }
 
         this.handleChange = this.handleChange.bind(this);
-        this.fetchSongs = this.fetchSongs.bind(this);
+        this.fetchUploads = this.fetchUploads.bind(this);
+        this.fetchFavorites = this.fetchFavorites.bind(this);
     }
 
     componentDidMount() {
         axios.get(url + "/api/users/info/" + this.state.username)
             .then(res => this.setState({ user: res.data }));
 
-        this.fetchSongs();
+        this.fetchUploads(this.state.uploadsPage);
+        this.fetchFavorites(this.state.favoritesPage);
     }
 
-    fetchSongs(page) {
-        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + this.state.page)
-            .then(res => this.setState({ songs: res.data }));
+    fetchUploads(page) {
+        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
+            .then(res => {
+                this.setState({ uploads: res.data, uploadsPage: page });
+            });
+    }
+
+    fetchFavorites(page) {
+        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
+            .then(res => {
+                this.setState({ favorites: res.data, favoritesPage: page });
+            });
     }
 
     handleChange(e, newValue) {
@@ -192,12 +197,12 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
-                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=0&"} page={this.state.page} />
+                    <Songs songs={this.state.uploads} fetchSongs={this.fetchUploads} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <ProfilePageButtons page={this.state.uploadsPage} fetchSongs={this.fetchUploads} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
-                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=1&"} page={this.state.page} />
+                    <Songs songs={this.state.favorites} fetchSongs={this.fetchFavorites} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                     <Following user={this.state.user} />

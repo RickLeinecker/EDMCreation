@@ -14,6 +14,7 @@ import {
     Link
 } from "@material-ui/core";
 import axios from "axios";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const styles = theme => ({
     root: {
@@ -57,14 +58,19 @@ class Following extends Component {
             followedUsers: [],
             loggedInUser: ""
         }
+
+        this.fetchData = this.fetchData.bind(this);
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testfollowing")
-            .then(res => this.setState({ followedUsers: res.data }));
+        this.fetchData();
+    }
 
-        axios.get("http://localhost:5000/api/testuser")
-            .then(res => this.setState({ loggedInUser: res.data }));
+    fetchData() {
+        setTimeout(() => {
+            axios.get("http://localhost:5000/api/testfollowing")
+                .then(res => this.setState({ followedUsers: this.state.followedUsers.concat(res.data) }));
+        }, 1500);
     }
 
     render() {
@@ -97,8 +103,13 @@ class Following extends Component {
             <div className={classes.root}>
                 <div className={classes.div}>
                     <List>
-                        {
-                            this.state.followedUsers.map((user, i, arr) => (
+                        <InfiniteScroll
+                            dataLength={this.state.followedUsers.length}
+                            next={this.fetchData}
+                            hasMore={true}
+                            loader={<h4>Loading...</h4>}
+                        >
+                            {this.state.followedUsers.map((user, i, arr) => (
                                 <div>
                                     <Grid item container alignItems="center">
                                         <Grid item xs={8}>
@@ -141,8 +152,8 @@ class Following extends Component {
                                     </Grid>
                                     {i + 1 !== arr.length ? (<Divider variant="inset" component="li" className={classes.divider} />) : <div />}
                                 </div>
-                            ))
-                        }
+                            ))}
+                        </InfiniteScroll>
                     </List>
                 </div>
             </div >

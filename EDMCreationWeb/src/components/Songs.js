@@ -10,7 +10,6 @@ import {
 	Link,
 	Chip,
 	Tooltip,
-	Fab
 } from "@material-ui/core";
 import {
 	Image,
@@ -23,10 +22,11 @@ import {
 	HighlightOff
 } from '@material-ui/icons';
 import "html-midi-player";
-import sample from "../dummy-data/Sample.mid";
 import "../player.css";
 import Comments from "./Comments";
 import PostComment from "./PostComment";
+import axios from "axios";
+import { url } from "./URL";
 
 const styles = theme => ({
 	root: {
@@ -125,7 +125,15 @@ class Songs extends Component {
 		this.state = {
 			editable: false,
 			deletable: false,
+			songs: []
 		}
+
+		this.fetchLiked = this.fetchLiked.bind(this);
+		this.playCount = this.playCount.bind(this);
+	}
+
+	playCount() {
+		alert("Test");
 	}
 
 	componentDidMount() {
@@ -138,10 +146,36 @@ class Songs extends Component {
 		}
 	}
 
+	async componentDidUpdate(prevProps) {
+		if (this.props.songs !== prevProps.songs) {
+			var songs = this.props.songs;
+
+			if (localStorage.getItem("access_token")) {
+				for (var x in songs) {
+					songs[x].liked = await this.fetchLiked(songs[x].composition_id);
+					// alert(songs[x].liked);
+				}
+			}
+
+			this.setState({ songs: songs })
+		}
+	}
+
+	async fetchLiked(songId) {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		const res = await axios.get(url + "/api/users/isliked?song_id=" + songId, config);
+		return res.data.liked;
+	}
+
 	render() {
 		const { classes } = this.props;
 
-		if (Object.keys(this.props.songs).length === 0) {
+		if (Object.keys(this.state.songs).length === 0) {
 			return (
 				<div className={classes.root}>
 					<Typography variant="body2">
@@ -154,7 +188,7 @@ class Songs extends Component {
 		return (
 			<div className={classes.root}>
 				{
-					this.props.songs.map((song, i) => (
+					this.state.songs.map((song, i) => (
 						<Paper className={classes.paper}>
 							<Grid item xs container direction="column" className={classes.songSection}>
 								<Grid container>
@@ -213,7 +247,11 @@ class Songs extends Component {
 											</Grid>
 											<Grid item xs container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
-													{song.liked === true ?
+													{song.liked ?
+														(< Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
+														(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)
+													}
+													{/* {this.fetchLiked(song.composition_id) === true ?
 														<div onClick={this.props.fetchSongs}
 															color="inherit" className={classes.statItem}>
 															<Tooltip title="Unlike" placement="top">
@@ -230,7 +268,7 @@ class Songs extends Component {
 																	(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)}
 															</Tooltip>
 														</div>
-													}
+													} */}
 													<span className={classes.numLikes}>
 														{song.likes}
 													</span>
@@ -251,7 +289,7 @@ class Songs extends Component {
 									<AccordionDetails className={classes.innerCommentsSection}>
 										<Grid container spacing={10}>
 											<Grid item xs={6}>
-												<Comments comments={song.comments} refresh={this.state.refreshComments} />
+												<Comments comments={song.comments} />
 											</Grid>
 											<Grid item xs={6}>
 												<PostComment songId={song.composition_id} fetchSongs={this.props.fetchSongs} songNumber={i} />
