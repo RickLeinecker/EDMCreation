@@ -6,5 +6,6 @@ namespace EDMCreation.Core.Services.Interfaces
     {
         List<string> GenerateSongs(List<string> prevGen);
 
+        void TrainModel();
     }
 }

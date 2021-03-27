@@ -56,6 +56,10 @@ namespace EDMCreation.Core.ViewModels
         private bool _notOnLastGen;
         public bool NotOnLastGen { get { return _notOnLastGen; } set { SetProperty(ref _notOnLastGen, value); } }
 
+        public bool AdvancedModeEnabled { get; set; }
+
+        public double MutationRate { get; set; }
+
 
         private readonly List<SongsContainerViewModel> _songsContainers;
 
@@ -88,7 +92,7 @@ namespace EDMCreation.Core.ViewModels
         }
 
         public MvxCommand GenerateCommand { get; set; }
-        public void Generate()
+        private void Generate()
         {
             PauseAll();
 
@@ -112,14 +116,14 @@ namespace EDMCreation.Core.ViewModels
             GenerateAndShowNext();
         }
 
-        public void GenerateAndShowNext()
+        private void GenerateAndShowNext()
         {
             GenerateNext();
             _currentGen++;
             ShowGeneration(_currentGen);
         }
 
-        public void GenerateNext()
+        private void GenerateNext()
         {
             // generates the next generation without updating view
             var songFiles = _trainingService.GenerateSongs(_currentSongFiles); // uses test files for now
@@ -132,7 +136,7 @@ namespace EDMCreation.Core.ViewModels
 
         }
 
-        public List<SongViewModel> GenerateSongPanels(List<string> songFiles)
+        private List<SongViewModel> GenerateSongPanels(List<string> songFiles)
         {
             int i = 0;
             List<SongViewModel> songPanels = new List<SongViewModel>();
@@ -206,7 +210,7 @@ namespace EDMCreation.Core.ViewModels
 
         public MvxAsyncCommand BackCommand { get; set; }
 
-        public async Task GoBack()
+        private async Task GoBack()
         {
             PauseAll();
 
@@ -266,7 +270,7 @@ namespace EDMCreation.Core.ViewModels
 
         public MvxCommand NextGenCommand { get; set; }
 
-        public void PreviousGeneration()
+        private void PreviousGeneration()
         {
             if (NotOnFirstGen)
             {
@@ -274,7 +278,7 @@ namespace EDMCreation.Core.ViewModels
                 ShowGeneration(_currentGen - 1);
             }
         }
-        public void NextGeneration()
+        private void NextGeneration()
         {
             if (NotOnLastGen)
             {

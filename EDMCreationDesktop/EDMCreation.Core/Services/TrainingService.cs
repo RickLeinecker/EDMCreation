@@ -1,7 +1,5 @@
 ﻿using EDMCreation.Core.Services.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EDMCreation.Core.Services
 {
@@ -24,6 +22,11 @@ namespace EDMCreation.Core.Services
             };
 
             return songs;
+        }
+
+        public void TrainModel()
+        {
+            
         }
     }
 }

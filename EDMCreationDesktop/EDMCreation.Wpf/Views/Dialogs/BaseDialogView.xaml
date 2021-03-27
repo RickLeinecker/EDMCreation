@@ -23,7 +23,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}" Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}" Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
         <Button IsDefault="True" Command="{Binding OkCommand}" Grid.Row="1" Grid.Column="0" x:Name="confirmButton" Margin="20" HorizontalAlignment="Right" />
         <Button IsCancel="True" Command="{Binding CancelCommand}" Grid.Row="1" Grid.Column="1" x:Name="cancelButton" Margin="20" HorizontalAlignment="Left" />
     </Grid>

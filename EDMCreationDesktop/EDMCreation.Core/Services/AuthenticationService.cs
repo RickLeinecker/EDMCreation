@@ -9,7 +9,7 @@ namespace EDMCreation.Core.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private IDataAccess _dataAccess;
+        private readonly IDataAccess _dataAccess;
 
         public AuthenticationService(IDataAccess dataAccess)
         {

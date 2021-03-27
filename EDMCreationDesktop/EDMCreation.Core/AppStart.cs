@@ -12,7 +12,7 @@ namespace EDMCreation.Core
 	public class AppStart : MvxAppStart<LaunchPageViewModel>
 	{
 
-		public AppStart(IMvxApplication application, IMvxNavigationService navigationService, IAuthenticationService authenticationService) : base(application, navigationService)
+		public AppStart(IMvxApplication application, IMvxNavigationService navigationService) : base(application, navigationService)
 		{
 		}
 	}

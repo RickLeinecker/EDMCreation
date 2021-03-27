@@ -9,6 +9,7 @@ using EDMCreation.Core.Models;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Devices;
 using System.Threading;
+using EDMCreation.Core.Services.Interfaces;
 
 namespace EDMCreation.Core.ViewModels
 {

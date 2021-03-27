@@ -5,22 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using EDMCreation.Core.Services.Interfaces;
+using EDMCreation.Core.Models;
 
 namespace EDMCreation.Core.ViewModels
 {
     public class SelectGenreViewModel : MvxViewModel
     {
         private readonly IMvxNavigationService _navigationService;
+        private readonly IGenreService _genreService;
 
-        private readonly List<string> _genres;
-        public List<string> Genres { get { return _genres; } }
+        private readonly List<GenreModel> _genres;
+        public List<GenreModel> Genres { get { return _genres; } }
 
-        public SelectGenreViewModel(IMvxNavigationService navigationService)
+        public SelectGenreViewModel(IMvxNavigationService navigationService, IGenreService genreService)
         {
             _navigationService = navigationService;
+            _genreService = genreService;
+
             BackCommand = new MvxAsyncCommand(GoBack);
             ShowSongGenerationViewCommand = new MvxAsyncCommand(ShowSongGenerationView);
-            _genres = new List<string>(){ "Genre 1", "Genre 2", "Genre 3", "Genre 4", "Genre 5", "Genre 6", "Genre 7" };
+
+            _genres = _genreService.Genres;
         }
         public MvxAsyncCommand BackCommand { get; set; }
 

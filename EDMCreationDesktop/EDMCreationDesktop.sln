@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDMCreation.Core", "EDMCreation.Core\EDMCreation.Core.csproj", "{F27144CD-72E4-4481-BB4F-B38F79A1F5C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EDMCreation.Core", "EDMCreation.Core\EDMCreation.Core.csproj", "{F27144CD-72E4-4481-BB4F-B38F79A1F5C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDMCreation.Wpf", "EDMCreation.Wpf\EDMCreation.Wpf.csproj", "{6191B451-53AF-44B6-BF8C-3D8557CEB098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EDMCreation.Wpf", "EDMCreation.Wpf\EDMCreation.Wpf.csproj", "{6191B451-53AF-44B6-BF8C-3D8557CEB098}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,6 +7,7 @@ using MvvmCross.IoC;
 using MongoDB.Driver;
 using EDMCreation.Core.Utilities;
 using EDMCreation.Core.Services.Interfaces;
+using System;
 
 namespace EDMCreation.Core
 {
@@ -14,6 +15,8 @@ namespace EDMCreation.Core
     {
         public override void Initialize()
         {
+            //Keras.Keras.DisablePySysConsoleLog = true;
+
             CreatableTypes()
                 .EndingWith("Service")
                 .AsInterfaces()
