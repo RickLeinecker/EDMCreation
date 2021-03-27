@@ -140,24 +140,9 @@ router.route('/login').post(
 
 
 router.route('/info/:username').get((req, res) => {
-    // User.findOne({ _id: mongoose.Types.ObjectId(req.params.user_id) })
-    //     .then(user => {
-    //         if (user) {//if user id found
-    //             res.status(200).json({
-    //                 username: user.username,
-    //                 description: user.description,
-    //                 upload_count: user.upload_count,
-    //                 listens_count: user.listens_count,
-    //                 msg: 'Login successful!'
-    //             }); //return token in body for log in      
-    //         } else {
-    //             return res.status(400).json({ msg: "Invalid username" });
-    //         }
-    //     }); //end user search
-
-    User.aggregate(
+      User.aggregate(
         [
-            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
+            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } }, //made case insensitive.
             {
                 $project: {
                     username: "$username",
@@ -178,7 +163,7 @@ router.route('/info/:username').get((req, res) => {
 
 //toggle a user favorite for a song
 router.route('/liketoggle').post(auth, (req, res) => {
-
+    
     //composition_id = req.body.song_id;
     //user_id = req.body.ID;
 
@@ -229,6 +214,61 @@ router.route('/liketoggle').post(auth, (req, res) => {
 
 });
 
+
+//toggle a user favorite for a song
+router.route('/followtoggle').post(auth, (req, res) => {
+    
+    //composition_id = req.body.song_id;
+    //user_id = req.body.ID;
+
+    User.findOne({ $and: [{ _id: req.body.ID }, { "following": { $elemMatch: { user_id: mongoose.Types.ObjectId(req.body.follow_id) } } }] })
+        .then(user => {
+
+            if (user) {//if present
+                //remove
+
+                User.findOneAndUpdate(
+                    { _id: req.body.ID },
+                    { $pull: { "following": { user_id: mongoose.Types.ObjectId(req.body.follow_id) } } },
+                    { new: true },
+                    function (err) {
+                        if (err) { console.log(err) }
+                    }
+                ).then(res.status(200).json({ msg: 'unfollowed' }));
+
+            } else {//if not present
+                //add
+                User.updateOne(
+                    { _id: req.body.ID },
+                    {
+                        $push:
+                        {
+                            following:
+                                [
+                                    {
+                                        user_id: mongoose.Types.ObjectId(req.body.follow_id),
+                                    }
+                                ]
+                        }
+                    },
+                    //{$push: {contacts: {$each: contact.contacts}}},
+                    { upsert: true },
+                    (err, result) => {
+                        if (err) {
+                            res.status(400).json('Error: ' + err);
+                        } else {
+                            res.status(200).json({ msg: 'followed' });
+                        }
+                    }
+                );
+            }//end add
+
+        });//end then
+
+});
+
+
+
 router.route('/isliked').get(auth, (req, res) => {
     User.findOne({ $and: [{ _id: req.body.ID }, { "favorites": { $elemMatch: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } } }] })
         .then(user => {
@@ -240,5 +280,94 @@ router.route('/isliked').get(auth, (req, res) => {
             }
         });
 });
+
+//loads the edit page for a user
+router.route('/editinfo/').get(auth, (req, res) => {
+    User.findOne({ _id: req.body.ID })
+        .then(user => {
+            if (user) {//if user id found
+                res.status(200).json({
+                    username: user.username,
+                    description: user.description,
+                    email: user.email,
+                    }); //return token in body for log in      
+            } else {
+                return res.status(400).json({ msg: "Invalid username" });
+            }
+        }); //end user search
+
+});
+
+//saves the edit page 
+router.route('/editsave/').post(auth,[
+    check('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
+    check('email').isEmail().withMessage('Email is invalid'),
+    check('newPassword').optional().isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
+    check('confirmationPassword').custom((value, { req }) => {
+                                                                if(!req.body.newPassword){
+                                                                    True
+                                                                }else{
+                                                                    (value === req.body.newPassword)
+                                                                }
+                                                             }).withMessage('Passwords do not match')],
+    (req, res) => {
+    //check the results of  the validation
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() })
+    }
+
+    //all applicable fields are valid
+
+    User.findOne({ _id: req.body.ID })
+        .then(user => {
+            if (user) {//if user id found
+                res.status(200).json({
+                    username: user.username,
+                    description: user.description,
+                    email: user.email,
+                    }); //return token in body for log in      
+            } else {
+                return res.status(400).json({ msg: "Invalid username" });
+            }
+        }); //end user search
+
+
+
+    if(req.body.password){//if password exists
+        
+        User.findOne({ _id: req.body.ID })
+            .then(user => {
+                if (user) {//if username found
+                    bcrypt.compare(password, user.password).then(isMatch => {
+                        if (isMatch) {
+                            //save new password but must encrypt
+                            //hashing password before storing it in database
+                            bcrypt.genSalt(10, (err, salt) => {
+                                bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                if (err) return res.status(400).json('Error: ' + err);
+                                    user.password = hash;
+                                    user.save()
+                                        .then(() => res.status(200).json('Password updated'))
+                                        .catch(err => res.status(400).json('Error: ' + err));
+                                });
+                            });
+                        } else {
+                            return res.status(400).json({ msg: "Incorrect password" });
+                        } //end password checking
+                    }); //exact match
+                } //end username match
+                else {
+                    return res.status(400).json({ msg: "Invalid User" });
+                }
+            }); //end user search
+
+    }//and password update
+
+});
+
+
+
 
 module.exports = router;

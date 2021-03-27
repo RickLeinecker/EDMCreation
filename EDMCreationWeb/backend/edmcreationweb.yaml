@@ -425,3 +425,40 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/users/followtoggle:
+    post:
+      summary: User follows a user
+      tags:
+        - account 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:               
+                follow_id:
+                  type: string
+                  example: 6058d7ab3c858d1ac4ce9ec1
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
