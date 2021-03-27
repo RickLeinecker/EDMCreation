@@ -268,7 +268,7 @@ router.route('/followtoggle').post(auth, (req, res) => {
 });
 
 
-
+//returns liked status
 router.route('/isliked').get(auth, (req, res) => {
     User.findOne({ $and: [{ _id: req.body.ID }, { "favorites": { $elemMatch: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } } }] })
         .then(user => {
@@ -281,8 +281,9 @@ router.route('/isliked').get(auth, (req, res) => {
         });
 });
 
+
 //loads the edit page for a user
-router.route('/editinfo/').get(auth, (req, res) => {
+router.route('/editinfo').get(auth, (req, res) => {
     User.findOne({ _id: req.body.ID })
         .then(user => {
             if (user) {//if user id found
@@ -298,16 +299,20 @@ router.route('/editinfo/').get(auth, (req, res) => {
 
 });
 
+
 //saves the edit page 
-router.route('/editsave/').post(auth,[
-    check('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
+router.route('/editsave').post(auth,[
     check('email').isEmail().withMessage('Email is invalid'),
-    check('newPassword').optional().isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
+    check('newPassword').optional({checkFalsy:true}).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
     check('confirmationPassword').custom((value, { req }) => {
                                                                 if(!req.body.newPassword){
-                                                                    True
+                                                                   return true;
                                                                 }else{
-                                                                    (value === req.body.newPassword)
+                                                                    if(value === req.body.newPassword){
+                                                                        return true;
+                                                                    }else{
+                                                                        return false;
+                                                                    }
                                                                 }
                                                              }).withMessage('Passwords do not match')],
     (req, res) => {
@@ -323,33 +328,35 @@ router.route('/editsave/').post(auth,[
     User.findOne({ _id: req.body.ID })
         .then(user => {
             if (user) {//if user id found
-                res.status(200).json({
-                    username: user.username,
-                    description: user.description,
-                    email: user.email,
-                    }); //return token in body for log in      
+                user.email = req.body.email;
+                user.description = req.body.description;
+                user.save()
+                    .catch(err => res.status(400).json('Error: ' + err));     
             } else {
                 return res.status(400).json({ msg: "Invalid username" });
+            }
+            if(req.body.newPassword === ""){
+                return res.status(200).json('Password and fields updated');
             }
         }); //end user search
 
 
 
-    if(req.body.password){//if password exists
+    if(!(req.body.newPassword === "")){//if password exists
         
         User.findOne({ _id: req.body.ID })
             .then(user => {
                 if (user) {//if username found
-                    bcrypt.compare(password, user.password).then(isMatch => {
+                    bcrypt.compare(req.body.password, user.password).then(isMatch => {
                         if (isMatch) {
                             //save new password but must encrypt
                             //hashing password before storing it in database
                             bcrypt.genSalt(10, (err, salt) => {
-                                bcrypt.hash(newUser.password, salt, (err, hash) => {
+                                bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
                                 if (err) return res.status(400).json('Error: ' + err);
                                     user.password = hash;
                                     user.save()
-                                        .then(() => res.status(200).json('Password updated'))
+                                        .then(() => res.status(200).json('Password and fields updated'))
                                         .catch(err => res.status(400).json('Error: ' + err));
                                 });
                             });
@@ -364,6 +371,7 @@ router.route('/editsave/').post(auth,[
             }); //end user search
 
     }//and password update
+
 
 });
 

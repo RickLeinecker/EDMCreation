@@ -226,10 +226,6 @@ paths:
           schema:
             type: integer
             example: "1"
-        - in: query
-          name: user
-          schema:
-            type: string
       responses:
         '200':
           description: Successful
@@ -462,3 +458,200 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/users/editsave:
+    post:
+      summary: edit user info
+      tags:
+        - account 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:                 
+                email:
+                  type: string
+                  example: "treven@treven.com" 
+                password:
+                  type: string
+                  example: "treven123"
+                newPassword:
+                  type: string
+                  example: "treven123"
+                confirmationPassword:
+                  type: string
+                  example: "treven123"
+                description:
+                  type: string
+                  example: "this is me"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/users/editinfo:
+    get:
+      summary: user info for edit page
+      tags:
+        - account 
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/editinfo:
+    get:
+      summary: song info for edit page
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: song_id
+          schema:
+            type: string 
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/editsave:
+    post:
+      summary: save new song info
+      tags:
+        - compositions 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:                 
+                title:
+                  type: string
+                  example: "treven@treven.com" 
+                genre:
+                  type: string
+                  example: "treven123"
+                song_id:
+                  type: string
+                  example: "605f9a9cb07dce2ff0cc7c24"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
