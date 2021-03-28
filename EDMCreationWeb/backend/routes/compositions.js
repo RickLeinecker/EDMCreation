@@ -407,22 +407,10 @@ router.route('/editsave').post(auth, [
     });
 
 router.route('/incrementplaycount').post((req, res) => {
-    const song = req.body.song_id;
-
-    User.updateOne(
-        { "compositions._id": song },
-        {
-            $inc: { "compositions.$.listens": 1 }
-        }
-    )
-        .then((err, res) => {
-            if (err) {
-                res.status(400).json({ msg: 'Play count increment failed' });
-            }
-
-            res.status(200).json({ msg: 'Play count increment successful' });
-        })
-        .catch(e => res.send("Error"))
+         
+          User.updateOne({ "compositions._id": req.body.song_id }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
+          .then(() => res.status(200).json('Play count incremented')) 
+          .catch(err => res.status(400).json('Error: ' + err)); 
 
 });
 
