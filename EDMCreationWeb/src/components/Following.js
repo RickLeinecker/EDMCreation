@@ -70,7 +70,7 @@ class Following extends Component {
         setTimeout(() => {
             axios.get("http://localhost:5000/api/testfollowing")
                 .then(res => this.setState({ followedUsers: this.state.followedUsers.concat(res.data) }));
-        }, 1500);
+        }, 500);
     }
 
     render() {

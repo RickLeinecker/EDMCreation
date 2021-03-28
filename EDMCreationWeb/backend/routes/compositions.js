@@ -101,7 +101,7 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
 
         const newComp = new Composition({ title, genre, user_id, username, path, listens, favorites, comment_count }); //just drop this line for only user upload?
 
-        User.updateOne({ _id: user_id }, { $push: { "compositions": newComp }, $inc: { upload_count: 1 } })
+        User.updateOne({ _id: user_id }, { $push: { "compositions": newComp } })
             .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
             .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
     });
@@ -185,6 +185,7 @@ router.route('/popular').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
+                    listens: "$compositions.listens"
                 },
             },
             {
@@ -207,6 +208,30 @@ router.route('/popular').get(async (req, res) => {
                     comments: { $push: "$comments" },
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
                 }
             },
             { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
@@ -229,23 +254,73 @@ router.route('/user/:username').get(async (req, res) => {
     try {
         const items = await User.aggregate([
             { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
-            { $unwind: "$compositions" },
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
             {
                 $project: {
-                    user_id: "$_id",
                     composition_id: "$compositions._id",
                     title: "$compositions.title",
                     username: "$username",
-                    likes: "$compositions.favorites",
-                    listens: "$compositions.listens",
-                    num_comments: "$compositions.comment_count",
+                    num_comments: { $size: "$compositions.comments" },
                     date: "$compositions.last_modified",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
-                    path: "$compositions.path"
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
                 },
             },
-            { $sort: { "listens": -1 } }, //descending values for listens
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.last_modified": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": -1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
@@ -271,7 +346,7 @@ router.route('/postcomment').post(auth, (req, res) => {
             newComment = new Comment({ username, user_id, comment });
         })
         .then(() => {
-            User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
+            User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment } })
                 .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
                 .catch(err => res.status(400).json('Error: ' + err));
         });
@@ -323,7 +398,7 @@ router.route('/editsave').post(auth, [
                     //update the song info
                     return res.status(200).json({ msg: 'Song has been updated' });
                 } else {//if not present
-                    return res.status(400).json({ msg: 'Invalid User or Song' });
+                    return res.status(400).json({ msg: 'Invalid user or song' });
                     //song doesnot belong to user access denied
                 }//end add
 
@@ -331,5 +406,24 @@ router.route('/editsave').post(auth, [
 
     });
 
+router.route('/incrementplaycount').post((req, res) => {
+    const song = req.body.song_id;
+
+    User.updateOne(
+        { "compositions._id": song },
+        {
+            $inc: { "compositions.$.listens": 1 }
+        }
+    )
+        .then((err, res) => {
+            if (err) {
+                res.status(400).json({ msg: 'Play count increment failed' });
+            }
+
+            res.status(200).json({ msg: 'Play count increment successful' });
+        })
+        .catch(e => res.send("Error"))
+
+});
 
 module.exports = router;
