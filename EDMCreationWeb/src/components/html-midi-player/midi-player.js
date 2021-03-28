@@ -7,6 +7,7 @@
 
 import { urlToNoteSequence, PianoRollSVGVisualizer, WaterfallSVGVisualizer, StaffSVGVisualizer, Player, SoundFontPlayer } from '@magenta/music/es6/core';
 import axios from "axios";
+import { url } from "../URL";
 
 var playIcon = "<svg width=\"24\" height=\"24\" version=\"1.1\" viewBox=\"0 0 6.35 6.35\" xmlns=\"http://www.w3.org/2000/svg\">\n <path d=\"m4.4979 3.175-2.1167 1.5875v-3.175z\" stroke-width=\".70201\"/>\n</svg>\n";
 
@@ -492,6 +493,10 @@ class PlayerElement extends HTMLElement {
         }
     }
     incrementPlayCount() {
+        const claims = {
+			song_id: this.songId
+		};
+        axios.post(url + "/api/compositions/incrementplaycount", claims);
     }
 }
 

@@ -113,6 +113,17 @@ class Profile extends Component {
         this.fetchFavorites(this.state.favoritesPage);
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.value === 0 && prevState.value !== 0) {
+            this.setState({ uploads: [] });
+            this.fetchUploads(this.state.uploadsPage);
+        }
+        else if (this.state.value === 1 && prevState.value !== 1) {
+            this.setState({ favorites: [] });
+            this.fetchFavorites(this.state.favoritesPage);
+        }
+    }
+
     fetchUploads(page) {
         axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
             .then(res => {
@@ -129,7 +140,6 @@ class Profile extends Component {
 
     handleChange(e, newValue) {
         this.setState({ value: newValue });
-        // window.location.href = "/profile?username=" + this.state.username + "&tab=" + newValue;
     }
 
     render() {
@@ -201,7 +211,7 @@ class Profile extends Component {
                     <ProfilePageButtons page={this.state.uploadsPage} fetchSongs={this.fetchUploads} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.favorites} fetchSongs={this.fetchFavorites} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <Songs songs={this.state.favorites} fetchSongs={this.fetchFavorites} />
                     <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>

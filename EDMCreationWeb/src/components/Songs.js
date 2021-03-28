@@ -22,8 +22,8 @@ import {
 	HighlightOff
 } from '@material-ui/icons';
 import "../player.css";
-//import "./html-midi-player/core";
-//import "./html-midi-player/Tone";
+// import "./html-midi-player/core";
+// import "./html-midi-player/Tone";
 import "./html-midi-player/midi-player";
 import Comments from "./Comments";
 import PostComment from "./PostComment";
