@@ -418,7 +418,6 @@ class PlayerElement extends HTMLElement {
             var existCondition = setInterval(() => {
                 if (document.querySelectorAll(selector).length) {
                     clearInterval(existCondition);
-
                     for (const element of document.querySelectorAll(selector)) {
                         if (!(element instanceof VisualizerElement)) {
                             console.warn(`Selector ${selector} matched non-visualizer element`, element);
@@ -427,7 +426,7 @@ class PlayerElement extends HTMLElement {
                         this.addVisualizer(element);
                     }
                 }
-            }, 100); // check every 100ms
+            }, 100);
         }
     }
     freeze() {

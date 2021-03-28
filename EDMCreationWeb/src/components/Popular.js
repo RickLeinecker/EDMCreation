@@ -46,13 +46,7 @@ class Popular extends Component {
 	}
 
 	fetchSongs() {
-		const config = {
-            headers: {
-                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
-            }
-        };
-		
-		axios.get(url + "/api/compositions/popular?page=" + this.state.page, config)
+		axios.get(url + "/api/compositions/popular?page=" + this.state.page)
 			.then(res => this.setState({ songs: res.data }));
 	}
 
