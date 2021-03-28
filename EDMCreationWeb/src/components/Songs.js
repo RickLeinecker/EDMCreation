@@ -21,8 +21,10 @@ import {
 	Edit,
 	HighlightOff
 } from '@material-ui/icons';
-import "html-midi-player";
 import "../player.css";
+import "./html-midi-player/core";
+import "./html-midi-player/Tone";
+import "./html-midi-player/midi-player";
 import Comments from "./Comments";
 import PostComment from "./PostComment";
 import axios from "axios";
@@ -129,12 +131,8 @@ class Songs extends Component {
 		}
 
 		this.fetchLiked = this.fetchLiked.bind(this);
-		this.playCount = this.playCount.bind(this);
 		this.setSongsState = this.setSongsState.bind(this);
 		this.toggleLike = this.toggleLike.bind(this);
-	}
-
-	playCount() {
 	}
 
 	componentDidMount() {
@@ -258,7 +256,8 @@ class Songs extends Component {
 												<midi-visualizer src={song.path} />
 												<midi-player src={song.path}
 													visualizer={"#section" + i + " midi-visualizer"}
-													sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus" />
+													sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus"
+													song-id={song.composition_id} />
 											</section>
 										</Grid>
 										<Grid item container xs style={{ paddingRight: 29 }} >
@@ -267,10 +266,6 @@ class Songs extends Component {
 											</Grid>
 											<Grid item xs container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
-													{/* {song.liked ?
-														(< Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
-														(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)
-													} */}
 													{song.liked ?
 														<div onClick={() => this.toggleLike(song.composition_id)}
 															color="inherit" className={classes.statItem}>
