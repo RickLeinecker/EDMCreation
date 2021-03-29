@@ -77,7 +77,7 @@ class Comments extends Component {
                                     </Grid>
                                     <Grid item>
                                         <Typography variant="body2" className={classes.date}>
-                                            <Moment fromNow ago>{(new Date(comment.last_modified))}</Moment> ago
+                                            <Moment fromNow ago>{(new Date(comment.created_on))}</Moment> ago
                                         </Typography>
                                     </Grid>
                                 </Grid>

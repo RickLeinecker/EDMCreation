@@ -7,9 +7,8 @@ const userSchema = new Schema(
         comment_id: { type: mongoose.Types.ObjectId },
         user_id: { type: mongoose.Types.ObjectId },
         username: { type: String },
-        comment:{ type: String },
-        created_on: { type: Date },
-        last_modified: { type: Date, default: Date.now }
+        comment: { type: String },
+        created_on: { type: Date, default: Date.now },
     },
     {
         timestamps: true

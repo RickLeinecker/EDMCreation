@@ -4,6 +4,7 @@ import { AccountBox } from '@material-ui/icons/';
 import axios from "axios";
 import LogIn from "./LogIn";
 import { withRouter } from "react-router-dom";
+import { url } from "./URL";
 
 const styles = theme => ({
     title: {
@@ -81,6 +82,7 @@ class EditProfile extends Component {
             email: "",
             username: "",
             description: "",
+            password: "",
             newPassword: "",
             confirmationNewPassword: "",
             currentEmail: "",
@@ -91,6 +93,7 @@ class EditProfile extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.changeButton = this.changeButton.bind(this);
+        this.getInfo = this.getInfo.bind(this);
     }
 
     handleChange(e) {
@@ -115,28 +118,58 @@ class EditProfile extends Component {
     handleSubmit(e) {
         e.preventDefault();
 
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
         const claims = {
             email: this.state.email,
             username: this.state.username,
+            password: this.state.password,
             newPassword: this.state.newPassword,
             confirmationNewPassword: this.state.confirmationNewPassword,
             description: this.state.description,
         };
 
-        // if (this.state.newPassword !== this.state.confirmationNewPassword) {
-        //     document.getElementById("errorMessage").innerHTML = "Error";
-        // }
+        axios.post(url + "/api/users/editsave", claims, config)
+            .then(res => {
+                if (this.state.email === this.state.currentEmail) {
+                    window.location.href = "/accountupdated";
+                }
+                else {
+                    window.location.href = "/accountemailupdated";
+                }
+            })
+            .catch(err => {
+                if (err.response.data.errors !== undefined) {
+                    var errMsg = "";
 
-        if (this.state.email === this.state.currentEmail) {
-            window.location.href = "/accountupdated";
-        }
-        else {
-            window.location.href = "/accountemailupdated";
-        }
+                    err.response.data.errors.map(validationErr => {
+                        errMsg += (validationErr.msg + "<br />");
+                    })
+
+                    document.getElementById("errorMessage").innerHTML = errMsg;
+                }
+                else {
+                    document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+                }
+            });
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testuserprivate")
+        this.getInfo();
+    }
+
+    getInfo() {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        axios.get(url + "/api/users/editinfo", config)
             .then(res => this.setState({
                 email: res.data.email,
                 username: res.data.username,
@@ -245,7 +278,7 @@ class EditProfile extends Component {
                                                         <TextField
                                                             type="password"
                                                             fullWidth
-                                                            name="currentPassword"
+                                                            name="password"
                                                             variant="filled"
                                                             label="Current password"
                                                             onChange={this.handleChange}
@@ -278,7 +311,7 @@ class EditProfile extends Component {
                                                         />
                                                     </Grid>
                                                     <Grid item>
-                                                        <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+                                                        <div id="errorMessage" className={classes.errorMessage}></div>
                                                     </Grid>
                                                     <Grid item>
                                                         <Grid container justify="center">

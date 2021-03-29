@@ -58,11 +58,23 @@ const styles = theme => ({
     user: {
         marginBottom: 5
     },
-    buttonBlock: {
+    buttonBlockFollow: {
         backgroundColor: "#219653",
         color: "white",
         "&:hover": {
             backgroundColor: "#219653"
+        },
+        "&:disabled": {
+            backgroundColor: "#BDBDBD"
+        },
+        paddingLeft: "25px",
+        paddingRight: "25px",
+    },
+    buttonBlockUnfollow: {
+        backgroundColor: "#AB3535",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#AB3535"
         },
         "&:disabled": {
             backgroundColor: "#BDBDBD"
@@ -86,31 +98,47 @@ class Profile extends Component {
             currentUser: [localStorage.getItem("username")]
         }
 
-        if (Object.keys(qs.parse(this.props.location.search)).length !== 0) {
+        if (this.props.location !== undefined &&
+            Object.keys(qs.parse(this.props.location.search)).length !== 0) {
             this.parameters = qs.parse(this.props.location.search);
 
             if (this.parameters.username !== undefined) {
                 this.state.username = this.parameters.username;
             }
             else {
+                if (localStorage.getItem("access_token") === null) {
+                    window.location.href = "/";
+                }
+
                 this.state.username = localStorage.getItem("username");
             }
         }
         else {
+            if (localStorage.getItem("access_token") === null) {
+                window.location.href = "/";
+            }
+
             this.state.username = localStorage.getItem("username");
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.fetchUploads = this.fetchUploads.bind(this);
         this.fetchFavorites = this.fetchFavorites.bind(this);
+        this.toggleFollow = this.toggleFollow.bind(this);
+        this.getUserInfo = this.getUserInfo.bind(this);
+        this.getFollow = this.getFollow.bind(this);
     }
 
     componentDidMount() {
-        axios.get(url + "/api/users/info/" + this.state.username)
-            .then(res => this.setState({ user: res.data }));
-
+        this.getUserInfo();
         this.fetchUploads(this.state.uploadsPage);
         this.fetchFavorites(this.state.favoritesPage);
+    }
+
+    getUserInfo() {
+        axios.get(url + "/api/users/info/" + this.state.username)
+            .then(res => this.setState({ user: res.data }))
+            .then(() => this.getFollow());
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -125,6 +153,10 @@ class Profile extends Component {
     }
 
     fetchUploads(page) {
+        if (page === undefined) {
+            page = this.state.uploadsPage;
+        }
+
         axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
             .then(res => {
                 this.setState({ uploads: res.data, uploadsPage: page });
@@ -132,9 +164,43 @@ class Profile extends Component {
     }
 
     fetchFavorites(page) {
+        if (page === undefined) {
+            page = this.state.favoritesPage;
+        }
+
         axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
             .then(res => {
                 this.setState({ favorites: res.data, favoritesPage: page });
+            });
+    }
+
+    toggleFollow() {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        const claims = {
+            follow_id: this.state.user._id
+        }
+
+        axios.post(url + "/api/users/followtoggle", claims, config)
+            .then(res => {
+                this.getFollow();
+            });
+    }
+
+    getFollow() {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        axios.get(url + "/api/users/getfollow?user_id=" + this.state.user._id, config)
+            .then(res => {
+                this.setState({ followed: res.data.followed });
             });
     }
 
@@ -182,11 +248,16 @@ class Profile extends Component {
                                         </span>
                                     </Typography>
                                 </Grid>
-                                <Grid item>
-                                    <Button className={classes.buttonBlock}>
-                                        Follow
-									</Button>
-                                </Grid>
+                                {(localStorage.getItem("access_token") !== null) &&
+                                    (
+                                        <Grid item>
+                                            <Button onClick={this.toggleFollow}
+                                                className={this.state.followed ? classes.buttonBlockUnfollow : classes.buttonBlockFollow} >
+                                                {this.state.followed ? "Unfollow" : "Follow"}
+                                            </Button>
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                             <Grid item>
                                 <Paper square>

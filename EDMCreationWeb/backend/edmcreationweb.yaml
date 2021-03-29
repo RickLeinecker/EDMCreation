@@ -421,6 +421,38 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/users/getfollow:
+    get:
+      summary: Returns true if user follows user
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
   /api/users/followtoggle:
     post:
       summary: User follows a user

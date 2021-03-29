@@ -15,6 +15,7 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { url } from "./URL";
 
 const styles = theme => ({
     root: {
@@ -68,7 +69,7 @@ class Following extends Component {
 
     fetchData() {
         setTimeout(() => {
-            axios.get("http://localhost:5000/api/testfollowing")
+            axios.get(url + "/api/testfollowing")
                 .then(res => this.setState({ followedUsers: this.state.followedUsers.concat(res.data) }));
         }, 500);
     }

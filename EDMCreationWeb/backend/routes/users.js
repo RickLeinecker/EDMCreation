@@ -140,7 +140,7 @@ router.route('/login').post(
 
 
 router.route('/info/:username').get((req, res) => {
-      User.aggregate(
+    User.aggregate(
         [
             { $match: { username: { $regex: new RegExp(req.params.username, "i") } } }, //made case insensitive.
             {
@@ -163,7 +163,7 @@ router.route('/info/:username').get((req, res) => {
 
 //toggle a user favorite for a song
 router.route('/liketoggle').post(auth, (req, res) => {
-    
+
     //composition_id = req.body.song_id;
     //user_id = req.body.ID;
 
@@ -217,7 +217,7 @@ router.route('/liketoggle').post(auth, (req, res) => {
 
 //toggle a user favorite for a song
 router.route('/followtoggle').post(auth, (req, res) => {
-    
+
     //composition_id = req.body.song_id;
     //user_id = req.body.ID;
 
@@ -282,6 +282,19 @@ router.route('/isliked').get(auth, (req, res) => {
 });
 
 
+router.route('/getfollow').get(auth, (req, res) => {
+    User.findOne({ $and: [{ _id: req.body.ID }, { "following": { $elemMatch: { user_id: mongoose.Types.ObjectId(req.query.user_id) } } }] })
+        .then(user => {
+            if (user) {
+                res.status(200).json({ followed: true });
+            }
+            else {
+                res.status(200).json({ followed: false });
+            }
+        });
+});
+
+
 //loads the edit page for a user
 router.route('/editinfo').get(auth, (req, res) => {
     User.findOne({ _id: req.body.ID })
@@ -291,7 +304,7 @@ router.route('/editinfo').get(auth, (req, res) => {
                     username: user.username,
                     description: user.description,
                     email: user.email,
-                    }); //return token in body for log in      
+                }); //return token in body for log in      
             } else {
                 return res.status(400).json({ msg: "Invalid username" });
             }
@@ -301,79 +314,76 @@ router.route('/editinfo').get(auth, (req, res) => {
 
 
 //saves the edit page 
-router.route('/editsave').post(auth,[
+router.route('/editsave').post(auth, [
     check('email').isEmail().withMessage('Email is invalid'),
-    check('newPassword').optional({checkFalsy:true}).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
-    check('confirmationPassword').custom((value, { req }) => {
-                                                                if(!req.body.newPassword){
-                                                                   return true;
-                                                                }else{
-                                                                    if(value === req.body.newPassword){
-                                                                        return true;
-                                                                    }else{
-                                                                        return false;
-                                                                    }
-                                                                }
-                                                             }).withMessage('Passwords do not match')],
-    (req, res) => {
-    //check the results of  the validation
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
-    }
-
-    //all applicable fields are valid
-
-    User.findOne({ _id: req.body.ID })
-        .then(user => {
-            if (user) {//if user id found
-                user.email = req.body.email;
-                user.description = req.body.description;
-                user.save()
-                    .catch(err => res.status(400).json('Error: ' + err));     
+    check('newPassword').optional({ checkFalsy: true }).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
+    check('confirmationNewPassword').custom((value, { req }) => {
+        if (req.body.newPassword === "") {
+            return true;
+        } else {
+            if (value === req.body.newPassword) {
+                return true;
             } else {
-                return res.status(400).json({ msg: "Invalid username" });
+                return false;
             }
-            if(req.body.newPassword === ""){
-                return res.status(200).json('Password and fields updated');
-            }
-        }); //end user search
+        }
+    }).withMessage('Passwords do not match')],
+    (req, res) => {
+        //check the results of  the validation
+        const errors = validationResult(req)
 
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() })
+        }
 
+        //all applicable fields are valid
 
-    if(!(req.body.newPassword === "")){//if password exists
-        
-        User.findOne({ _id: req.body.ID })
-            .then(user => {
-                if (user) {//if username found
-                    bcrypt.compare(req.body.password, user.password).then(isMatch => {
-                        if (isMatch) {
-                            //save new password but must encrypt
-                            //hashing password before storing it in database
-                            bcrypt.genSalt(10, (err, salt) => {
-                                bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
-                                if (err) return res.status(400).json('Error: ' + err);
-                                    user.password = hash;
-                                    user.save()
-                                        .then(() => res.status(200).json('Password and fields updated'))
-                                        .catch(err => res.status(400).json('Error: ' + err));
+        if (req.body.newPassword === "") {
+            User.findOne({ _id: req.body.ID })
+                .then(user => {
+                    if (user) {//if user id found
+                        user.email = req.body.email;
+                        user.description = req.body.description;
+                        user.save()
+                            .catch(err => res.status(400).json('Error: ' + err));
+                    } else {
+                        return res.status(400).json({ msg: "Invalid username" });
+                    }
+                    if (req.body.newPassword === "") {
+                        return res.status(200).json('Password and fields updated');
+                    }
+                }); //end user search
+        }
+        else {//if password exists
+            User.findOne({ _id: req.body.ID })
+                .then(user => {
+                    if (user) {//if username found
+                        bcrypt.compare(req.body.password, user.password).then(isMatch => {
+                            if (isMatch) {
+                                //save new password but must encrypt
+                                //hashing password before storing it in database
+                                bcrypt.genSalt(10, (err, salt) => {
+                                    bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
+                                        if (err) return res.status(400).json('Error: ' + err);
+                                        user.password = hash;
+                                        user.save()
+                                            .then(() => res.status(200).json('Password and fields updated'))
+                                            .catch(err => res.status(400).json('Error: ' + err));
+                                    });
                                 });
-                            });
-                        } else {
-                            return res.status(400).json({ msg: "Incorrect password" });
-                        } //end password checking
-                    }); //exact match
-                } //end username match
-                else {
-                    return res.status(400).json({ msg: "Invalid User" });
-                }
-            }); //end user search
-
-    }//and password update
+                            } else {
+                                return res.status(400).json({ msg: "Incorrect password" });
+                            } //end password checking
+                        }); //exact match
+                    } //end username match
+                    else {
+                        return res.status(400).json({ msg: "Invalid User" });
+                    }
+                }); //end user search
+        }//and password update
 
 
-});
+    });
 
 
 

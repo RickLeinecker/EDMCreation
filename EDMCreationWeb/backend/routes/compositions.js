@@ -181,7 +181,7 @@ router.route('/popular').get(async (req, res) => {
                     title: "$compositions.title",
                     username: "$username",
                     num_comments: { $size: "$compositions.comments" },
-                    date: "$compositions.last_modified",
+                    date: "$compositions.created_on",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
@@ -195,7 +195,7 @@ router.route('/popular').get(async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            { $sort: { "comments.last_modified": -1 } },
+            { $sort: { "comments.created_on": -1 } },
             {
                 $group: {
                     _id: "$composition_id",
@@ -268,7 +268,7 @@ router.route('/user/:username').get(async (req, res) => {
                     title: "$compositions.title",
                     username: "$username",
                     num_comments: { $size: "$compositions.comments" },
-                    date: "$compositions.last_modified",
+                    date: "$compositions.created_on",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
@@ -282,7 +282,7 @@ router.route('/user/:username').get(async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            { $sort: { "comments.last_modified": -1 } },
+            { $sort: { "comments.created_on": -1 } },
             {
                 $group: {
                     _id: "$composition_id",

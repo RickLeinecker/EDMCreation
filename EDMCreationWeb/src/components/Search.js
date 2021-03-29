@@ -3,6 +3,7 @@ import { Typography, withStyles } from "@material-ui/core";
 import Songs from "./Songs";
 import qs from "query-string";
 import axios from "axios";
+import { url } from "./URL";
 
 const styles = theme => ({
     title: {
@@ -23,7 +24,7 @@ class Search extends Component {
 	}
 
 	componentDidMount() {
-		axios.get("http://localhost:5000/api/testsongs")
+		axios.get(url + "/api/testsongs")
 			.then(res => this.setState({ songs: res.data }));
     }
     

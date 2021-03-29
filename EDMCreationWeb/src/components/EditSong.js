@@ -18,6 +18,8 @@ import {
 import Songs from "./Songs";
 import axios from "axios";
 import LogIn from "./LogIn";
+import { url } from "./URL";
+import qs from "query-string";
 
 const styles = theme => ({
 	title: {
@@ -104,6 +106,7 @@ class EditSong extends Component {
 		super(props);
 
 		this.state = {
+			songId: "",
 			title: "",
 			genre: "",
 			currentTitle: "",
@@ -113,23 +116,46 @@ class EditSong extends Component {
 			openDialog: false,
 		};
 
+		if (Object.keys(qs.parse(this.props.location.search)).length !== 0) {
+			this.parameters = qs.parse(this.props.location.search);
+
+			if (this.parameters.songid !== undefined) {
+				this.state.songId = this.parameters.songid;
+			}
+			else {
+				window.location.href = "/profile";
+			}
+		}
+		else {
+			window.location.href = "/profile";
+		}
+
+
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.changeButton = this.changeButton.bind(this);
 		this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.handleCancel = this.handleCancel.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
+		this.getInfo = this.getInfo.bind(this);
 	}
 
 	componentDidMount() {
-		axios.get("http://localhost:5000/api/testsong")
+		this.getInfo();
+	}
+
+	getInfo() {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.get(url + "/api/compositions/editinfo?song_id=" + this.state.songId, config)
 			.then(res => this.setState({
 				title: res.data.title,
 				genre: res.data.genre,
-				currentTitle: res.data.title,
-				currentGenre: res.data.genre,
-				songs: [res.data]
-			}));
+			}));			
 	}
 
 	handleChange(e) {
@@ -295,7 +321,7 @@ class EditSong extends Component {
 						</Grid>
 					</Grid>
 				</Grid>
-				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
+				<Songs songs={this.state} fetchSongs={this.fetchSongs} />
 			</div >
 		);
 	}
