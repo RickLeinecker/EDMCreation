@@ -247,7 +247,7 @@ router.route('/popular').get(async (req, res) => {
     }
 });
 
-//for a given profile
+//for a given profile and their uploads
 router.route('/user/:username').get(async (req, res) => {
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
@@ -417,93 +417,103 @@ router.route('/incrementplaycount').post((req, res) => {
 });
 
 
+//search bar for songs
+router.route('/search').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+    const lookup = req.query.search;
 
-// router.route('/search').get(async (req, res) => {
-//     const songsPerPage = 5;
-//     const skip = songsPerPage * (req.query.page - 1);
-//     const lookup = req.query.search;
+    try {
+        const songs = await User.aggregate([
+            
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $match:
+                {
+                    $or:
+                    [
+                        {"compositions.username": {$regex: "^" + lookup, '$options': 'i'}},
+                        {"compositions.title": {$regex: "^" + lookup, '$options': 'i'}}
+                    ]
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.last_modified",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.last_modified": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
 
-//     try {
-//         const songs = await User.aggregate([
-//             { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
-//             {
-//                 $unwind:
-//                 {
-//                     path: "$compositions",
-//                     preserveNullAndEmptyArrays: false
-//                 }
-//             },
-//             {
-//                 $project: {
-//                     composition_id: "$compositions._id",
-//                     title: "$compositions.title",
-//                     username: "$username",
-//                     num_comments: { $size: "$compositions.comments" },
-//                     date: "$compositions.last_modified",
-//                     comments: "$compositions.comments",
-//                     genre: "$compositions.genre",
-//                     path: "$compositions.path",
-//                     listens: "$compositions.listens"
-//                 },
-//             },
-//             {
-//                 $unwind:
-//                 {
-//                     path: "$comments",
-//                     preserveNullAndEmptyArrays: true
-//                 }
-//             },
-//             { $sort: { "comments.last_modified": -1 } },
-//             {
-//                 $group: {
-//                     _id: "$composition_id",
-//                     composition_id: { $first: "$composition_id" },
-//                     user_id: { $first: "$_id" },
-//                     title: { $first: "$title" },
-//                     username: { $first: "$username" },
-//                     num_comments: { $first: "$num_comments" },
-//                     date: { $first: "$date" },
-//                     comments: { $push: "$comments" },
-//                     genre: { $first: "$genre" },
-//                     path: { $first: "$path" },
-//                     listens: { $first: "$listens" },
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: "users",
-//                     localField: "_id",
-//                     foreignField: "favorites.composition_id",
-//                     as: "favorites",
-//                 }
-//             },
-//             {
-//                 $project: {
-//                     composition_id: 1,
-//                     user_id: 1,
-//                     title: 1,
-//                     username: 1,
-//                     num_comments: 1,
-//                     date: 1,
-//                     comments: 1,
-//                     genre: 1,
-//                     path: 1,
-//                     listens: 1,
-//                     likes: { $size: "$favorites" }
-//                 }
-//             },
-//             { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
-//             { $skip: skip },
-//             { $limit: songsPerPage }, //skip controls page number and limit controls output
-//         ]);
+        if (!songs) throw Error('No items');
 
-//         if (!songs) throw Error('No items');
-
-//         res.status(200).json(songs);
-//     } catch (e) {
-//         res.status(400).json({ msg: e.message });
-//     }
-// });
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
 
 
 module.exports = router;

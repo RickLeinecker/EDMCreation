@@ -375,7 +375,39 @@ router.route('/editsave').post(auth,[
 
 });
 
+//load a users favorited/liked songs to be displayed
+router.route('/favorites').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+    //req.query.username  for query name
 
+    try {
+        const songs = await User.aggregate([
+            { $match: { username: req.query.username } },//find user
+            {
+                $unwind:
+                {
+                    path: "$favorites", //unwind favorites
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$favorites.composition_id"
+                },
+            },
+            
+            //at this point the songs from the favorites are returned by composition id
+            
+        ]);
+
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
 
 
 module.exports = router;
