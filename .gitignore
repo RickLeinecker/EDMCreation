@@ -18,3 +18,5 @@ bld/
 
 #Visual Studio cache
 .vs/
+
+.DS_Store
