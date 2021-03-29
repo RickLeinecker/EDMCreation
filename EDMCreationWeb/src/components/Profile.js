@@ -95,7 +95,7 @@ class Profile extends Component {
             user: [],
             uploadsPage: 1,
             favoritesPage: 1,
-            currentUser: [localStorage.getItem("username")]
+            currentUser: [localStorage.getItem("username")],
         }
 
         if (this.props.location !== undefined &&
@@ -249,6 +249,7 @@ class Profile extends Component {
                                     </Typography>
                                 </Grid>
                                 {(localStorage.getItem("access_token") !== null) &&
+                                    localStorage.getItem("username") !== this.state.username &&
                                     (
                                         <Grid item>
                                             <Button onClick={this.toggleFollow}
@@ -286,7 +287,7 @@ class Profile extends Component {
                     <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
-                    <Following user={this.state.user} />
+                    <Following username={this.state.username} />
                 </TabPanel>
             </div >
         )

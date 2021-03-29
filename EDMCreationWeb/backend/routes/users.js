@@ -30,8 +30,8 @@ router.route('/signup').post(
         User.findOne(
             {
                 $or: [
-                    { "email": { $regex: new RegExp(email, "i") } },
-                    { "username": { $regex: new RegExp(username, "i") } }
+                    { "email": { $regex: new RegExp('^' + email + '$', "i") } },
+                    { "username": { $regex: new RegExp('^' + username + '$', "i") } }
                 ]
             })
             .then(user => { //$or selects from either elements of array
@@ -95,8 +95,8 @@ router.route('/login').post(
         User.findOne(
             {
                 $or: [
-                    { "email": { $regex: new RegExp(username, "i") } },
-                    { "username": { $regex: new RegExp(username, "i") } }
+                    { "email": { $regex: new RegExp('^' + username + '$', "i") } },
+                    { "username": { $regex: new RegExp('^' + username + '$', "i") } }
                 ]
             })
             .then(user => {
@@ -142,12 +142,12 @@ router.route('/login').post(
 router.route('/info/:username').get((req, res) => {
     User.aggregate(
         [
-            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } }, //made case insensitive.
+            { $match: { username: { $regex: new RegExp('^' + req.params.username + '$', "i") } } }, //made case insensitive.
             {
                 $project: {
                     username: "$username",
                     description: "$description",
-                    listens_count: "$listens_count",
+                    listens_count: { $sum: "$compositions.listens" },
                     upload_count: { $cond: { if: { $isArray: "$compositions" }, then: { $size: "$compositions" }, else: "NA" } }
                 },
             }
@@ -193,6 +193,7 @@ router.route('/liketoggle').post(auth, (req, res) => {
                                 [
                                     {
                                         composition_id: mongoose.Types.ObjectId(req.body.song_id),
+                                        create_on: new Date().toISOString()
                                     }
                                 ]
                         }
@@ -234,7 +235,7 @@ router.route('/followtoggle').post(auth, (req, res) => {
                     function (err) {
                         if (err) { console.log(err) }
                     }
-                ).then(res.status(200).json({ msg: 'unfollowed' }));
+                ).then(res.status(200).json({ msg: 'Unfollowed' }));
 
             } else {//if not present
                 //add
@@ -247,6 +248,7 @@ router.route('/followtoggle').post(auth, (req, res) => {
                                 [
                                     {
                                         user_id: mongoose.Types.ObjectId(req.body.follow_id),
+                                        create_on: new Date().toISOString()
                                     }
                                 ]
                         }
@@ -257,7 +259,7 @@ router.route('/followtoggle').post(auth, (req, res) => {
                         if (err) {
                             res.status(400).json('Error: ' + err);
                         } else {
-                            res.status(200).json({ msg: 'followed' });
+                            res.status(200).json({ msg: 'Followed' });
                         }
                     }
                 );
@@ -389,31 +391,195 @@ router.route('/editsave').post(auth, [
 router.route('/favorites').get(async (req, res) => {
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
-    //req.query.username  for query name
 
     try {
         const songs = await User.aggregate([
-            { $match: { username: req.query.username } },//find user
+            { $match: { username: { $regex: new RegExp('^' + req.query.username + '$', "i") } } },
             {
                 $unwind:
                 {
-                    path: "$favorites", //unwind favorites
+                    path: "$favorites",
                     preserveNullAndEmptyArrays: false
                 }
             },
             {
                 $project: {
-                    composition_id: "$favorites.composition_id"
+                    composition_id: "$favorites.composition_id",
+                    favorited_date: "$favorites.created_on"
                 },
             },
-            
-            //at this point the songs from the favorites are returned by composition id
-            
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "composition_id",
+                    foreignField: "compositions._id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    favorited_date: 1,
+                    favorites: "$favorites.compositions",
+
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    favorited_date: 1,
+                    favorites: 1,
+                    match: { $eq: ["$composition_id", "$favorites._id"] }
+                },
+            },
+            { $match: { match: true } },
+            {
+                $project: {
+                    favorited_date: 1,
+                    compositions: "$favorites",
+                },
+            },
+            {
+                $project: {
+                    favorited_date: 1,
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$compositions.username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    favorited_date: { $first: "$favorited_date" },
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    favorited_date: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "favorited_date": -1 } },
+            { $skip: skip },
+            { $limit: songsPerPage },
         ]);
 
         if (!songs) throw Error('No items');
 
         res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+
+router.route('/following').get(async (req, res) => {
+    const usersPerPage = 5;
+    const skip = usersPerPage * (req.query.page - 1);
+
+    try {
+        const users = await User.aggregate([
+            { $match: { username: { $regex: new RegExp('^' + req.query.username + '$', "i") } } },
+            {
+                $unwind:
+                {
+                    path: "$following",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    user_id: "$following.user_id",
+                    followed_date: "$following.created_on"
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "users",
+                }
+            },
+            {
+                $unwind:
+                {
+                    path: "$users",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    user_id: 1,
+                    followed_date: 1,
+                    username: "$users.username",
+                    description: "$users.description",
+                },
+            },
+            { $sort: { "followed_date": -1 } },
+            { $skip: skip },
+            { $limit: usersPerPage },
+        ]);
+
+        if (!users) throw Error('No items');
+
+        res.status(200).json(users);
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }

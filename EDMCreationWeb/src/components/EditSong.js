@@ -111,7 +111,7 @@ class EditSong extends Component {
 			genre: "",
 			currentTitle: "",
 			currentGenre: "",
-			songs: [],
+			song: [],
 			disableButton: true,
 			openDialog: false,
 		};
@@ -137,14 +137,14 @@ class EditSong extends Component {
 		this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.handleCancel = this.handleCancel.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
-		this.getInfo = this.getInfo.bind(this);
+		this.getInfo = this.getSong.bind(this);
 	}
 
 	componentDidMount() {
-		this.getInfo();
+		this.getSong();
 	}
 
-	getInfo() {
+	getSong() {
 		const config = {
 			headers: {
 				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
@@ -153,9 +153,12 @@ class EditSong extends Component {
 
 		axios.get(url + "/api/compositions/editinfo?song_id=" + this.state.songId, config)
 			.then(res => this.setState({
-				title: res.data.title,
-				genre: res.data.genre,
-			}));			
+				title: res.data[0].title,
+				genre: res.data[0].genre,
+				currentTitle: res.data[0].title,
+				currentGenre: res.data[0].genre,
+				song: res.data
+			}));
 	}
 
 	handleChange(e) {
@@ -180,9 +183,23 @@ class EditSong extends Component {
 		const claims = {
 			title: this.state.title,
 			genre: this.state.genre,
+			song_id: this.state.songId
 		};
 
-		window.location.href = "/songupdated";
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.post(url + "/api/compositions/editsave", claims, config)
+			.then(res => {
+				window.location.href = "/songupdated";
+			})
+			.catch(err => {
+				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+			});
+
 	}
 
 	handleClickOpen() {
@@ -272,7 +289,7 @@ class EditSong extends Component {
 												</Select>
 											</Grid>
 											<Grid item>
-												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+												<div id="errorMessage" className={classes.errorMessage}></div>
 											</Grid>
 											<Grid item>
 												<Grid container>
@@ -321,7 +338,7 @@ class EditSong extends Component {
 						</Grid>
 					</Grid>
 				</Grid>
-				<Songs songs={this.state} fetchSongs={this.fetchSongs} />
+				<Songs songs={this.state.song} fetchSongs={this.fetchSongs} />
 			</div >
 		);
 	}

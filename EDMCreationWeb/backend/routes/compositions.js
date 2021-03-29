@@ -254,7 +254,7 @@ router.route('/user/:username').get(async (req, res) => {
 
     try {
         const items = await User.aggregate([
-            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
+            { $match: { username: { $regex: new RegExp('^' + req.params.username + '$', "i") } } },
             {
                 $unwind:
                 {
@@ -321,9 +321,9 @@ router.route('/user/:username').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "_id": -1 } }, //descending values for listens
+            { $sort: { "_id": -1 } },
             { $skip: skip },
-            { $limit: songsPerPage }, //skip controls page number and limit controls output
+            { $limit: songsPerPage },
         ]);
 
         if (!items) throw Error('No items');
@@ -355,30 +355,98 @@ router.route('/postcomment').post(auth, (req, res) => {
 
 
 //loads the edit page for a song
-router.route('/editinfo').get(auth, (req, res) => {
+router.route('/editinfo').get(auth, async (req, res) => {
+    try {
+        const song = await User.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(req.body.ID) } },
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            { $match: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+        ]);
 
-    //add a check for is the song belongs to the user
-    User.findOne({ $and: [{ _id: req.body.ID }, { "compositions": { $elemMatch: { _id: mongoose.Types.ObjectId(req.query.song_id) } } }] })
-        .then(async user => {
-
-            if (user) {//if present
-
-                return res.status(200).json(user.compositions.id(req.query.song_id));
-
-            } else {//if not present
-                return res.status(400).json({ msg: 'Invalid User or Song' });
-                //song doesnot belong to user access denied
-            }//end add
-
-        });//end then
+        if (song) {
+            return res.status(200).json(song);
+        } else {
+            return res.status(400).json({ msg: 'Invalid User or Song' });
+        }
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
 
 });
 
 
 //saves the edit page for a song
-router.route('/editsave').post(auth, [
-    check('title').isLength({ min: 1 }).withMessage('Title is required'),
-    check('genre').isLength({ min: 1 }).withMessage('Genre is required')], (req, res) => {
+router.route('/editsave').post(auth,
+    [
+        check('title').isLength({ min: 1 }).withMessage('Title is required'),
+        check('genre').isLength({ min: 1 }).withMessage('Genre is required')
+    ],
+    (req, res) => {
 
         //check the results of  the validation
         const errors = validationResult(req)
@@ -405,14 +473,15 @@ router.route('/editsave').post(auth, [
 
             });//end then
 
-    });
+    }
+);
 
 
 router.route('/incrementplaycount').post((req, res) => {
-         
-          User.updateOne({ "compositions._id": req.body.song_id }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
-          .then(() => res.status(200).json('Play count incremented')) 
-          .catch(err => res.status(400).json('Error: ' + err)); 
+
+    User.updateOne({ "compositions._id": req.body.song_id }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
+        .then(() => res.status(200).json('Play count incremented'))
+        .catch(err => res.status(400).json('Error: ' + err));
 
 });
 
@@ -425,7 +494,7 @@ router.route('/search').get(async (req, res) => {
 
     try {
         const songs = await User.aggregate([
-            
+
             {
                 $unwind:
                 {
@@ -437,10 +506,10 @@ router.route('/search').get(async (req, res) => {
                 $match:
                 {
                     $or:
-                    [
-                        {"compositions.username": {$regex: "^" + lookup, '$options': 'i'}},
-                        {"compositions.title": {$regex: "^" + lookup, '$options': 'i'}}
-                    ]
+                        [
+                            { "compositions.username": { $regex: "^" + lookup, '$options': 'i' } },
+                            { "compositions.title": { $regex: "^" + lookup, '$options': 'i' } }
+                        ]
                 }
             },
             {
@@ -449,7 +518,7 @@ router.route('/search').get(async (req, res) => {
                     title: "$compositions.title",
                     username: "$username",
                     num_comments: { $size: "$compositions.comments" },
-                    date: "$compositions.last_modified",
+                    date: "$compositions.created_on",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
@@ -463,7 +532,7 @@ router.route('/search').get(async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            { $sort: { "comments.last_modified": -1 } },
+            { $sort: { "comments.created_on": -1 } },
             {
                 $group: {
                     _id: "$composition_id",

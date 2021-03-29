@@ -801,3 +801,42 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/users/following:
+    get:
+      summary: Get list of users followed
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: username
+          schema:
+            type: string
+            example: "Treven"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string

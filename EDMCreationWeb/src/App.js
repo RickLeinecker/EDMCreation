@@ -68,7 +68,7 @@ class App extends Component {
 					<Route path="/editprofile" component={EditProfile} />
 					<Route path="/register" component={Register} />
 					<Route path="/registercompleted" component={RegisterCompleted} />
-					<Route path="/search" component={Search} />
+					<Route path="/search" render={(props) => <Search {...props} key={Date.now()} />} />
 					<Route path="/profile" render={(props) => <Profile {...props} key={Date.now()} />} />
 					<Route path="/editsong" component={EditSong} />
 					<Route path="/uploadsong" component={UploadSong} />
