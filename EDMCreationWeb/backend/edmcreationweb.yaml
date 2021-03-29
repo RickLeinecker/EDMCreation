@@ -724,3 +724,80 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/compositions/search:
+    get:
+      summary: search songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: search
+          schema:
+            type: string
+            example: "apple"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/favorites:
+    get:
+      summary: pulling favorites paged
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: username
+          schema:
+            type: string
+            example: "Treven"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
