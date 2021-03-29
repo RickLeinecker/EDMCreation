@@ -510,7 +510,7 @@ paths:
                 newPassword:
                   type: string
                   example: "treven123"
-                confirmationPassword:
+                confirmationNewPassword:
                   type: string
                   example: "treven123"
                 description:
@@ -817,6 +817,72 @@ paths:
           schema:
             type: string
             example: "Treven"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/sendverification:
+    get:
+      summary: Send email verification
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/verify:
+    get:
+      summary: Verify email
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
       responses:
         '200':
           description: Successful

@@ -81,7 +81,6 @@ function NavBar(props) {
 	const classes = useStyles();
 	const { location: { pathname } } = props;
 	const [anchorEl, setAnchorEl] = React.useState(null);
-	const [searchTerm, setSearchTerm] = React.useState(null);
 
 	const handleClick = (e) => {
 		setAnchorEl(e.currentTarget);

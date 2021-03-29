@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography, withStyles, Grid, Button } from "@material-ui/core";
+import { withStyles, Grid, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 
 const styles = theme => ({
@@ -27,10 +27,6 @@ const styles = theme => ({
 });
 
 class PageButtons extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { classes } = this.props;
 
@@ -38,7 +34,7 @@ class PageButtons extends Component {
             <div className={classes.root}>
                 <Grid container direction="row" justify="space-between">
                     <Grid item>
-                        {this.props.page == 1 ?
+                        {parseInt(this.props.page) === 1 ?
                             <Button disabled="true" className={classes.buttonBlock}>
                                 Previous
                             </Button> :

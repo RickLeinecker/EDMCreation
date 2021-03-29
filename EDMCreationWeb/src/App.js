@@ -24,6 +24,9 @@ import SongUploaded from "./components/SongUploaded";
 import AccountUpdated from "./components/AccountUpdated";
 import AccountEmailUpdated from "./components/AccountEmailUpdated";
 import SongDeleted from "./components/SongDeleted";
+import SendVerification from "./components/SendVerification";
+import Verify from "./components/Verify";
+import UpdateEmailVerified from "./components/UpdateEmailVerified";
 
 const theme = createMuiTheme({
 	palette: {
@@ -68,6 +71,9 @@ class App extends Component {
 					<Route path="/editprofile" component={EditProfile} />
 					<Route path="/register" component={Register} />
 					<Route path="/registercompleted" component={RegisterCompleted} />
+					<Route path="/sendverification" component={SendVerification} />
+					<Route path="/verify" component={Verify} />
+					<Route path="/updateemailverified" component={UpdateEmailVerified} />
 					<Route path="/search" render={(props) => <Search {...props} key={Date.now()} />} />
 					<Route path="/profile" render={(props) => <Profile {...props} key={Date.now()} />} />
 					<Route path="/editsong" component={EditSong} />

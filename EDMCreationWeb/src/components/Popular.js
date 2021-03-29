@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography, withStyles, Grid, Button } from "@material-ui/core";
+import { Typography, withStyles } from "@material-ui/core";
 import Songs from "./Songs";
 import axios from "axios";
 import qs from "query-string";

@@ -8253,6 +8253,11 @@
   "resolved" "https://registry.npmjs.org/node-releases/-/node-releases-1.1.69.tgz"
   "version" "1.1.69"
 
+"nodemailer@^6.5.0":
+  "integrity" "sha512-Tm4RPrrIZbnqDKAvX+/4M+zovEReiKlEXWDzG4iwtpL9X34MJY+D5LnQPH/+eghe8DLlAVshHAJZAZWBGhkguw=="
+  "resolved" "https://registry.npmjs.org/nodemailer/-/nodemailer-6.5.0.tgz"
+  "version" "6.5.0"
+
 "normalize-package-data@^2.3.2", "normalize-package-data@^2.5.0":
   "integrity" "sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA=="
   "resolved" "https://registry.npmjs.org/normalize-package-data/-/normalize-package-data-2.5.0.tgz"

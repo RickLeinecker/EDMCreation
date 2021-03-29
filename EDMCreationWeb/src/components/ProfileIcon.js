@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Typography, withStyles, Link, IconButton, Menu, MenuItem } from "@material-ui/core";
 import { Link as RouterLink } from "react-router-dom";
 import { AccountCircle } from '@material-ui/icons/';
-import axios from "axios";
 
 const styles = theme => ({
     loginLink: {

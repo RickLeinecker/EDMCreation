@@ -25,6 +25,7 @@ router.route('/signup').post(
         }
 
         const { username, email, password } = req.body;
+        const verified = false;
 
         //check if existing username or email
         User.findOne(
@@ -44,42 +45,49 @@ router.route('/signup').post(
                     //creating user
                     const listens_count = 0;
                     //const upload_count = 0;
-                    const newUser = new User({ username, email, password, listens_count });
+                    const newUser = new User({ username, email, password, listens_count, verified });
 
                     //hashing password before storing it in database
                     bcrypt.genSalt(10, (err, salt) => {
                         bcrypt.hash(newUser.password, salt, (err, hash) => {
                             if (err) return res.status(400).json('Error: ' + err);
+
                             newUser.password = hash;
+
                             newUser.save()
-                                .then(() => res.status(200).json('Registration successful!'))
+                                .then(() => {
+                                    const payload = { 'query': { 'email': email } };
+                                    sendVerification(payload);
+
+                                    res.status(200).json('Registration successful!')
+                                })
                                 .catch(err => res.status(400).json('Error: ' + err));
                         });
                     });
 
-                    //creating web token for registration sign in
-                    var day = new Date();
-                    var time = day.getTime(); //get time to embed in token 
-                    time += 604800000; //7 day expiration
+                    // //creating web token for registration sign in
+                    // var day = new Date();
+                    // var time = day.getTime(); //get time to embed in token 
+                    // time += 604800000; //7 day expiration
 
-                    const claims = { //assaign payload
-                        Username: username,
-                        ID: newUser.id, //new user for one just created
-                        Expires: time
-                    }
+                    // const claims = { //assaign payload
+                    //     Username: username,
+                    //     ID: newUser.id, //new user for one just created
+                    //     Expires: time
+                    // }
 
-                    const key = process.env.JWT_KEY; //signature key
-                    const header = { //token description
-                        alg: "HS512",
-                        typ: "JWT"
-                    };
+                    // const key = process.env.JWT_KEY; //signature key
+                    // const header = { //token description
+                    //     alg: "HS512",
+                    //     typ: "JWT"
+                    // };
 
-                    var sHeader = JSON.stringify(header);
-                    var sPayload = JSON.stringify(claims);
+                    // var sHeader = JSON.stringify(header);
+                    // var sPayload = JSON.stringify(claims);
 
-                    const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, key); //token creation
+                    // const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, key); //token creation
 
-                    res.json({ sJWT, msg: 'Registration Successful!' }); //return token in body for log in
+                    // res.json({ sJWT, msg: 'Registration Successful!' }); //return token in body for log in
                 } //end adding user
             }); //end of user search
     }); //end registration
@@ -103,6 +111,16 @@ router.route('/login').post(
                 if (user) {//if username found
                     bcrypt.compare(password, user.password).then(isMatch => {
                         if (isMatch) {
+                            if (user.verified === false) {
+                                const link = process.env.URL + "/sendverification?email=" + user.email;
+                                res.status(400).json(
+                                    {
+                                        msg: "Please verify your email. Click <a href=" +
+                                            link + " style=\"color: #BDBDBD\">here</a> to resend verification link."
+                                    }
+                                );
+                            }
+
                             //creating web token for normal sign in
                             var day = new Date();
                             var time = day.getTime(); //get time to embed in token 
@@ -302,11 +320,13 @@ router.route('/editinfo').get(auth, (req, res) => {
     User.findOne({ _id: req.body.ID })
         .then(user => {
             if (user) {//if user id found
-                res.status(200).json({
-                    username: user.username,
-                    description: user.description,
-                    email: user.email,
-                }); //return token in body for log in      
+                res.status(200).json(
+                    {
+                        username: user.username,
+                        description: user.description,
+                        email: user.email,
+                    }
+                );
             } else {
                 return res.status(400).json({ msg: "Invalid username" });
             }
@@ -316,76 +336,73 @@ router.route('/editinfo').get(auth, (req, res) => {
 
 
 //saves the edit page 
-router.route('/editsave').post(auth, [
-    check('email').isEmail().withMessage('Email is invalid'),
-    check('newPassword').optional({ checkFalsy: true }).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
-    check('confirmationNewPassword').custom((value, { req }) => {
-        if (req.body.newPassword === "") {
-            return true;
-        } else {
-            if (value === req.body.newPassword) {
+router.route('/editsave').post(auth,
+    [
+        check('email').isEmail().withMessage('Email is invalid'),
+        check('newPassword').optional({ checkFalsy: true }).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
+        check('confirmationNewPassword').custom((value, { req }) => {
+            if (req.body.newPassword === "") {
                 return true;
             } else {
-                return false;
+                if (value === req.body.newPassword) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-        }
-    }).withMessage('Passwords do not match')],
-    (req, res) => {
-        //check the results of  the validation
+        })
+            .withMessage('Passwords do not match')
+    ],
+    async (req, res) => {
         const errors = validationResult(req)
 
         if (!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() })
         }
 
-        //all applicable fields are valid
+        User.findOne({ _id: req.body.ID })
+            .then(user => {
+                if (user) {
+                    user.description = req.body.description;
 
-        if (req.body.newPassword === "") {
-            User.findOne({ _id: req.body.ID })
-                .then(user => {
-                    if (user) {//if user id found
-                        user.email = req.body.email;
-                        user.description = req.body.description;
-                        user.save()
-                            .catch(err => res.status(400).json('Error: ' + err));
-                    } else {
-                        return res.status(400).json({ msg: "Invalid username" });
+                    if (user.email !== req.body.email) {
+                        user.new_email = req.body.email;
+                        user.update_verified = false;
                     }
-                    if (req.body.newPassword === "") {
-                        return res.status(200).json('Password and fields updated');
-                    }
-                }); //end user search
-        }
-        else {//if password exists
-            User.findOne({ _id: req.body.ID })
-                .then(user => {
-                    if (user) {//if username found
-                        bcrypt.compare(req.body.password, user.password).then(isMatch => {
-                            if (isMatch) {
-                                //save new password but must encrypt
-                                //hashing password before storing it in database
-                                bcrypt.genSalt(10, (err, salt) => {
-                                    bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
-                                        if (err) return res.status(400).json('Error: ' + err);
-                                        user.password = hash;
-                                        user.save()
-                                            .then(() => res.status(200).json('Password and fields updated'))
-                                            .catch(err => res.status(400).json('Error: ' + err));
-                                    });
-                                });
-                            } else {
-                                return res.status(400).json({ msg: "Incorrect password" });
-                            } //end password checking
-                        }); //exact match
-                    } //end username match
-                    else {
-                        return res.status(400).json({ msg: "Invalid User" });
-                    }
-                }); //end user search
-        }//and password update
 
+                    if (req.body.newPassword !== "") {
+                        const match = bcrypt.compareSync(req.body.password, user.password);
 
-    });
+                        if (match) {
+                            const hash = bcrypt.hashSync(req.body.newPassword, 10);
+                            user.password = hash;
+                        } else {
+                            return res.status(400).json({ msg: "Incorrect password" });
+                        }
+                    }
+
+                    user.save()
+                        .then(() => {
+                            if (user.email !== req.body.email) {
+                                const payload = { 'query': { 'email': req.body.email } };
+                                sendVerification(payload);
+                            }
+
+                            res.status(200).json({ msg: "Profile has been updated" })
+                        })
+                        .catch(err => res.status(400).json('Error: ' + err));
+                } else {
+                    return res.status(400).json({ msg: "Invalid username" });
+                }
+                if (req.body.newPassword === "") {
+                    return res.status(200).json('Password and fields updated');
+                }
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
+            });
+    }
+);
 
 //load a users favorited/liked songs to be displayed
 router.route('/favorites').get(async (req, res) => {
@@ -583,6 +600,149 @@ router.route('/following').get(async (req, res) => {
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
+});
+
+// Email verification
+const nodemailer = require("nodemailer");
+const mailUsername = process.env['MAIL_USERNAME'];
+const mailPassword = process.env['MAIL_PASSWORD'];
+const verificationKey = process.env['EMAIL_VERIFIER_JWT_KEY'];
+
+const smtpTransport = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: mailUsername,
+        pass: mailPassword
+    }
+});
+
+const sendVerification = (req, res) => {
+    User.findOne({
+        $or: [
+            { email: { $regex: new RegExp('^' + req.query.email + '$', "i") } },
+            { new_email: { $regex: new RegExp('^' + req.query.email + '$', "i") } },
+        ]
+    })
+        .then(user => {
+            if (!user)
+                res.status(400).json({ msg: "Error" });
+
+            if (user.verified === true && user.update_verified !== false)
+                res.status(400).json({ msg: 'Email already verified or not registered' })
+
+            var day = new Date();
+            var time = day.getTime();
+            time += 604800000;
+
+            var email;
+
+            if (user.verified !== true) {
+                email = user.email
+            }
+            else if (user.update_verified === false) {
+                email = user.new_email
+            }
+            else {
+                res.status(400).json({ msg: "Error" });
+            }
+
+            const claims = {
+                email: email
+            }
+
+            const header = {
+                alg: "HS512",
+                typ: "JWT"
+            };
+
+            var sHeader = JSON.stringify(header);
+            var sPayload = JSON.stringify(claims);
+
+            const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, verificationKey);
+
+            const link = process.env.URL + "/verify?token=" + sJWT;
+
+            const mailOptions = {
+                'to': email,
+                'subject': "EDM Creation: Verify your email address",
+                'html': "Hello,<br><br>Please click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+            }
+
+            smtpTransport.sendMail(mailOptions, (error, transportRes) => {
+                if (error) {
+                    res.status(400).json({ 'msg': error.toString() });
+                }
+                else {
+                    res.status(200).json({ 'msg': 'Verification request email sent' });
+                }
+            });
+        });
+};
+
+router.route('/sendverification').get(sendVerification);
+
+router.route('/verify').get((req, res) => {
+    const token = req.query.token;
+
+    if (!JSRSASign.jws.JWS.verifyJWT(token, process.env.EMAIL_VERIFIER_JWT_KEY, { alg: ["HS512"] })) {
+        return res.status(401).json({ msg: 'Invalid token provided' });
+    }
+
+    const jWS = token;
+    const jWT = jWS.split(".");
+    const uClaim = JSRSASign.b64utos(jWT[1]);
+    const pClaim = JSRSASign.jws.JWS.readSafeJSONString(uClaim);
+
+    const email = pClaim.email;
+
+    User.findOne({
+        $or: [
+            { email: { $regex: new RegExp('^' + email + '$', "i") } },
+            { new_email: { $regex: new RegExp('^' + email + '$', "i") } },
+        ]
+    })
+        .then(user => {
+            if (!user)
+                res.status(400).json({ msg: "Error" });
+
+            if (user.verified === true && user.update_verified === false) {
+                User.updateOne(
+                    {
+                        _id: user._id,
+                        new_email: { $ne: null }
+                    },
+                    {
+                        $set: {
+
+                            email: user.new_email,
+                            update_verified: true
+
+                        },
+                        $unset: {
+                            new_email: 1
+                        }
+                    }
+                )
+                    .then(result => {
+                        res.status(200).json({ msg: "Success", type: "Update" });
+                    })
+                    .catch(err => {
+                        res.status(200).json({ msg: "Error" });
+                    });
+            }
+            else if (user.verified === false) {
+                User.updateOne({ _id: user._id }, { verified: true })
+                    .then(result => {
+                        res.status(200).json({ msg: "Success", type: "Register" });
+                    })
+                    .catch(err => {
+                        res.status(200).json({ msg: "Error" });
+                    });
+            }
+            else {
+                res.status(400).json({ msg: 'Email already verified' })
+            }
+        });
 });
 
 
