@@ -684,7 +684,7 @@ router.route('/sendverification').get(sendVerification);
 router.route('/verify').get((req, res) => {
     const token = req.query.token;
 
-    if (!JSRSASign.jws.JWS.verifyJWT(token, process.env.EMAIL_VERIFIER_JWT_KEY, { alg: ["HS512"] })) {
+    if (!JSRSASign.jws.JWS.verifyJWT(token, verificationKey, { alg: ["HS512"] })) {
         return res.status(401).json({ msg: 'Invalid token provided' });
     }
 
@@ -745,5 +745,104 @@ router.route('/verify').get((req, res) => {
         });
 });
 
+// Password reset
+const resetKey = process.env['PASSWORD_RESET_JWT_KEY'];
+
+resetPasswordRequest = (req, res) => {
+    User.findOne({
+        email: { $regex: new RegExp('^' + req.query.email + '$', "i") },
+    })
+        .then(user => {
+            if (!user)
+                res.status(400).json({ msg: "Error" });
+
+            const claims = {
+                email: user.email
+            }
+
+            const header = {
+                alg: "HS512",
+                typ: "JWT"
+            };
+
+            var sHeader = JSON.stringify(header);
+            var sPayload = JSON.stringify(claims);
+
+            const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, resetKey);
+
+            const link = process.env.URL + "/resetpassword?email=" + user.email + "&token=" + sJWT;
+
+            const mailOptions = {
+                'to': user.email,
+                'subject': "EDM Creation: Reset your password",
+                'html': "Hello,<br><br>Please click on the link to reset your password.<br><a href=" + link + ">Click here to reset password</a>"
+            }
+
+            smtpTransport.sendMail(mailOptions, (error, transportres) => {
+                if (error) {
+                    res.status(400).json({ 'msg': error.toString() });
+                }
+                else {
+                    res.status(200).json({ 'msg': 'Reset password request sent' });
+                }
+            });
+        })
+};
+
+router.route('/resetpassword').get(resetPasswordRequest);
+
+router.route('/changepassword').post(
+    [
+        check('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
+        check('confirmationPassword').custom((value, { req }) => (value === req.body.password)).withMessage('Passwords do not match')
+    ],
+    async (req, res) => {
+        const errors = validationResult(req)
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() })
+        }
+
+        const token = req.query.token;
+
+        if (!JSRSASign.jws.JWS.verifyJWT(token, resetKey, { alg: ["HS512"] })) {
+            return res.status(401).json({ msg: 'Invalid token provided' });
+        }
+
+        const jWS = token;
+        const jWT = jWS.split(".");
+        const uClaim = JSRSASign.b64utos(jWT[1]);
+        const pClaim = JSRSASign.jws.JWS.readSafeJSONString(uClaim);
+
+        const email = pClaim.email;
+
+        User.findOne({
+            email: { $regex: new RegExp('^' + email + '$', "i") },
+        })
+            .then(user => {
+                if (!user)
+                    res.status(400).json({ msg: "Error" });
+
+                const newPassword = bcrypt.hashSync(req.body.password, 10);
+
+                User.updateOne(
+                    {
+                        _id: user._id,
+                    },
+                    {
+                        $set: {
+                            password: newPassword,
+                        },
+                    }
+                )
+                    .then(result => {
+                        res.status(200).json({ msg: "Success" });
+                    })
+                    .catch(err => {
+                        res.status(200).json({ msg: "Error" });
+                    });
+            });
+    }
+);
 
 module.exports = router;

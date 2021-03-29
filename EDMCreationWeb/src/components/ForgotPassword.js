@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
+import { url } from "./URL";
 
 const styles = theme => ({
     form: {
@@ -88,6 +89,8 @@ class ForgotPassword extends Component {
             email: this.state.email,
         };
 
+        axios.get(url + "/api/users/resetpassword?email=" + this.state.email);
+
         window.location.href = "/resetrequested";
     }
 
@@ -96,7 +99,7 @@ class ForgotPassword extends Component {
 
         if (localStorage.getItem("access_token") !== null) {
             return (
-                <Redirect to="/" />
+                <Redirect to="/profile" />
             )
         }
 
@@ -141,7 +144,7 @@ class ForgotPassword extends Component {
                                                 />
                                             </Grid>
                                             <Grid item>
-                                                <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+                                                <div id="errorMessage" className={classes.errorMessage}></div>
                                             </Grid>
                                             <Grid item>
                                                 <Grid container justify="center">

@@ -906,3 +906,81 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/users/resetpassword:
+    get:
+      summary: Request password reset
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/changepassword:
+    post:
+      summary: Change password
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "treven123"
+                confirmationPassword:
+                  type: string
+                  example: "treven123"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string

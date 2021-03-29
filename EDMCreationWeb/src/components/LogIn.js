@@ -129,7 +129,7 @@ class LogIn extends Component {
 
 		if (localStorage.getItem("access_token") !== null) {
 			return (
-				<Redirect to="/" />
+				<Redirect to="/profile" />
 			)
 		}
 
