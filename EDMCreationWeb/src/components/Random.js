@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Typography, withStyles } from "@material-ui/core";
+import { Typography, withStyles, Grid, Button } from "@material-ui/core";
 import Songs from "./Songs";
 import axios from "axios";
 import qs from "query-string";
-import PageButtons from "./PageButtons";
 import { url } from "./URL";
+import { Refresh } from '@material-ui/icons/';
 
 const styles = theme => ({
 	title: {
@@ -25,6 +25,27 @@ const styles = theme => ({
 		paddingLeft: "25px",
 		paddingRight: "25px",
 	},
+	refreshBox: {
+		margin: "auto",
+		marginTop: 20,
+		marginBottom: 20,
+		maxWidth: 800,
+	},
+	buttonBlock: {
+		backgroundColor: "#219653",
+		color: "white",
+		"&:hover": {
+			backgroundColor: "#219653"
+		},
+		"&:disabled": {
+			backgroundColor: "#BDBDBD"
+		},
+		paddingLeft: "25px",
+		paddingRight: "25px",
+	},
+	buttonLink: {
+		textDecoration: "none"
+	}
 });
 
 class Random extends Component {
@@ -46,7 +67,7 @@ class Random extends Component {
 	}
 
 	fetchSongs() {
-		axios.get(url + "/api/compositions/popular?page=" + this.state.page)
+		axios.get(url + "/api/compositions/random?page=" + this.state.page)
 			.then(res => this.setState({ songs: res.data }));
 	}
 
@@ -59,7 +80,15 @@ class Random extends Component {
 					Random
                 </Typography>
 				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
-				<PageButtons path={"/random?"} page={this.state.page} />
+				<div className={classes.refreshBox}>
+					<Grid container justify="center">
+						<Grid item>
+							<Button onClick={() => window.location.href = "/random"} className={classes.buttonBlock}>
+								<Refresh /> &nbsp; Refresh
+							</Button>
+						</Grid>
+					</Grid>
+				</div>
 			</div>
 		)
 	}
