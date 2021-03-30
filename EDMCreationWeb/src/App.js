@@ -63,9 +63,9 @@ class App extends Component {
 					<NavBar />
 					<Route path="/" exact component={Popular} />
 					<Route path="/popular" render={(props) => <Popular {...props} key={Date.now()} />} />
-					<Route path="/topfavorites" component={TopFavorites} />
-					<Route path="/browsegenres" component={BrowseGenres} />
-					<Route path="/random" component={Random} />
+					<Route path="/topfavorites" render={(props) => <TopFavorites {...props} key={Date.now()} />} />
+					<Route path="/browsegenres" render={(props) => <BrowseGenres {...props} key={Date.now()} />} />
+					<Route path="/random" render={(props) => <Random {...props} key={Date.now()} />} />
 					<Route path="/login" component={LogIn} />
 					<Route path="/logout" component={LogOut} />
 					<Route path="/editprofile" component={EditProfile} />

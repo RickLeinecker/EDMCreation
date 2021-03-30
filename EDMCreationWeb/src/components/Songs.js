@@ -295,10 +295,10 @@ class Songs extends Component {
 														{song.likes}
 													</span>
 													<span className={classes.statItem}>
-														<PlayArrow className={classes.numPlaysIcon} /> {song.listens}
+														<Tooltip title="Plays" placement="top"><PlayArrow className={classes.numPlaysIcon} /></Tooltip> {song.listens}
 													</span>
 													<span className={classes.statItem}>
-														<ModeComment className={classes.smallIcon} /> {song.num_comments}
+														<Tooltip title="Comments" placement="top"><ModeComment className={classes.smallIcon} /></Tooltip> {song.num_comments}
 													</span>
 												</Typography>
 											</Grid>

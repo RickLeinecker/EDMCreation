@@ -137,14 +137,14 @@ class EditSong extends Component {
 		this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.handleCancel = this.handleCancel.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
-		this.getInfo = this.getSong.bind(this);
+		this.fetchSongs = this.fetchSongs.bind(this);
 	}
 
 	componentDidMount() {
-		this.getSong();
+		this.fetchSongs();
 	}
 
-	getSong() {
+	fetchSongs() {
 		const config = {
 			headers: {
 				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
