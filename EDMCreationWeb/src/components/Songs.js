@@ -59,6 +59,12 @@ const styles = theme => ({
 		fontSize: "0.4cm",
 		marginRight: theme.spacing(0.5),
 	},
+	favoriteIcon: {
+		fontSize: "0.4cm",
+		marginRight: theme.spacing(0.5),
+		color: "#AB3535",
+		cursor: "pointer"
+	},
 	numPlaysIcon: {
 		fontSize: "0.55cm",
 		marginRight: 1,
@@ -117,7 +123,7 @@ const styles = theme => ({
 		"&:hover": {
 			color: "#EB5757"
 		}
-	}
+	},
 });
 
 class Songs extends Component {
@@ -197,7 +203,8 @@ class Songs extends Component {
 			return (
 				<div className={classes.root}>
 					<Typography variant="body2">
-						No results
+						You've reached the end. &nbsp; ‘︿’
+						<br /><br />
 					</Typography>
 				</div>
 			);
@@ -270,7 +277,7 @@ class Songs extends Component {
 														<div onClick={() => this.toggleLike(song.composition_id)}
 															color="inherit" className={classes.statItem}>
 															<Tooltip title="Unlike" placement="top">
-																{<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />}
+																{<Favorite className={classes.favoriteIcon} />}
 															</Tooltip>
 														</div> :
 														<div onMouseEnter={() => this.setState({ ["favorite" + i]: true })}
@@ -279,7 +286,7 @@ class Songs extends Component {
 															onClick={() => this.toggleLike(song.composition_id)}>
 															<Tooltip title="Like" placement="top">
 																{this.state["favorite" + i] ?
-																	(<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
+																	(<Favorite className={classes.favoriteIcon} />) :
 																	(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)}
 															</Tooltip>
 														</div>

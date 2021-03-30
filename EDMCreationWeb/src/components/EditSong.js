@@ -212,10 +212,22 @@ class EditSong extends Component {
 
 	handleDelete() {
 		const claims = {
-			title: this.state.title,
+			song_id: this.state.songId
 		};
 
-		window.location.href = "/songdeleted";
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.post(url + "/api/compositions/delete", claims, config)
+			.then(res => {
+				window.location.href = "/songdeleted";
+			})
+			.catch(err => {
+				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+			});
 	}
 
 	render() {

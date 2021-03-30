@@ -168,7 +168,7 @@ class Profile extends Component {
             page = this.state.favoritesPage;
         }
 
-        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
+        axios.get(url + "/api/users/favorites?username=" + this.state.username + "&page=" + page)
             .then(res => {
                 this.setState({ favorites: res.data, favoritesPage: page });
             });

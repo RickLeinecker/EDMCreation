@@ -984,3 +984,39 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/compositions/delete:
+    post:
+      summary: Delete a composition
+      tags:
+        - compositions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                song_id:
+                  type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string

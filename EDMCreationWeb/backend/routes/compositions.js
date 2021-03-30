@@ -98,8 +98,7 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
         user_id = req.body.ID; //for finding account
         username = req.body.uName;
 
-
-        const newComp = new Composition({ title, genre, user_id, username, path, listens, favorites, comment_count }); //just drop this line for only user upload?
+        const newComp = new Composition({ title, genre, path, listens }); //just drop this line for only user upload?
 
         User.updateOne({ _id: user_id }, { $push: { "compositions": newComp } })
             .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
@@ -475,6 +474,58 @@ router.route('/editsave').post(auth,
 
     }
 );
+
+
+router.route('/delete').post(auth, (req, res) => {
+    User.aggregate(
+        [
+            {
+                $match: {
+                    _id: mongoose.Types.ObjectId(req.body.ID)
+                }
+            },
+            {
+                $unwind: "$compositions"
+            },
+            {
+                $match: {
+                    "compositions._id": mongoose.Types.ObjectId(req.body.song_id)
+                }
+            },
+            {
+                $project: {
+                    path: "$compositions.path"
+                }
+            }
+        ])
+        .then(result => {
+            const path = result[0].path.split("/");
+            const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+
+            cloudinary.uploader.destroy(
+                publicId,
+                { invalidate: true, resource_type: "raw" },
+                cloudinaryRes => res.send(cloudinaryRes)
+            );
+
+            User.updateOne(
+                { _id: req.body.ID },
+                {
+                    $pull: {
+                        compositions: {
+                            _id: req.body.song_id
+                        }
+                    }
+                }
+            )
+                .then(result => {
+                    res.status(200).json({ msg: "Success" });
+                })
+        })
+        .catch(err => {
+            res.status(200).json({ msg: "Error" });
+        });
+});
 
 
 router.route('/incrementplaycount').post((req, res) => {
