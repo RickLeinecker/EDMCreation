@@ -90,13 +90,17 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
             return res.status(422).json({ errors: errors.array() })
         }
 
-        const { title, genre } = req.body;
+        var { title, genre } = req.body;
         const path = req.file.path;
         listens = 0; //0 listens
         favorites = 0; // 0 favorites
         comment_count = 0;
         user_id = req.body.ID; //for finding account
         username = req.body.uName;
+
+        if (genre === "") {
+            genre = "Other";
+        }
 
         const newComp = new Composition({ title, genre, path, listens }); //just drop this line for only user upload?
 
@@ -752,6 +756,131 @@ router.route('/genre').get(async (req, res) => {
             { $sort: { "_id": 1, "likes": -1 } }, //descending values for likes
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
+
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+
+router.route('/topfavorites').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+
+    try {
+        const songs = await User.aggregate([
+            {
+                $project: {
+                    favorites: "$favorites",
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$favorites.composition_id",
+                },
+            },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    likes: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "compositions._id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    likes: 1,
+                    favorites: "$favorites.compositions",
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    likes: 1,
+                    favorites: 1,
+                    match: { $eq: ["$_id", "$favorites._id"] }
+                },
+            },
+            { $match: { match: true } },
+            {
+                $project: {
+                    likes: 1,
+                    compositions: "$favorites",
+                },
+            },
+            {
+                $project: {
+                    likes: 1,
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$compositions.username",
+                    num_comments: { $size: "$compositions.comments" },
+                    likes: 1,
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    favorited_date: { $first: "$favorited_date" },
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    likes: { $first: "$likes" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            { $sort: { "_id": 1, "likes": 1 } },
+            { $skip: skip },
+            { $limit: songsPerPage },
         ]);
 
         if (!songs) throw Error('No items');

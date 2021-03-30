@@ -3,6 +3,8 @@ import { Typography, withStyles } from "@material-ui/core";
 import Songs from "./Songs";
 import axios from "axios";
 import { url } from "./URL";
+import qs from "query-string";
+import PageButtons from "./PageButtons";
 
 const styles = theme => ({
 	title: {
@@ -17,8 +19,11 @@ class TopFavorites extends Component {
 	constructor(props) {
 		super(props);
 
+		this.parameters = qs.parse(this.props.location.search);
+
 		this.state = {
-			songs: []
+			songs: [],
+			page: [this.parameters.page !== undefined ? this.parameters.page : 1]
 		}
 
 		this.fetchSongs = this.fetchSongs.bind(this);
@@ -29,7 +34,7 @@ class TopFavorites extends Component {
 	}
 
 	fetchSongs() {
-		axios.get(url + "/api/testsongs")
+		axios.get(url + "/api/compositions/topfavorites?page=" + this.state.page)
 			.then(res => this.setState({ songs: res.data }));
 	}
 
@@ -42,6 +47,7 @@ class TopFavorites extends Component {
 					Top Favorites
                 </Typography>
 				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
+				<PageButtons path={"/topfavorites?"} page={this.state.page} />
 			</div>
 		)
 	}
