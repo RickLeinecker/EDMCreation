@@ -97,7 +97,6 @@ class Register extends Component {
             confirmationPassword: this.state.confirmationPassword
         };
 
-
         axios.post(url + "/api/users/signup", claims)
             .then(res => {
                 window.location.href = "/registercompleted";
