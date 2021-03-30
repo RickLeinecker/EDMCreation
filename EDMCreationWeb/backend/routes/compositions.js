@@ -105,59 +105,7 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
             .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
     });
 
-// EDIT UPLOAD FOR TRAINING FILE ZIP TO MONGO DB
-// router.route('/upload').post(auth, upload.single('file'), auth, (req, res) => {
 
-//     //'file' for field name from front end  
-//     //AUTH CALLED TWICE BECAUSE MULTER OCCUPIES REQUESTBODY until after 
-
-//     const { title, description, ID, genre, image_id, uName } = req.body;
-
-//     //if fields are missing, need to add error here for it and remove song that was just uploaded?
-
-//    const file_id = req.file.id; //id from file being stored
-//    const filename = req.file.filename;
-//    listens = 0; //0 listens
-//    favorites = 0; // 0 favorites
-//    comment_count = 0;
-//    user_id = ID; //for finding accoun
-//    username = uName;
-
-//     const newComp = new Composition({ title, description, genre, image_id, user_id, username, file_id, listens, favorites, comment_count, filename });//just drop this line for only user upload?
-
-
-//     User.updateOne({ _id: ID }, { $push: { "compositions": newComp }, $inc: { upload_count: 1 } })
-//         .then(() => res.status(200).json({ msg: 'composition uploaded' }))
-//         .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
-
-//     //need to redirect on page once done? 
-// });
-
-// //single play and update count for when a user hits play on a given song
-// router.route('/play/:filename').get((req, res) => {
-//     gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-//         // Check if file
-//         if (!file || file.length === 0) {
-//             return res.status(404).json({ err: 'No file exists' });
-//         }
-
-//         // File exists
-
-//         // Check if midi then load
-//         if (file.contentType === 'audio/mid') {
-
-//         } else {
-//             return res.status(404).json({ err: 'Not a MID file' });
-//         }
-//         const readstream = gfs.createReadStream(file.filename);
-
-//         //update listens for comp and user and send file data
-//         User.updateOne({ "compositions.filename": req.params.filename }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
-//             .then(() => readstream.pipe(res)) //Return File for playing
-//             .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
-
-//     });
-// });
 
 //load multiple composition infos for pages
 //REQUIRES PAGE NUMBER IN ROUTE, STARTING ON 1
@@ -623,6 +571,185 @@ router.route('/search').get(async (req, res) => {
                 }
             },
             { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
+
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+//random kinda works but isnt cached so paging isnt right.
+router.route('/random').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+
+    try {
+        const songs = await User.aggregate([
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" },
+                    rand: { $multiply: [ { $rand: {} }, 12345 ] } 
+                }
+            },
+            { $sort: { "rand": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
+
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+
+//genre search for songs
+router.route('/genre').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+    const genre = req.query.genre;
+
+    try {
+        const songs = await User.aggregate([
+
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $match:{ "compositions.genre": { $regex: "^" + genre, '$options': 'i' } }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": 1, "likes": -1 } }, //descending values for likes
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);

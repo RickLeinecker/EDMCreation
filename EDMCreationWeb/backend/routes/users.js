@@ -8,6 +8,58 @@ const auth = require('../middleware/auth');
 const { json } = require('body-parser');
 require('dotenv').config();
 
+
+//for gridfs use
+const bodyParser = require('body-parser');
+const path = require('path');
+const crypto = require('crypto');
+const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+const methodOverride = require('method-override');
+const { Router } = require('express');
+const { rstrtohex } = require('jsrsasign');
+
+//had to put here as well as index so I can use gfs?
+const uri = process.env.ATLAS_URI; //for connection //needed even in here
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+});
+const connection = mongoose.connection;
+
+let gfs;
+connection.once('open', () => {
+    gfs = Grid(connection.db, mongoose.mongo);
+    gfs.collection('uploads');
+});
+
+// Create storage engine
+const storage = new GridFsStorage({
+    url: uri,
+    file: (req, file) => {
+        return new Promise((resolve, reject) => {
+
+            crypto.randomBytes(16, (err, buf) => {
+
+                if (err) {
+                    return reject(err);
+                }
+                const filename = buf.toString('hex') + path.extname(file.originalname);
+                const fileInfo = {
+                    filename: filename,
+                    metadata: req.body.ID,
+                    bucketName: 'uploads'
+                };
+                resolve(fileInfo);
+            });
+        });
+    }
+});
+
+const multer = require('multer');
+const upload = multer({ storage });
+
 //sign up 
 router.route('/signup').post(
     [
@@ -844,5 +896,60 @@ router.route('/changepassword').post(
             });
     }
 );
+
+
+// EDIT UPLOAD FOR TRAINING FILE ZIP TO MONGO DB
+router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, res) => {
+
+    //NEED TO DELETE OLD TRAINING IF IT EXISTS
+    User.findOne({ _id: req.body.ID })
+        .then(user=>{ 
+            if(user.training_file_id){//if not empty
+                gfs.remove({ _id: user.training_file_id, root: 'uploads' }, (err) => {
+                    if (err) {
+                    return res.status(404).json({ err: err });
+                    }
+                });
+            }
+        });
+
+    User.updateOne({ _id: req.body.ID }, { $set: { "training_file_id": req.file.id }})
+        .then(() => res.status(200).json({ msg: 'training uploaded' }))
+        .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
+
+    //need to redirect on page once done? 
+});
+
+
+// //modify for get training
+// //single play and update count for when a user hits play on a given song
+router.route('/trainingudownload').get(auth,(req, res) => {
+    
+    User.findOne({_id : req.body.ID})
+        .then(user=>{ 
+            
+            if(user){
+                
+                gfs.files.findOne({ _id: user.training_file_id }, (err, file) => {
+                    // Check if file
+                    if (!file || file.length === 0) {
+                        return res.status(404).json({ err: 'No file exists' });
+                    }
+            
+                    const readstream = gfs.createReadStream(file.filename);
+                    return readstream.pipe(res); //front end saves?
+                     //res.status(200).json( "Training returned" );
+                
+
+                });
+            }else{
+                //error retrieving user
+            }
+            
+        });
+    
+   
+});
+
 
 module.exports = router;

@@ -1020,3 +1020,172 @@ paths:
                     type: boolean
                   message:
                     type: string
+  /api/compositions/random:
+    get:
+      summary: random songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/genre:
+    get:
+      summary: genre songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: genre
+          schema:
+            type: string
+            example: "apple"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/trainingupload:
+    post:
+      summary: training upload
+      description: file and user id needed
+      tags:
+        - account
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/users/trainingudownload:
+    get:
+      summary: User info
+      tags:
+        - account
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
