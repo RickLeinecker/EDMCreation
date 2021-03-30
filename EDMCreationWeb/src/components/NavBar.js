@@ -181,25 +181,25 @@ function NavBar(props) {
 							anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 							transformOrigin={{ vertical: "top", horizontal: "center" }}
 						>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%201" onClick={handleClose}>
 								Genre 1
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%202" onClick={handleClose}>
 								Genre 2
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%203" onClick={handleClose}>
 								Genre 3
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%204" onClick={handleClose}>
 								Genre 4
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%205" onClick={handleClose}>
 								Genre 5
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%206" onClick={handleClose}>
 								Genre 6
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
+							<MenuItem component={RouterLink} to="/genres?genre=Genre%207" onClick={handleClose}>
 								Genre 7
                     		</MenuItem>
 						</Menu>

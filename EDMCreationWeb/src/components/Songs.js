@@ -269,7 +269,7 @@ class Songs extends Component {
 										</Grid>
 										<Grid item container xs style={{ paddingRight: 29 }} >
 											<Grid item xs>
-												<Chip size="small" label={song.genre} className={classes.genre} onClick={() => window.location.replace("#")} />
+												<Chip size="small" label={song.genre} className={classes.genre} onClick={() => window.location = ("/genres?genre=" + song.genre)} />
 											</Grid>
 											<Grid item xs container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
