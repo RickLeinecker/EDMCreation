@@ -1020,15 +1020,9 @@ paths:
                     type: boolean
                   message:
                     type: string
-<<<<<<< HEAD
-  /api/compositions/random:
-    get:
-      summary: random songs
-=======
   /api/compositions/topfavorites:
     get:
       summary: Top favorites
->>>>>>> 18adfe3acb04cc2bd1566403efc9c888903bce9b
       tags:
         - compositions
       parameters:
@@ -1041,7 +1035,40 @@ paths:
         '200':
           description: Successful
           content:
-<<<<<<< HEAD
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/random:
+    get:
+      summary: random songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+      responses:
+        '200':
+          description: Successful
+          content:
           multipart/form-data:
             schema:
               type: object
@@ -1052,8 +1079,6 @@ paths:
         '400':
           description: Failed
           content:
-=======
->>>>>>> 18adfe3acb04cc2bd1566403efc9c888903bce9b
             application/json:
               schema:
                 type: object
@@ -1062,7 +1087,6 @@ paths:
                     type: boolean
                   message:
                     type: string
-<<<<<<< HEAD
   /api/compositions/genre:
     get:
       summary: genre songs
@@ -1090,8 +1114,6 @@ paths:
                 file:
                   type: string
                   format: binary
-=======
->>>>>>> 18adfe3acb04cc2bd1566403efc9c888903bce9b
         '400':
           description: Failed
           content:
@@ -1102,7 +1124,6 @@ paths:
                   success:
                     type: boolean
                   message:
-<<<<<<< HEAD
                     type: string
   /api/users/trainingupload:
     post:
@@ -1202,6 +1223,3 @@ paths:
                     type: boolean
                   message:
                     type: string
-=======
-                    type: string
->>>>>>> 18adfe3acb04cc2bd1566403efc9c888903bce9b
