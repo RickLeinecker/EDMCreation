@@ -49,7 +49,7 @@ class Search extends Component {
 
     fetchSongs() {
         axios.get(url + "/api/compositions/search?page=" + this.state.page + "&search=" + this.state.query)
-            .then(res => this.setState({ songs: res.data }));
+            .then(res => this.setState({ songs: res.data.songs }));
     }
 
     render() {
