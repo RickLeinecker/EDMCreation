@@ -190,7 +190,7 @@ class Register extends Component {
                                                     fullWidth
                                                     name="confirmationPassword"
                                                     variant="filled"
-                                                    label="Comfirm password"
+                                                    label="Confirm password"
                                                     onChange={this.handleChange}
                                                     InputProps={{ className: classes.inputBox, disableUnderline: true }}
                                                     InputLabelProps={{ className: classes.inputBoxLabel }}
