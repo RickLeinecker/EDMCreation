@@ -45,11 +45,15 @@ class PageButtons extends Component {
                             </Link>}
                     </Grid>
                     <Grid item>
-                        <Link to={this.props.path + "page=" + (parseInt(this.props.page) + 1)} className={classes.buttonLink}>
-                            <Button className={classes.buttonBlock}>
+                        {this.props.lastPage ?
+                            <Button disabled="true" className={classes.buttonBlock}>
                                 Next
-						    </Button>
-                        </Link>
+                            </Button> :
+                            <Link to={this.props.path + "page=" + (parseInt(this.props.page) + 1)} className={classes.buttonLink}>
+                                <Button className={classes.buttonBlock}>
+                                    Next
+						        </Button>
+                            </Link>}
                     </Grid>
                 </Grid>
             </div>

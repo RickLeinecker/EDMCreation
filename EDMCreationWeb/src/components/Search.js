@@ -23,7 +23,8 @@ class Search extends Component {
 
         this.state = {
             songs: [],
-            page: [this.parameters.page !== undefined ? this.parameters.page : 1]
+            page: [this.parameters.page !== undefined ? this.parameters.page : 1],
+            uploadsLastPage: true,
         }
 
         if (this.props.location !== undefined &&
@@ -49,7 +50,7 @@ class Search extends Component {
 
     fetchSongs() {
         axios.get(url + "/api/compositions/search?page=" + this.state.page + "&search=" + this.state.query)
-            .then(res => this.setState({ songs: res.data.songs }));
+            .then(res => this.setState({ songs: res.data.songs, lastPage: res.data.lastPage }));
     }
 
     render() {
@@ -61,7 +62,7 @@ class Search extends Component {
                     Search results for "{this.state.query}"
                 </Typography>
                 <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
-                <PageButtons path={"/search?query=" + this.state.query + "&"} page={this.state.page} />
+                <PageButtons path={"/search?query=" + this.state.query + "&"} page={this.state.page} lastPage={this.state.lastPage} />
             </div>
         )
     }

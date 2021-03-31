@@ -35,7 +35,8 @@ class Popular extends Component {
 
 		this.state = {
 			songs: [],
-			page: [this.parameters.page !== undefined ? this.parameters.page : 1]
+			page: [this.parameters.page !== undefined ? this.parameters.page : 1],
+			lastPage: true
 		}
 
 		this.fetchSongs = this.fetchSongs.bind(this);
@@ -47,7 +48,7 @@ class Popular extends Component {
 
 	fetchSongs() {
 		axios.get(url + "/api/compositions/popular?page=" + this.state.page)
-			.then(res => this.setState({ songs: res.data.songs }));
+			.then(res => this.setState({ songs: res.data.songs, lastPage: res.data.lastPage }));
 	}
 
 	render() {
@@ -59,7 +60,7 @@ class Popular extends Component {
 					Popular
                 </Typography>
 				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
-				<PageButtons path={"/popular?"} page={this.state.page} />
+				<PageButtons path={"/popular?"} page={this.state.page} lastPage={this.state.lastPage} />
 			</div>
 		)
 	}

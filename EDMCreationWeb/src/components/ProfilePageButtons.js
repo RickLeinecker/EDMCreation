@@ -43,9 +43,13 @@ class PageButtons extends Component {
                         }
                     </Grid>
                     <Grid item>
-                        <Button className={classes.buttonBlock} onClick={() => this.props.fetchSongs(parseInt(this.props.page) + 1)}>
-                            Next
-						</Button>
+                        {this.props.lastPage ?
+                            <Button disabled="true" className={classes.buttonBlock}>
+                                Next
+                            </Button> :
+                            <Button disabled={this.props.lastPage} className={classes.buttonBlock} onClick={() => this.props.fetchSongs(parseInt(this.props.page) + 1)}>
+                                Next
+						    </Button>}
                     </Grid>
                 </Grid>
             </div>

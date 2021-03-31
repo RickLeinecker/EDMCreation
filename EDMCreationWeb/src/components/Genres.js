@@ -25,6 +25,7 @@ class Genres extends Component {
 			songs: [],
 			page: [this.parameters.page !== undefined ? this.parameters.page : 1],
 			genre: [this.parameters.genre !== undefined ? this.parameters.genre : "Other"],
+			lastPage: true
 		}
 
 		this.fetchSongs = this.fetchSongs.bind(this);
@@ -36,7 +37,7 @@ class Genres extends Component {
 
 	fetchSongs() {
 		axios.get(url + "/api/compositions/genre?genre=" + this.state.genre + "&page=" + this.state.page)
-			.then(res => this.setState({ songs: res.data.songs }));
+			.then(res => this.setState({ songs: res.data.songs, lastPage: res.data.lastPage }));
 	}
 
 	render() {
@@ -48,7 +49,7 @@ class Genres extends Component {
 					{this.state.genre}
 				</Typography>
 				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
-				<PageButtons path={"/genres?genre=" + this.state.genre + "&"} page={this.state.page} />
+				<PageButtons path={"/genres?genre=" + this.state.genre + "&"} page={this.state.page} lastPage={this.state.lastPage} />
 			</div>
 		)
 	}

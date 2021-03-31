@@ -94,7 +94,9 @@ class Profile extends Component {
             favorites: [],
             user: [],
             uploadsPage: 1,
+            uploadsLastPage: true,
             favoritesPage: 1,
+            favoritesLastPage: true,
             currentUser: [localStorage.getItem("username")],
         }
 
@@ -159,7 +161,7 @@ class Profile extends Component {
 
         axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
             .then(res => {
-                this.setState({ uploads: res.data.songs, uploadsPage: page });
+                this.setState({ uploads: res.data.songs, uploadsPage: page, lastPage: res.data.lastPage });
             });
     }
 
@@ -170,7 +172,7 @@ class Profile extends Component {
 
         axios.get(url + "/api/users/favorites?username=" + this.state.username + "&page=" + page)
             .then(res => {
-                this.setState({ favorites: res.data.songs, favoritesPage: page });
+                this.setState({ favorites: res.data.songs, favoritesPage: page, lastPage: res.data.lastPage });
             });
     }
 
@@ -280,11 +282,11 @@ class Profile extends Component {
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
                     <Songs songs={this.state.uploads} fetchSongs={this.fetchUploads} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
-                    <ProfilePageButtons page={this.state.uploadsPage} fetchSongs={this.fetchUploads} />
+                    <ProfilePageButtons page={this.state.uploadsPage} fetchSongs={this.fetchUploads} lastPage={this.state.uploadsLastPage} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
                     <Songs songs={this.state.favorites} fetchSongs={this.fetchFavorites} />
-                    <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} />
+                    <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} lastPage={this.state.favoritesLastPage} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
                     <Following username={this.state.username} />
