@@ -15,7 +15,7 @@ const userSchema = new Schema(
         description: { type: String },
         upload_count: { type: Number },
         listens_count: { type: Number },
-        image_id: { type: mongoose.Types.ObjectId },
+        image_id: { type: String },
         compositions: [
             {
                 composition_id: { type: mongoose.Types.ObjectId },
@@ -24,7 +24,7 @@ const userSchema = new Schema(
                 title: { type: String },
                 description: { type: String },
                 genre: { type: String },
-                image_id: { type: mongoose.Types.ObjectId },
+                image_id: { type: String },
                 file_id: { type: mongoose.Types.ObjectId },
                 filename: { type: String },
                 path: { type: String },

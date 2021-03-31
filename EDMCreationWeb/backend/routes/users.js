@@ -19,7 +19,7 @@ const methodOverride = require('method-override');
 const { Router } = require('express');
 const { rstrtohex } = require('jsrsasign');
 
-//had to put here as well as index so I can use gfs?
+
 const uri = process.env.ATLAS_URI; //for connection //needed even in here
 mongoose.connect(uri, {
     useNewUrlParser: true,
@@ -59,6 +59,28 @@ const storage = new GridFsStorage({
 
 const multer = require('multer');
 const upload = multer({ storage });
+
+//for image upload
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+});
+
+const fileStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'images',
+        allowed_formats: ['jpg', 'jpeg','png'],
+        resource_type: 'raw'
+    },
+});
+
+const parser = multer({ storage: fileStorage });
+
 
 //sign up 
 router.route('/signup').post(
@@ -409,7 +431,7 @@ router.route('/editinfo').get(auth, (req, res) => {
 
 
 //saves the edit page 
-router.route('/editsave').post(auth,
+router.route('/editsave').post(auth, parser.single("file"), auth,
     [
         check('email').isEmail().withMessage('Email is invalid'),
         check('newPassword').optional({ checkFalsy: true }).isLength({ min: 5 }).withMessage('Password must be at least 5 characters'),
@@ -437,6 +459,22 @@ router.route('/editsave').post(auth,
             .then(user => {
                 if (user) {
                     user.description = req.body.description;
+                    
+
+                    if(req.file.path){
+                        const path = user.image_id.split("/");
+                        const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+    
+                        cloudinary.uploader.destroy(
+                            publicId,
+                            { invalidate: true, resource_type: "raw" },
+                            cloudinaryRes => res.send(cloudinaryRes)
+                        );
+                        
+                        user.image_id = req.file.path;
+                    }
+
+                    
 
                     if (user.email !== req.body.email) {
                         user.new_email = req.body.email;
@@ -461,15 +499,23 @@ router.route('/editsave').post(auth,
                                 sendVerification(payload);
                             }
 
-                            res.status(200).json({ msg: "Profile has been updated" })
+                           return res.status(200).json({ msg: "Profile has been updated" })
                         })
                         .catch(err => res.status(400).json('Error: ' + err));
                 } else {
+                    
+                    const path = req.file.path.split("/");
+                    const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+
+                    cloudinary.uploader.destroy(
+                        publicId,
+                        { invalidate: true, resource_type: "raw" },
+                        cloudinaryRes => res.send(cloudinaryRes)
+                    );
+                    
                     return res.status(400).json({ msg: "Invalid username" });
                 }
-                if (req.body.newPassword === "") {
-                    return res.status(200).json('Password and fields updated');
-                }
+
             })
             .catch(err => {
                 res.status(400).json({ msg: err });

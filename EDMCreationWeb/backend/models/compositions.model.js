@@ -10,7 +10,7 @@ const userSchema = new Schema(
         title: { type: String },
         description: { type: String },
         genre: { type: String },
-        image_id: { type: mongoose.Types.ObjectId },
+        image_id: { type: String },
         file_id: { type: mongoose.Types.ObjectId },
         filename: { type: String },
         path: { type: String },

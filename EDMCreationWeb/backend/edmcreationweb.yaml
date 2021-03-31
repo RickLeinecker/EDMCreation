@@ -497,10 +497,13 @@ paths:
         - account
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
+                file:
+                  type: string
+                  format: binary          
                 email:
                   type: string
                   example: "treven@treven.com"

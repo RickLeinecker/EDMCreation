@@ -19,7 +19,7 @@ const methodOverride = require('method-override');
 const { Router } = require('express');
 const { rstrtohex } = require('jsrsasign');
 
-//had to put here as well as index so I can use gfs?
+
 const uri = process.env.ATLAS_URI; //for connection //needed even in here
 mongoose.connect(uri, {
     useNewUrlParser: true,
