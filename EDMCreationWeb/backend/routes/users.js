@@ -182,7 +182,7 @@ router.route('/login').post(
                             time += 604800000; // 7 day expiration
 
                             const claims = { //assaign payload
-                                Username: username,
+                                Username: user.username,
                                 ID: user.id,
                                 Expires: time
                             }
@@ -610,9 +610,11 @@ router.route('/favorites').get(async (req, res) => {
             { $limit: songsPerPage },
         ]);
 
-        if (!songs) throw Error('No items');
-
-        res.status(200).json(songs);
+        if (!songs) throw Error('No songs');
+       
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -667,7 +669,7 @@ router.route('/following').get(async (req, res) => {
             { $limit: usersPerPage },
         ]);
 
-        if (!users) throw Error('No items');
+        if (!users) throw Error('No songs');
 
         res.status(200).json(users);
     } catch (e) {
@@ -738,7 +740,7 @@ const sendVerification = (req, res) => {
             const mailOptions = {
                 'to': email,
                 'subject': "EDM Creation: Verify your email address",
-                'html': "Hello,<br><br>Please click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+                'html': "Hello "+user.username+",<br><br>Please click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
             }
 
             smtpTransport.sendMail(mailOptions, (error, transportRes) => {
@@ -959,7 +961,7 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
 
 // //modify for get training
 // //single play and update count for when a user hits play on a given song
-router.route('/trainingudownload').get(auth,(req, res) => {
+router.route('/trainingdownload').get(auth,(req, res) => {
     
     User.findOne({_id : req.body.ID})
         .then(user=>{ 

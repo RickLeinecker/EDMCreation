@@ -102,7 +102,7 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
             genre = "Other";
         }
 
-        const newComp = new Composition({ title, genre, path, listens }); //just drop this line for only user upload?
+        const newComp = new Composition({ title, username, genre, path, listens }); //just drop this line for only user upload?
 
         User.updateOne({ _id: user_id }, { $push: { "compositions": newComp } })
             .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
@@ -190,9 +190,11 @@ router.route('/popular').get(async (req, res) => {
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
-        if (!songs) throw Error('No items');
-
-        res.status(200).json(songs);
+        if (!songs) throw Error('No songs');
+        
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -204,7 +206,7 @@ router.route('/user/:username').get(async (req, res) => {
     const skip = songsPerPage * (req.query.page - 1);
 
     try {
-        const items = await User.aggregate([
+        const songs = await User.aggregate([
             { $match: { username: { $regex: new RegExp('^' + req.params.username + '$', "i") } } },
             {
                 $unwind:
@@ -277,9 +279,10 @@ router.route('/user/:username').get(async (req, res) => {
             { $limit: songsPerPage },
         ]);
 
-        if (!items) throw Error('No items');
-
-        res.status(200).json(items);
+        if (!songs) throw Error('No songs');
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -504,6 +507,8 @@ router.route('/search').get(async (req, res) => {
     const skip = songsPerPage * (req.query.page - 1);
     const lookup = req.query.search;
 
+    
+        
     try {
         const songs = await User.aggregate([
 
@@ -518,9 +523,10 @@ router.route('/search').get(async (req, res) => {
                 $match:
                 {
                     $or:
-                        [
-                            { "compositions.username": { $regex: "^" + lookup, '$options': 'i' } },
-                            { "compositions.title": { $regex: "^" + lookup, '$options': 'i' } }
+                        [//partial hit search all categories
+                            { "compositions.username":{ $regex: ".*" + lookup + ".*", '$options': 'i' } },
+                            { "compositions.genre": { $regex: ".*" + lookup + ".*", '$options': 'i' } },
+                            { "compositions.title": { $regex: ".*" + lookup + ".*", '$options': 'i' } }
                         ]
                 }
             },
@@ -583,14 +589,18 @@ router.route('/search').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
+            
             { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
+            
         ]);
 
-        if (!songs) throw Error('No items');
+        if (!songs) throw Error('No songs');
 
-        res.status(200).json(songs);
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -675,7 +685,7 @@ router.route('/random').get(async (req, res) => {
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
-        if (!songs) throw Error('No items');
+        if (!songs) throw Error('No songs');
 
         res.status(200).json(songs);
     } catch (e) {
@@ -767,9 +777,11 @@ router.route('/genre').get(async (req, res) => {
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
-        if (!songs) throw Error('No items');
-
-        res.status(200).json(songs);
+        if (!songs) throw Error('No songs');
+       
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -892,9 +904,11 @@ router.route('/topfavorites').get(async (req, res) => {
             { $limit: songsPerPage },
         ]);
 
-        if (!songs) throw Error('No items');
-
-        res.status(200).json(songs);
+        if (!songs) throw Error('No songs');
+        
+        const lastPage = songs.length<5;
+        
+        res.status(200).json({songs,lastPage});
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
