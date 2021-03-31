@@ -185,7 +185,7 @@ router.route('/popular').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "listens": -1, "_id": 1 } }, //descending values for listens
+            { $sort: { "listens": -1, "composition_id": 1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
@@ -590,7 +590,7 @@ router.route('/search').get(async (req, res) => {
                 }
             },
 
-            { $sort: { "listens": -1, "_id": 1 } }, //descending values for listens
+            { $sort: { "listens": -1, "composition_id": 1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
 
@@ -772,7 +772,7 @@ router.route('/genre').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "likes": -1, "_id": 1 } }, //descending values for likes
+            { $sort: { "likes": -1, "composition_id": 1 } }, //descending values for likes
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
@@ -868,6 +868,7 @@ router.route('/topfavorites').get(async (req, res) => {
                     title: "$compositions.title",
                     username: "$compositions.username",
                     num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
                     likes: 1,
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
@@ -897,6 +898,7 @@ router.route('/topfavorites').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    date: { $first: "$date" },
                 }
             },
             { $sort: { "likes": -1, "_id": 1 } },
