@@ -9,16 +9,16 @@ namespace EDMCreation.Core.Services
         {
             var songs = new List<string>()
             {
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test2.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test3.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test4.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test5.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test6.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test7.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test8.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test9.mid",
-                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\test10.mid"
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\10_latin-brazilian-sambareggae_96_beat_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\102_funk_95_beat_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\124_afrocuban-bembe_122_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\159_latin-brazilian-baiao_95_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\168_latin-brazilian-baiao_95_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\169_afrocuban-rhumba_110_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\17_country_114_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\175_afrocuban-rhumba_110_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\19_hiphop_100_fill_4-4.mid",
+                @"..\..\..\..\EDMCreation.Core\ViewModels\TestSongs\19_jazz-funk_116_fill_4-4.mid"
             };
 
             return songs;
