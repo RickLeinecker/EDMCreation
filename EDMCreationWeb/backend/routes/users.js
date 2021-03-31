@@ -461,14 +461,14 @@ router.route('/editsave').post(auth, parser.single("file"), auth,
                     user.description = req.body.description;
                     
 
-                    if(req.file.path){
+                    if(req.file){
                         const path = user.image_id.split("/");
                         const publicId = path[path.length - 2] + "/" + path[path.length - 1];
     
                         cloudinary.uploader.destroy(
                             publicId,
                             { invalidate: true, resource_type: "raw" },
-                            cloudinaryRes => res.send(cloudinaryRes)
+                            //cloudinaryRes => res.send(cloudinaryRes)
                         );
                         
                         user.image_id = req.file.path;
@@ -503,16 +503,16 @@ router.route('/editsave').post(auth, parser.single("file"), auth,
                         })
                         .catch(err => res.status(400).json('Error: ' + err));
                 } else {
-                    
-                    const path = req.file.path.split("/");
-                    const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+                    if(req.file){
+                        const path = req.file.path.split("/");
+                        const publicId = path[path.length - 2] + "/" + path[path.length - 1];
 
-                    cloudinary.uploader.destroy(
-                        publicId,
-                        { invalidate: true, resource_type: "raw" },
-                        cloudinaryRes => res.send(cloudinaryRes)
-                    );
-                    
+                        cloudinary.uploader.destroy(
+                            publicId,
+                            { invalidate: true, resource_type: "raw" },
+                            //cloudinaryRes => res.send(cloudinaryRes)
+                        );
+                    }
                     return res.status(400).json({ msg: "Invalid username" });
                 }
 
