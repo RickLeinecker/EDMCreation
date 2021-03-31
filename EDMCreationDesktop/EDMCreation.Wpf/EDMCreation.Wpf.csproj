@@ -6,6 +6,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+
+
   <ItemGroup>
     <PackageReference Include="MaterialDesignColors" Version="2.0.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.0.0" />
@@ -16,5 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\EDMCreation.Core\EDMCreation.Core.csproj" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="XCOPY $(SolutionDir)python $(TargetDir)python /S /E /Y /I" />
+  </Target>
 
 </Project>
