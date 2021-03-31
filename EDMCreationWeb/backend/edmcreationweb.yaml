@@ -13,7 +13,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      
+
 security:
   - bearerAuth: []
 
@@ -22,7 +22,7 @@ paths:
     post:
       summary: Registration
       tags:
-        - account 
+        - account
       requestBody:
         content:
           application/json:
@@ -31,10 +31,10 @@ paths:
               properties:
                 username:
                   type: string
-                  example: "Treven"                 
+                  example: "Treven"
                 email:
                   type: string
-                  example: "treven@treven.com" 
+                  example: "treven@treven.com"
                 password:
                   type: string
                   example: "treven123"
@@ -93,7 +93,7 @@ paths:
     post:
       summary: Login
       tags:
-        - account 
+        - account
       requestBody:
         content:
           application/json:
@@ -102,7 +102,7 @@ paths:
               properties:
                 username:
                   type: string
-                  example: "Treven"                 
+                  example: "Treven"
                 password:
                   type: string
                   example: "treven123"
@@ -226,10 +226,6 @@ paths:
           schema:
             type: integer
             example: "1"
-        - in: query
-          name: user
-          schema:
-            type: string
       responses:
         '200':
           description: Successful
@@ -288,13 +284,13 @@ paths:
     post:
       summary: Post comment
       tags:
-        - compositions 
+        - compositions
       requestBody:
         content:
           application/json:
             schema:
               type: object
-              properties:               
+              properties:
                 song_id:
                   type: string
                   example: 605baea083633672d3f04cd7
@@ -326,11 +322,7 @@ paths:
                     type: string
   /api/users/info/{username}:
     get:
-<<<<<<< HEAD
-      summary: profile page
-=======
       summary: User info
->>>>>>> 96af1c8afeb16021583aa6b3876e3536e0536971
       tags:
         - account
       parameters:
@@ -362,15 +354,15 @@ paths:
                     type: string
   /api/users/liketoggle:
     post:
-      summary: user favorite a song
+      summary: User favorite a song
       tags:
-        - account 
+        - account
       requestBody:
         content:
           application/json:
             schema:
               type: object
-              properties:               
+              properties:
                 song_id:
                   type: string
                   example: 605baea083633672d3f04cd7
@@ -387,6 +379,840 @@ paths:
                   message:
                     type: string
         '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/isliked:
+    get:
+      summary: Returns true if user favorited the song
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: song_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/getfollow:
+    get:
+      summary: Returns true if user follows user
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/followtoggle:
+    post:
+      summary: User follows a user
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                follow_id:
+                  type: string
+                  example: 6058d7ab3c858d1ac4ce9ec1
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/editsave:
+    post:
+      summary: edit user info
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "treven@treven.com"
+                password:
+                  type: string
+                  example: "treven123"
+                newPassword:
+                  type: string
+                  example: "treven123"
+                confirmationNewPassword:
+                  type: string
+                  example: "treven123"
+                description:
+                  type: string
+                  example: "this is me"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/users/editinfo:
+    get:
+      summary: user info for edit page
+      tags:
+        - account
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/editinfo:
+    get:
+      summary: song info for edit page
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: song_id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/editsave:
+    post:
+      summary: save new song info
+      tags:
+        - compositions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "treven@treven.com"
+                genre:
+                  type: string
+                  example: "treven123"
+                song_id:
+                  type: string
+                  example: "605f9a9cb07dce2ff0cc7c24"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/compositions/incrementplaycount:
+    post:
+      summary: Increment the play count
+      tags:
+        - compositions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                song_id:
+                  type: string
+                  example: "605f9a9cb07dce2ff0cc7c24"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/search:
+    get:
+      summary: search songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: search
+          schema:
+            type: string
+            example: "apple"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/favorites:
+    get:
+      summary: pulling favorites paged
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: username
+          schema:
+            type: string
+            example: "Treven"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/following:
+    get:
+      summary: Get list of users followed
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: username
+          schema:
+            type: string
+            example: "Treven"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/sendverification:
+    get:
+      summary: Send email verification
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/verify:
+    get:
+      summary: Verify email
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/resetpassword:
+    get:
+      summary: Request password reset
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/changepassword:
+    post:
+      summary: Change password
+      tags:
+        - account
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "treven123"
+                confirmationPassword:
+                  type: string
+                  example: "treven123"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/delete:
+    post:
+      summary: Delete a composition
+      tags:
+        - compositions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                song_id:
+                  type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/topfavorites:
+    get:
+      summary: Top favorites
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/random:
+    get:
+      summary: random songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/compositions/genre:
+    get:
+      summary: genre songs
+      tags:
+        - compositions
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: "1"
+        - in: query
+          name: genre
+          schema:
+            type: string
+            example: "apple"
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/users/trainingupload:
+    post:
+      summary: training upload
+      description: file and user id needed
+      tags:
+        - account
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Input errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        values:
+                          type: string
+                        msg:
+                          type: string
+                        param:
+                          type: string
+                        location:
+                          type: string
+  /api/users/trainingudownload:
+    get:
+      summary: User info
+      tags:
+        - account
+      responses:
+        '200':
+          description: Successful
+          content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        '400':
+          description: Failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '404':
           description: Failed
           content:
             application/json:

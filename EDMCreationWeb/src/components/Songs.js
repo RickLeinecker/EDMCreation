@@ -10,7 +10,6 @@ import {
 	Link,
 	Chip,
 	Tooltip,
-	Fab
 } from "@material-ui/core";
 import {
 	Image,
@@ -22,11 +21,14 @@ import {
 	Edit,
 	HighlightOff
 } from '@material-ui/icons';
-import "html-midi-player";
-import sample from "../dummy-data/Sample.mid";
 import "../player.css";
+// import "./html-midi-player/core";
+// import "./html-midi-player/Tone";
+import "./html-midi-player/midi-player";
 import Comments from "./Comments";
 import PostComment from "./PostComment";
+import axios from "axios";
+import { url } from "./URL";
 
 const styles = theme => ({
 	root: {
@@ -56,6 +58,12 @@ const styles = theme => ({
 	smallIcon: {
 		fontSize: "0.4cm",
 		marginRight: theme.spacing(0.5),
+	},
+	favoriteIcon: {
+		fontSize: "0.4cm",
+		marginRight: theme.spacing(0.5),
+		color: "#AB3535",
+		cursor: "pointer"
 	},
 	numPlaysIcon: {
 		fontSize: "0.55cm",
@@ -115,7 +123,7 @@ const styles = theme => ({
 		"&:hover": {
 			color: "#EB5757"
 		}
-	}
+	},
 });
 
 class Songs extends Component {
@@ -125,7 +133,12 @@ class Songs extends Component {
 		this.state = {
 			editable: false,
 			deletable: false,
+			songs: []
 		}
+
+		this.fetchLiked = this.fetchLiked.bind(this);
+		this.setSongsState = this.setSongsState.bind(this);
+		this.toggleLike = this.toggleLike.bind(this);
 	}
 
 	componentDidMount() {
@@ -138,14 +151,60 @@ class Songs extends Component {
 		}
 	}
 
+	async componentDidUpdate(prevProps) {
+		if (this.props.songs !== prevProps.songs) {
+			this.setSongsState();
+		}
+	}
+
+	async setSongsState() {
+		var songs = this.props.songs;
+
+		if (localStorage.getItem("access_token")) {
+			for (var x in songs) {
+				songs[x].liked = await this.fetchLiked(songs[x].composition_id);
+			}
+		}
+
+		this.setState({ songs: songs })
+	}
+
+	async fetchLiked(songId) {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		const res = await axios.get(url + "/api/users/isliked?song_id=" + songId, config);
+
+		return res.data.liked;
+	}
+
+	toggleLike(songId) {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		const claims = {
+			song_id: songId,
+		};
+
+		axios.post(url + "/api/users/liketoggle", claims, config)
+			.then(res => this.props.fetchSongs());
+	}
+
 	render() {
 		const { classes } = this.props;
 
-		if (Object.keys(this.props.songs).length === 0) {
+		if (Object.keys(this.state.songs).length === 0) {
 			return (
 				<div className={classes.root}>
 					<Typography variant="body2">
-						No results
+						You've reached the end. &nbsp; ‘︿’
+						<br /><br />
 					</Typography>
 				</div>
 			);
@@ -154,7 +213,7 @@ class Songs extends Component {
 		return (
 			<div className={classes.root}>
 				{
-					this.props.songs.map((song, i) => (
+					this.state.songs.map((song, i) => (
 						<Paper className={classes.paper}>
 							<Grid item xs container direction="column" className={classes.songSection}>
 								<Grid container>
@@ -204,29 +263,30 @@ class Songs extends Component {
 												<midi-visualizer src={song.path} />
 												<midi-player src={song.path}
 													visualizer={"#section" + i + " midi-visualizer"}
-													sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus" />
+													sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus"
+													song-id={song.composition_id} />
 											</section>
 										</Grid>
 										<Grid item container xs style={{ paddingRight: 29 }} >
 											<Grid item xs>
-												<Chip size="small" label={song.genre} className={classes.genre} onClick={() => window.location.replace("#")} />
+												<Chip size="small" label={song.genre} className={classes.genre} onClick={() => window.location = ("/genres?genre=" + song.genre)} />
 											</Grid>
 											<Grid item xs container justify="flex-end">
 												<Typography variant="body2" className={classes.statsSection}>
-													{song.liked === true ?
-														<div onClick={this.props.fetchSongs}
+													{song.liked ?
+														<div onClick={() => this.toggleLike(song.composition_id)}
 															color="inherit" className={classes.statItem}>
 															<Tooltip title="Unlike" placement="top">
-																{<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />}
+																{<Favorite className={classes.favoriteIcon} />}
 															</Tooltip>
 														</div> :
 														<div onMouseEnter={() => this.setState({ ["favorite" + i]: true })}
 															onMouseLeave={() => this.setState({ ["favorite" + i]: false })}
-															color="inherit" className={classes.statItem}>
-															<Tooltip title="Like" placement="top"
-																onClick={this.props.fetchSongs}>
+															color="inherit" className={classes.statItem}
+															onClick={() => this.toggleLike(song.composition_id)}>
+															<Tooltip title="Like" placement="top">
 																{this.state["favorite" + i] ?
-																	(<Favorite className={classes.smallIcon} style={{ cursor: "pointer" }} />) :
+																	(<Favorite className={classes.favoriteIcon} />) :
 																	(<FavoriteBorder className={classes.smallIcon} style={{ cursor: "pointer" }} />)}
 															</Tooltip>
 														</div>
@@ -235,10 +295,10 @@ class Songs extends Component {
 														{song.likes}
 													</span>
 													<span className={classes.statItem}>
-														<PlayArrow className={classes.numPlaysIcon} /> {song.listens}
+														<Tooltip title="Plays" placement="top"><PlayArrow className={classes.numPlaysIcon} /></Tooltip> {song.listens}
 													</span>
 													<span className={classes.statItem}>
-														<ModeComment className={classes.smallIcon} /> {song.num_comments}
+														<Tooltip title="Comments" placement="top"><ModeComment className={classes.smallIcon} /></Tooltip> {song.num_comments}
 													</span>
 												</Typography>
 											</Grid>
@@ -251,7 +311,7 @@ class Songs extends Component {
 									<AccordionDetails className={classes.innerCommentsSection}>
 										<Grid container spacing={10}>
 											<Grid item xs={6}>
-												<Comments comments={song.comments} refresh={this.state.refreshComments} />
+												<Comments comments={song.comments} />
 											</Grid>
 											<Grid item xs={6}>
 												<PostComment songId={song.composition_id} fetchSongs={this.props.fetchSongs} songNumber={i} />

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Paper, withStyles, Grid, TextField, Button, Typography } from "@material-ui/core";
 import axios from "axios";
+import { url } from "./URL";
 
 const styles = theme => ({
     registerForm: {
@@ -96,8 +97,7 @@ class Register extends Component {
             confirmationPassword: this.state.confirmationPassword
         };
 
-
-        axios.post("http://localhost:5000/api/users/signup", claims)
+        axios.post(url + "/api/users/signup", claims)
             .then(res => {
                 window.location.href = "/registercompleted";
             })

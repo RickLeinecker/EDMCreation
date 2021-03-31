@@ -3,6 +3,7 @@ import { Paper, withStyles, Grid, TextField, Button, Typography } from "@materia
 import axios from "axios";
 import qs from "qs";
 import { Redirect } from "react-router-dom";
+import { url } from "./URL";
 
 const styles = theme => ({
     form: {
@@ -64,11 +65,14 @@ class ResetPassword extends Component {
     constructor(props) {
         super(props);
 
+        this.parameters = qs.parse(this.props.location.search, { ignoreQueryPrefix: true });
+
         this.state = {
-            email: [qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).email],
+            email: this.parameters.email,
             newPassword: "",
             confirmationNewPassword: "",
-            disableButton: true
+            disableButton: true,
+            token: this.parameters.token
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -95,13 +99,28 @@ class ResetPassword extends Component {
         e.preventDefault();
 
         const claims = {
-            email: this.state.email,
-            username: this.state.username,
-            newPassword: this.state.newPassword,
-            confirmationNewPassword: this.state.confirmationNewPassword
+            password: this.state.newPassword,
+            confirmationPassword: this.state.confirmationNewPassword
         };
 
-        window.location.href = "/passwordreset";
+        axios.post(url + "/api/users/changepassword?token=" + this.state.token, claims)
+            .then(res => {
+                window.location.href = "/passwordreset";
+            })
+            .catch(err => {
+                if (err.response.data.errors !== undefined) {
+                    var errMsg = "";
+
+                    err.response.data.errors.map(validationErr => {
+                        errMsg += (validationErr.msg + "<br />");
+                    })
+
+                    document.getElementById("errorMessage").innerHTML = errMsg;
+                }
+                else {
+                    document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+                }
+            });
     }
 
     render() {
@@ -109,7 +128,7 @@ class ResetPassword extends Component {
 
         if (localStorage.getItem("access_token") !== null) {
             return (
-                <Redirect to="/" />
+                <Redirect to="/profile" />
             )
         }
 
@@ -174,7 +193,7 @@ class ResetPassword extends Component {
                                                 />
                                             </Grid>
                                             <Grid item>
-                                                <div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+                                                <div id="errorMessage" className={classes.errorMessage}></div>
                                             </Grid>
                                             <Grid item>
                                                 <Grid container justify="center">

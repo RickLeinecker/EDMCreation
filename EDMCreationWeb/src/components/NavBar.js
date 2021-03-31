@@ -81,7 +81,6 @@ function NavBar(props) {
 	const classes = useStyles();
 	const { location: { pathname } } = props;
 	const [anchorEl, setAnchorEl] = React.useState(null);
-	const [searchTerm, setSearchTerm] = React.useState(null);
 
 	const handleClick = (e) => {
 		setAnchorEl(e.currentTarget);
@@ -182,26 +181,26 @@ function NavBar(props) {
 							anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 							transformOrigin={{ vertical: "top", horizontal: "center" }}
 						>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 1
+							<MenuItem component={RouterLink} to="/genres?genre=Trap" onClick={handleClose}>
+								Trap
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 2
+							<MenuItem component={RouterLink} to="/genres?genre=Trance" onClick={handleClose}>
+								Trance
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 3
+							<MenuItem component={RouterLink} to="/genres?genre=Techno" onClick={handleClose}>
+								Techno
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 4
+							<MenuItem component={RouterLink} to="/genres?genre=Dubstep" onClick={handleClose}>
+								Dubstep
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 5
+							<MenuItem component={RouterLink} to="/genres?genre=Drum%20and%20Bass" onClick={handleClose}>
+								Drum and Bass
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 6
+							<MenuItem component={RouterLink} to="/genres?genre=Garage" onClick={handleClose}>
+								Garage
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="#" onClick={handleClose}>
-								Genre 7
+							<MenuItem component={RouterLink} to="/genres?genre=Juke%20House" onClick={handleClose}>
+								Juke House
                     		</MenuItem>
 						</Menu>
 					</Toolbar>

@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {
     Typography,
     withStyles,
-    Paper,
     List,
     ListItem,
     ListItemText,
@@ -14,6 +13,8 @@ import {
     Link
 } from "@material-ui/core";
 import axios from "axios";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { url } from "./URL";
 
 const styles = theme => ({
     root: {
@@ -55,39 +56,85 @@ class Following extends Component {
 
         this.state = {
             followedUsers: [],
-            loggedInUser: ""
+            loggedInUser: [localStorage.getItem("username")],
+            page: 1,
+            hasMore: true,
+            timeout: 0,
         }
+
+        this.fetchData = this.fetchData.bind(this);
+        this.toggleFollow = this.toggleFollow.bind(this);
     }
 
     componentDidMount() {
-        axios.get("http://localhost:5000/api/testfollowing")
-            .then(res => this.setState({ followedUsers: res.data }));
+        this.fetchData();
+    }
 
-        axios.get("http://localhost:5000/api/testuser")
-            .then(res => this.setState({ loggedInUser: res.data }));
+    fetchData() {
+        setTimeout(() => {
+            axios.get(url + "/api/users/following?page=" + this.state.page + "&username=" + this.props.username)
+                .then(res => {
+                    if (res.data.length === 0) {
+                        this.setState({ hasMore: false });
+                    }
+
+                    if (this.state.page > 1) {
+                        this.setState({ timeout: 1500 });
+                    }
+
+                    this.setState({ followedUsers: this.state.followedUsers.concat(res.data), page: [this.state.page + 1] },
+                        () => {
+                            for (var i = 0; i < this.state.followedUsers.length; i++) {
+                                this.setState({ ["followed" + i]: true });
+                            }
+                        }
+                    );
+                });
+        }, this.state.timeout);
+    }
+
+    toggleFollow(userId, i) {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        const claims = {
+            follow_id: userId
+        }
+
+        axios.post(url + "/api/users/followtoggle", claims, config)
+            .then(res => {
+                if (res.data.msg === "Followed") {
+                    this.setState({ ["followed" + i]: true });
+                }
+                else {
+                    this.setState({ ["followed" + i]: false });
+                }
+            });
     }
 
     render() {
         const { classes } = this.props;
 
-
         if (Object.keys(this.state.followedUsers).length === 0) {
             return (
                 <div className={classes.root}>
                     <Typography variant="body2">
-                        The user has not followed anyone.
+                        This user has not followed anyone.
 					</Typography>
                 </div>
             );
         }
 
-        if (Object.keys(this.props.user).length === 0) {
+        if (Object.keys(this.props.username).length === 0) {
             return (
                 null
             );
         }
 
-        if (Object.keys(this.state.loggedInUser).length === "") {
+        if (Object.keys(this.state.loggedInUser) === "") {
             return (
                 null
             );
@@ -97,8 +144,17 @@ class Following extends Component {
             <div className={classes.root}>
                 <div className={classes.div}>
                     <List>
-                        {
-                            this.state.followedUsers.map((user, i, arr) => (
+                        <InfiniteScroll
+                            dataLength={this.state.followedUsers.length}
+                            next={this.fetchData}
+                            hasMore={this.state.hasMore}
+                            loader={
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <h4>Loading...</h4>
+                                </div>
+                            }
+                        >
+                            {this.state.followedUsers.map((user, i, arr) => (
                                 <div>
                                     <Grid item container alignItems="center">
                                         <Grid item xs={8}>
@@ -114,7 +170,7 @@ class Following extends Component {
                                                                 variant="h6"
                                                                 color="textPrimary"
                                                             >
-                                                                <Link href="#" color="inherit">{user.username}</Link>
+                                                                <Link href={"/profile?username=" + user.username} color="inherit">{user.username}</Link>
                                                             </Typography>
                                                         </React.Fragment>
                                                     }
@@ -131,18 +187,18 @@ class Following extends Component {
                                                     } />
                                             </ListItem>
                                         </Grid>
-                                        {this.state.loggedInUser.user_id === this.props.user.user_id &&
+                                        {this.state.loggedInUser.toString() === this.props.username.toString() &&
                                             <Grid item xs align="right">
-                                                <Button className={classes.buttonBlock} variant="outlined">
-                                                    Unfollow
+                                                <Button onClick={() => this.toggleFollow(user.user_id, i)} className={classes.buttonBlock} variant="outlined">
+                                                    {this.state["followed" + i] ? "Unfollow" : "Follow"}
                                                 </Button>
                                             </Grid>
                                         }
                                     </Grid>
                                     {i + 1 !== arr.length ? (<Divider variant="inset" component="li" className={classes.divider} />) : <div />}
                                 </div>
-                            ))
-                        }
+                            ))}
+                        </InfiniteScroll>
                     </List>
                 </div>
             </div >

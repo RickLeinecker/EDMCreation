@@ -4,7 +4,7 @@ import { createMuiTheme, ThemeProvider, CssBaseline } from "@material-ui/core";
 import NavBar from "./components/NavBar";
 import Popular from "./components/Popular";
 import TopFavorites from "./components/TopFavorites";
-import BrowseGenres from "./components/BrowseGenres";
+import Genres from "./components/Genres";
 import Random from "./components/Random";
 import LogIn from "./components/LogIn";
 import LogOut from "./components/LogOut";
@@ -24,6 +24,9 @@ import SongUploaded from "./components/SongUploaded";
 import AccountUpdated from "./components/AccountUpdated";
 import AccountEmailUpdated from "./components/AccountEmailUpdated";
 import SongDeleted from "./components/SongDeleted";
+import SendVerification from "./components/SendVerification";
+import Verify from "./components/Verify";
+import UpdateEmailVerified from "./components/UpdateEmailVerified";
 
 const theme = createMuiTheme({
 	palette: {
@@ -60,15 +63,18 @@ class App extends Component {
 					<NavBar />
 					<Route path="/" exact component={Popular} />
 					<Route path="/popular" render={(props) => <Popular {...props} key={Date.now()} />} />
-					<Route path="/topfavorites" component={TopFavorites} />
-					<Route path="/browsegenres" component={BrowseGenres} />
-					<Route path="/random" component={Random} />
+					<Route path="/topfavorites" render={(props) => <TopFavorites {...props} key={Date.now()} />} />
+					<Route path="/genres" render={(props) => <Genres {...props} key={Date.now()} />} />
+					<Route path="/random" render={(props) => <Random {...props} key={Date.now()} />} />
 					<Route path="/login" component={LogIn} />
 					<Route path="/logout" component={LogOut} />
 					<Route path="/editprofile" component={EditProfile} />
 					<Route path="/register" component={Register} />
 					<Route path="/registercompleted" component={RegisterCompleted} />
-					<Route path="/search" component={Search} />
+					<Route path="/sendverification" component={SendVerification} />
+					<Route path="/verify" component={Verify} />
+					<Route path="/updateemailverified" component={UpdateEmailVerified} />
+					<Route path="/search" render={(props) => <Search {...props} key={Date.now()} />} />
 					<Route path="/profile" render={(props) => <Profile {...props} key={Date.now()} />} />
 					<Route path="/editsong" component={EditSong} />
 					<Route path="/uploadsong" component={UploadSong} />

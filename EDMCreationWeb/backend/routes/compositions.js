@@ -79,103 +79,592 @@ const fileStorage = new CloudinaryStorage({
 const parser = multer({ storage: fileStorage });
 
 //upload new composition
-router.route('/upload').post(auth, parser.single("file"), auth, (req, res) => {
-    const { title, genre } = req.body;
-    const path = req.file.path;
+router.route('/upload').post(auth, parser.single("file"), auth, [
+    check('title').isLength({ min: 1 }).withMessage('Title is required'),
+    check('genre').isLength({ min: 1 }).withMessage('Genre is required')], (req, res) => {
 
-    listens = 0; //0 listens
-    favorites = 0; // 0 favorites
-    comment_count = 0;
-    user_id = req.body.ID; //for finding account
-    username = req.body.uName;
+        //check the results of  the validation
+        const errors = validationResult(req)
 
-    const newComp = new Composition({ title, genre, user_id, username, path, listens, favorites, comment_count }); //just drop this line for only user upload?
-
-    User.updateOne({ _id: user_id }, { $push: { "compositions": newComp }, $inc: { upload_count: 1 } })
-        .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
-        .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
-});
-
-// EDIT UPLOAD FOR TRAINING FILE ZIP TO MONGO DB
-// router.route('/upload').post(auth, upload.single('file'), auth, (req, res) => {
-
-//     //'file' for field name from front end  
-//     //AUTH CALLED TWICE BECAUSE MULTER OCCUPIES REQUESTBODY until after 
-
-//     const { title, description, ID, genre, image_id, uName } = req.body;
-
-//     //if fields are missing, need to add error here for it and remove song that was just uploaded?
-
-//    const file_id = req.file.id; //id from file being stored
-//    const filename = req.file.filename;
-//    listens = 0; //0 listens
-//    favorites = 0; // 0 favorites
-//    comment_count = 0;
-//    user_id = ID; //for finding accoun
-//    username = uName;
-
-//     const newComp = new Composition({ title, description, genre, image_id, user_id, username, file_id, listens, favorites, comment_count, filename });//just drop this line for only user upload?
-
-
-//     User.updateOne({ _id: ID }, { $push: { "compositions": newComp }, $inc: { upload_count: 1 } })
-//         .then(() => res.status(200).json({ msg: 'composition uploaded' }))
-//         .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
-
-//     //need to redirect on page once done? 
-// });
-
-//single play and update count for when a user hits play on a given song
-router.route('/play/:filename').get((req, res) => {
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        // Check if file
-        if (!file || file.length === 0) {
-            return res.status(404).json({ err: 'No file exists' });
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() })
         }
 
-        // File exists
+        var { title, genre } = req.body;
+        const path = req.file.path;
+        listens = 0; //0 listens
+        favorites = 0; // 0 favorites
+        comment_count = 0;
+        user_id = req.body.ID; //for finding account
+        username = req.body.uName;
 
-        // Check if midi then load
-        if (file.contentType === 'audio/mid') {
-
-        } else {
-            return res.status(404).json({ err: 'Not a MID file' });
+        if (genre === "") {
+            genre = "Other";
         }
-        const readstream = gfs.createReadStream(file.filename);
 
-        //update listens for comp and user and send file data
-        User.updateOne({ "compositions.filename": req.params.filename }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
-            .then(() => readstream.pipe(res)) //Return File for playing
+        const newComp = new Composition({ title, genre, path, listens }); //just drop this line for only user upload?
+
+        User.updateOne({ _id: user_id }, { $push: { "compositions": newComp } })
+            .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
             .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
-
     });
-});
+
+
 
 //load multiple composition infos for pages
 //REQUIRES PAGE NUMBER IN ROUTE, STARTING ON 1
 router.route('/popular').get(async (req, res) => {
-
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
 
     try {
         const songs = await User.aggregate([
-            { $unwind: "$compositions" },
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
             {
                 $project: {
                     composition_id: "$compositions._id",
                     title: "$compositions.title",
                     username: "$username",
-                    likes: "$compositions.favorites",
-                    listens: "$compositions.listens",
                     num_comments: { $size: "$compositions.comments" },
-                    date: "$compositions.last_modified",
+                    date: "$compositions.created_on",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
-                    path: "$compositions.path"
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
                 },
             },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
 
-            { $sort: { "listens": -1 } }, //descending values for listens
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+//for a given profile and their uploads
+router.route('/user/:username').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+
+    try {
+        const items = await User.aggregate([
+            { $match: { username: { $regex: new RegExp('^' + req.params.username + '$', "i") } } },
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": -1 } },
+            { $skip: skip },
+            { $limit: songsPerPage },
+        ]);
+
+        if (!items) throw Error('No items');
+
+        res.status(200).json(items);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+//upload comment for a given song
+router.route('/postcomment').post(auth, (req, res) => {
+    const comment = req.body.comment;
+    const song = req.body.song_id;
+    const user_id = req.body.ID;
+    var newComment;
+
+    User.findOne({ "_id": user_id })
+        .then(user => {
+            const username = user.username;
+            newComment = new Comment({ username, user_id, comment });
+        })
+        .then(() => {
+            User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment } })
+                .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
+                .catch(err => res.status(400).json('Error: ' + err));
+        });
+});
+
+
+//loads the edit page for a song
+router.route('/editinfo').get(auth, async (req, res) => {
+    try {
+        const song = await User.aggregate([
+            { $match: { _id: mongoose.Types.ObjectId(req.body.ID) } },
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            { $match: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+        ]);
+
+        if (song) {
+            return res.status(200).json(song);
+        } else {
+            return res.status(400).json({ msg: 'Invalid User or Song' });
+        }
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+
+});
+
+
+//saves the edit page for a song
+router.route('/editsave').post(auth,
+    [
+        check('title').isLength({ min: 1 }).withMessage('Title is required'),
+        check('genre').isLength({ min: 1 }).withMessage('Genre is required')
+    ],
+    (req, res) => {
+
+        //check the results of  the validation
+        const errors = validationResult(req)
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() })
+        }
+
+        //add a check for is the song belongs to the user
+        User.findOne({ $and: [{ _id: req.body.ID }, { "compositions": { $elemMatch: { _id: mongoose.Types.ObjectId(req.body.song_id) } } }] })
+            .then(async user => {
+                if (req.body.genre === "") {
+                    req.body.genre = "Other";
+                }
+
+                if (user) {//if present
+                    user.compositions.id(req.body.song_id).title = req.body.title;
+                    user.compositions.id(req.body.song_id).genre = req.body.genre;
+                    user.save()
+                        .catch(err => res.status(400).json('Error: ' + err));
+                    //update the song info
+                    return res.status(200).json({ msg: 'Song has been updated' });
+                } else {//if not present
+                    return res.status(400).json({ msg: 'Invalid user or song' });
+                    //song doesnot belong to user access denied
+                }//end add
+
+            });//end then
+
+    }
+);
+
+
+router.route('/delete').post(auth, (req, res) => {
+    User.aggregate(
+        [
+            {
+                $match: {
+                    _id: mongoose.Types.ObjectId(req.body.ID)
+                }
+            },
+            {
+                $unwind: "$compositions"
+            },
+            {
+                $match: {
+                    "compositions._id": mongoose.Types.ObjectId(req.body.song_id)
+                }
+            },
+            {
+                $project: {
+                    path: "$compositions.path"
+                }
+            }
+        ])
+        .then(result => {
+            const path = result[0].path.split("/");
+            const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+
+            cloudinary.uploader.destroy(
+                publicId,
+                { invalidate: true, resource_type: "raw" },
+                cloudinaryRes => res.send(cloudinaryRes)
+            );
+
+            User.updateOne(
+                { _id: req.body.ID },
+                {
+                    $pull: {
+                        compositions: {
+                            _id: req.body.song_id
+                        }
+                    }
+                }
+            )
+                .then(result => {
+                    res.status(200).json({ msg: "Success" });
+                })
+        })
+        .catch(err => {
+            res.status(200).json({ msg: "Error" });
+        });
+});
+
+
+router.route('/incrementplaycount').post((req, res) => {
+
+    User.updateOne({ "compositions._id": req.body.song_id }, { $inc: { "compositions.$.listens": 1, listens_count: 1 } })
+        .then(() => res.status(200).json('Play count incremented'))
+        .catch(err => res.status(400).json('Error: ' + err));
+
+});
+
+
+//search bar for songs
+router.route('/search').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+    const lookup = req.query.search;
+
+    try {
+        const songs = await User.aggregate([
+
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $match:
+                {
+                    $or:
+                        [
+                            { "compositions.username": { $regex: "^" + lookup, '$options': 'i' } },
+                            { "compositions.title": { $regex: "^" + lookup, '$options': 'i' } }
+                        ]
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+            { $skip: skip },
+            { $limit: songsPerPage }, //skip controls page number and limit controls output
+        ]);
+
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+});
+
+//random kinda works but isnt cached so paging isnt right.
+router.route('/random').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
+
+    try {
+        const songs = await User.aggregate([
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$username",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" },
+                    rand: { $multiply: [{ $rand: {} }, 12345] }
+                }
+            },
+            { $sort: { "rand": -1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
@@ -189,62 +678,221 @@ router.route('/popular').get(async (req, res) => {
 });
 
 
-router.route('/user/:username').get(async (req, res) => {
+//genre search for songs
+router.route('/genre').get(async (req, res) => {
     const songsPerPage = 5;
     const skip = songsPerPage * (req.query.page - 1);
+    const genre = req.query.genre;
 
     try {
-        const items = await User.aggregate([
-            { $match: { username: { $regex: new RegExp(req.params.username, "i") } } },
-            { $unwind: "$compositions" },
+        const songs = await User.aggregate([
+
+            {
+                $unwind:
+                {
+                    path: "$compositions",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $match: { "compositions.genre": { $regex: "^" + genre, '$options': 'i' } }
+            },
             {
                 $project: {
-                    user_id: "$_id",
                     composition_id: "$compositions._id",
                     title: "$compositions.title",
                     username: "$username",
-                    likes: "$compositions.favorites",
-                    listens: "$compositions.listens",
-                    num_comments: "$compositions.comment_count",
-                    date: "$compositions.last_modified",
+                    num_comments: { $size: "$compositions.comments" },
+                    date: "$compositions.created_on",
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
-                    path: "$compositions.path"
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
                 },
             },
-            { $sort: { "listens": -1 } }, //descending values for listens
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    date: { $first: "$date" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "favorites.composition_id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    composition_id: 1,
+                    user_id: 1,
+                    title: 1,
+                    username: 1,
+                    num_comments: 1,
+                    date: 1,
+                    comments: 1,
+                    genre: 1,
+                    path: 1,
+                    listens: 1,
+                    likes: { $size: "$favorites" }
+                }
+            },
+            { $sort: { "_id": 1, "likes": -1 } }, //descending values for likes
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
-        if (!items) throw Error('No items');
+        if (!songs) throw Error('No items');
 
-        res.status(200).json(items);
+        res.status(200).json(songs);
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
 });
 
 
-//upload comment for a given song
-router.route('/postcomment').post(auth, (req, res) => {
-    const comment = req.body.comment;
-    const song = req.body.song_id;
-    const username = req.body.uName;
-    const user_id = req.body.ID;
+router.route('/topfavorites').get(async (req, res) => {
+    const songsPerPage = 5;
+    const skip = songsPerPage * (req.query.page - 1);
 
-    const newComment = new Comment({ username, user_id, comment });
+    try {
+        const songs = await User.aggregate([
+            {
+                $project: {
+                    favorites: "$favorites",
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    composition_id: "$favorites.composition_id",
+                },
+            },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    likes: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "compositions._id",
+                    as: "favorites",
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    likes: 1,
+                    favorites: "$favorites.compositions",
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $unwind:
+                {
+                    path: "$favorites",
+                    preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    likes: 1,
+                    favorites: 1,
+                    match: { $eq: ["$_id", "$favorites._id"] }
+                },
+            },
+            { $match: { match: true } },
+            {
+                $project: {
+                    likes: 1,
+                    compositions: "$favorites",
+                },
+            },
+            {
+                $project: {
+                    likes: 1,
+                    composition_id: "$compositions._id",
+                    title: "$compositions.title",
+                    username: "$compositions.username",
+                    num_comments: { $size: "$compositions.comments" },
+                    likes: 1,
+                    comments: "$compositions.comments",
+                    genre: "$compositions.genre",
+                    path: "$compositions.path",
+                    listens: "$compositions.listens"
+                },
+            },
+            {
+                $unwind:
+                {
+                    path: "$comments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            { $sort: { "comments.created_on": -1 } },
+            {
+                $group: {
+                    _id: "$composition_id",
+                    favorited_date: { $first: "$favorited_date" },
+                    composition_id: { $first: "$composition_id" },
+                    user_id: { $first: "$_id" },
+                    title: { $first: "$title" },
+                    username: { $first: "$username" },
+                    num_comments: { $first: "$num_comments" },
+                    likes: { $first: "$likes" },
+                    comments: { $push: "$comments" },
+                    genre: { $first: "$genre" },
+                    path: { $first: "$path" },
+                    listens: { $first: "$listens" },
+                }
+            },
+            { $sort: { "_id": 1, "likes": 1 } },
+            { $skip: skip },
+            { $limit: songsPerPage },
+        ]);
 
-    User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment }, $inc: { "compositions.$.comment_count": 1 } })
-        .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
-        .catch(err => res.status(400).json('Error: ' + err));
+        if (!songs) throw Error('No items');
+
+        res.status(200).json(songs);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
 });
-
-
-
-
-
-
 
 
 module.exports = router;

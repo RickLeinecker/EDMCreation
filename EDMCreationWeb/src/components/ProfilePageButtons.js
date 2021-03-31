@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { withStyles, Grid, Button } from "@material-ui/core";
-import { Link } from "react-router-dom";
 
 const styles = theme => ({
     root: {
@@ -34,22 +33,19 @@ class PageButtons extends Component {
             <div className={classes.root}>
                 <Grid container direction="row" justify="space-between">
                     <Grid item>
-                        {parseInt(this.props.page) === 1 ?
+                        {parseInt(this.props.page) <= 1 ?
                             <Button disabled="true" className={classes.buttonBlock}>
                                 Previous
                             </Button> :
-                            <Link to={this.props.path + "page=" + (parseInt(this.props.page) - 1)} className={classes.buttonLink}>
-                                <Button className={classes.buttonBlock}>
-                                    Previous
-						        </Button>
-                            </Link>}
+                            <Button className={classes.buttonBlock} onClick={() => this.props.fetchSongs(parseInt(this.props.page) - 1)}>
+                                Previous
+						    </Button>
+                        }
                     </Grid>
                     <Grid item>
-                        <Link to={this.props.path + "page=" + (parseInt(this.props.page) + 1)} className={classes.buttonLink}>
-                            <Button className={classes.buttonBlock}>
-                                Next
-						    </Button>
-                        </Link>
+                        <Button className={classes.buttonBlock} onClick={() => this.props.fetchSongs(parseInt(this.props.page) + 1)}>
+                            Next
+						</Button>
                     </Grid>
                 </Grid>
             </div>

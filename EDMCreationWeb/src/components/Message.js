@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { withStyles, IconButton, Collapse } from "@material-ui/core";
-import Profile from "./Profile";
 import Alert from "@material-ui/lab/Alert";
 import { Close } from "@material-ui/icons";
 

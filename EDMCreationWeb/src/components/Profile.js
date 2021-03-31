@@ -7,7 +7,7 @@ import Following from "./Following";
 import axios from "axios";
 import qs from "query-string";
 import { url } from "./URL";
-import PageButtons from "./PageButtons";
+import ProfilePageButtons from "./ProfilePageButtons";
 
 const styles = theme => ({
     profile: {
@@ -58,11 +58,23 @@ const styles = theme => ({
     user: {
         marginBottom: 5
     },
-    buttonBlock: {
+    buttonBlockFollow: {
         backgroundColor: "#219653",
         color: "white",
         "&:hover": {
             backgroundColor: "#219653"
+        },
+        "&:disabled": {
+            backgroundColor: "#BDBDBD"
+        },
+        paddingLeft: "25px",
+        paddingRight: "25px",
+    },
+    buttonBlockUnfollow: {
+        backgroundColor: "#AB3535",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#AB3535"
         },
         "&:disabled": {
             backgroundColor: "#BDBDBD"
@@ -78,53 +90,122 @@ class Profile extends Component {
 
         this.state = {
             value: 0,
-            songs: [],
+            uploads: [],
+            favorites: [],
             user: [],
-            page: 1,
-            currentUser: [localStorage.getItem("username")]
+            uploadsPage: 1,
+            favoritesPage: 1,
+            currentUser: [localStorage.getItem("username")],
         }
 
-        if (Object.keys(qs.parse(this.props.location.search)).length !== 0) {
+        if (this.props.location !== undefined &&
+            Object.keys(qs.parse(this.props.location.search)).length !== 0) {
             this.parameters = qs.parse(this.props.location.search);
 
             if (this.parameters.username !== undefined) {
                 this.state.username = this.parameters.username;
             }
             else {
+                if (localStorage.getItem("access_token") === null) {
+                    window.location.href = "/";
+                }
+
                 this.state.username = localStorage.getItem("username");
-            }
-
-            if (this.parameters.tab !== undefined) {
-                this.state.value = parseInt(this.parameters.tab);
-            }
-
-            if (this.parameters.page !== undefined) {
-                this.state.page = this.parameters.page;
             }
         }
         else {
+            if (localStorage.getItem("access_token") === null) {
+                window.location.href = "/";
+            }
+
             this.state.username = localStorage.getItem("username");
         }
 
         this.handleChange = this.handleChange.bind(this);
-        this.fetchSongs = this.fetchSongs.bind(this);
+        this.fetchUploads = this.fetchUploads.bind(this);
+        this.fetchFavorites = this.fetchFavorites.bind(this);
+        this.toggleFollow = this.toggleFollow.bind(this);
+        this.getUserInfo = this.getUserInfo.bind(this);
+        this.getFollow = this.getFollow.bind(this);
     }
 
     componentDidMount() {
-        axios.get(url + "/api/users/info/" + this.state.username)
-            .then(res => this.setState({ user: res.data }));
-
-        this.fetchSongs();
+        this.getUserInfo();
+        this.fetchUploads(this.state.uploadsPage);
+        this.fetchFavorites(this.state.favoritesPage);
     }
 
-    fetchSongs(page) {
-        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + this.state.page)
-            .then(res => this.setState({ songs: res.data }));
+    getUserInfo() {
+        axios.get(url + "/api/users/info/" + this.state.username)
+            .then(res => this.setState({ user: res.data }))
+            .then(() => this.getFollow());
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.value === 0 && prevState.value !== 0) {
+            this.setState({ uploads: [] });
+            this.fetchUploads(this.state.uploadsPage);
+        }
+        else if (this.state.value === 1 && prevState.value !== 1) {
+            this.setState({ favorites: [] });
+            this.fetchFavorites(this.state.favoritesPage);
+        }
+    }
+
+    fetchUploads(page) {
+        if (page === undefined) {
+            page = this.state.uploadsPage;
+        }
+
+        axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
+            .then(res => {
+                this.setState({ uploads: res.data, uploadsPage: page });
+            });
+    }
+
+    fetchFavorites(page) {
+        if (page === undefined) {
+            page = this.state.favoritesPage;
+        }
+
+        axios.get(url + "/api/users/favorites?username=" + this.state.username + "&page=" + page)
+            .then(res => {
+                this.setState({ favorites: res.data, favoritesPage: page });
+            });
+    }
+
+    toggleFollow() {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        const claims = {
+            follow_id: this.state.user._id
+        }
+
+        axios.post(url + "/api/users/followtoggle", claims, config)
+            .then(res => {
+                this.getFollow();
+            });
+    }
+
+    getFollow() {
+        const config = {
+            headers: {
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        axios.get(url + "/api/users/getfollow?user_id=" + this.state.user._id, config)
+            .then(res => {
+                this.setState({ followed: res.data.followed });
+            });
     }
 
     handleChange(e, newValue) {
         this.setState({ value: newValue });
-        // window.location.href = "/profile?username=" + this.state.username + "&tab=" + newValue;
     }
 
     render() {
@@ -167,11 +248,17 @@ class Profile extends Component {
                                         </span>
                                     </Typography>
                                 </Grid>
-                                <Grid item>
-                                    <Button className={classes.buttonBlock}>
-                                        Follow
-									</Button>
-                                </Grid>
+                                {(localStorage.getItem("access_token") !== null) &&
+                                    localStorage.getItem("username") !== this.state.username &&
+                                    (
+                                        <Grid item>
+                                            <Button onClick={this.toggleFollow}
+                                                className={this.state.followed ? classes.buttonBlockUnfollow : classes.buttonBlockFollow} >
+                                                {this.state.followed ? "Unfollow" : "Follow"}
+                                            </Button>
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                             <Grid item>
                                 <Paper square>
@@ -192,15 +279,15 @@ class Profile extends Component {
                     </Grid>
                 </Grid>
                 <TabPanel value={this.state.value} index={0}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
-                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=0&"} page={this.state.page} />
+                    <Songs songs={this.state.uploads} fetchSongs={this.fetchUploads} editable={this.state.currentUser.toString() === this.state.user.username.toString()} />
+                    <ProfilePageButtons page={this.state.uploadsPage} fetchSongs={this.fetchUploads} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={1}>
-                    <Songs songs={this.state.songs} fetchSongs={this.fetchSongs} deletable={this.state.currentUser.toString() === this.state.user.username.toString()} />
-                    <PageButtons path={"/profile?username=" + this.state.username + "&tab=1&"} page={this.state.page} />
+                    <Songs songs={this.state.favorites} fetchSongs={this.fetchFavorites} />
+                    <ProfilePageButtons page={this.state.favoritesPage} fetchSongs={this.fetchFavorites} />
                 </TabPanel>
                 <TabPanel value={this.state.value} index={2}>
-                    <Following user={this.state.user} />
+                    <Following username={this.state.username} />
                 </TabPanel>
             </div >
         )

@@ -7,6 +7,9 @@ const userSchema = new Schema(
         username: { type: String },
         email: { type: String },
         password: { type: String },
+        new_email: { type: String },
+        verified: { type: Boolean },
+        update_verified: { type: Boolean },
         first_name: { type: String },
         last_name: { type: String },
         description: { type: String },
@@ -33,36 +36,33 @@ const userSchema = new Schema(
                         comment_id: { type: mongoose.Types.ObjectId },
                         user_id: { type: mongoose.Types.ObjectId },
                         username: { type: String },
-                        comment:{ type: String },
-                        created_on: { type: Date },
-                        last_modified: { type: Date, default: Date.now }
+                        comment: { type: String },
+                        created_on: { type: Date, default: Date.now },
                     }
                 ],
-                created_on: { type: Date },
-                last_modified: { type: Date, default: Date.now }
+                created_on: { type: Date, default: Date.now },
             }
         ],
         following: [
             {
                 user_id: { type: mongoose.Types.ObjectId },
-                created_on: { type: Date }
+                created_on: { type: Date, default: Date.now }
             }
         ],
         favorites: [
             {
                 composition_id: { type: mongoose.Types.ObjectId },
-                created_on: { type: Date }
+                created_on: { type: Date, default: Date.now }
             }
         ],
         comment_likes: [
             {
                 comment_id: { type: mongoose.Types.ObjectId },
-                created_on: { type: Date }
+                created_on: { type: Date, default: Date.now }
             }
         ],
         training_file_id: { type: mongoose.Types.ObjectId },
-        created_on: { type: Date },
-        last_modified: { type: Date }
+        created_on: { type: Date, default: Date.now },
     },
     {
         timestamps: true

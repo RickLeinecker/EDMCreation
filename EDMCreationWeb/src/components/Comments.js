@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { Typography, Grid, withStyles, Paper, Link } from "@material-ui/core";
+import { Typography, Grid, withStyles, Paper, Link, Avatar } from "@material-ui/core";
 import { AccountCircle } from "@material-ui/icons";
 import Moment from 'react-moment';
 
 const styles = theme => ({
     username: {
         marginRight: 5,
-        color: "#219653"
+        color: "#219653",
+        display: "inline-block",
     },
     date: {
         color: "#828282",
@@ -31,8 +32,13 @@ const styles = theme => ({
         }
     },
     profilePicture: {
-        marginRight: 5
-    }
+        marginRight: 8
+    },
+    avatar: {
+        width: 32,
+        height: 32,
+        backgroundColor: "rgba(255, 255, 255, 0.6)"
+    },
 });
 
 class Comments extends Component {
@@ -64,19 +70,20 @@ class Comments extends Component {
                         <Grid container className={classes.comment}>
                             <Grid item className={classes.profilePicture}>
                                 <Typography variant="body2">
-                                    <AccountCircle className={classes.mediumIcon} />
+                                    {/* <AccountCircle className={classes.mediumIcon} /> */}
+                                    <Avatar alt={comment.username.toString().toUpperCase()} src="#" className={classes.avatar} />
                                 </Typography>
                             </Grid>
                             <Grid item xs={12} sm>
                                 <Grid item container>
                                     <Grid item className={classes.userSection}>
                                         <Typography variant="body2" className={classes.username}>
-                                            <Link href="#" color="inherit">{comment.username}</Link>
+                                            <Link href={"/profile?username=" + comment.username} color="inherit">{comment.username}</Link>
                                         </Typography>
                                     </Grid>
                                     <Grid item>
                                         <Typography variant="body2" className={classes.date}>
-                                            <Moment fromNow ago>{(new Date(comment.last_modified))}</Moment> ago
+                                            <Moment fromNow ago>{(new Date(comment.created_on))}</Moment> ago
                                         </Typography>
                                     </Grid>
                                 </Grid>

@@ -18,6 +18,8 @@ import {
 import Songs from "./Songs";
 import axios from "axios";
 import LogIn from "./LogIn";
+import { url } from "./URL";
+import qs from "query-string";
 
 const styles = theme => ({
 	title: {
@@ -104,14 +106,30 @@ class EditSong extends Component {
 		super(props);
 
 		this.state = {
+			songId: "",
 			title: "",
 			genre: "",
 			currentTitle: "",
 			currentGenre: "",
-			songs: [],
+			song: [],
 			disableButton: true,
 			openDialog: false,
 		};
+
+		if (Object.keys(qs.parse(this.props.location.search)).length !== 0) {
+			this.parameters = qs.parse(this.props.location.search);
+
+			if (this.parameters.songid !== undefined) {
+				this.state.songId = this.parameters.songid;
+			}
+			else {
+				window.location.href = "/profile";
+			}
+		}
+		else {
+			window.location.href = "/profile";
+		}
+
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
@@ -119,16 +137,27 @@ class EditSong extends Component {
 		this.handleClickOpen = this.handleClickOpen.bind(this);
 		this.handleCancel = this.handleCancel.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
+		this.fetchSongs = this.fetchSongs.bind(this);
 	}
 
 	componentDidMount() {
-		axios.get("http://localhost:5000/api/testsong")
+		this.fetchSongs();
+	}
+
+	fetchSongs() {
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.get(url + "/api/compositions/editinfo?song_id=" + this.state.songId, config)
 			.then(res => this.setState({
-				title: res.data.title,
-				genre: res.data.genre,
-				currentTitle: res.data.title,
-				currentGenre: res.data.genre,
-				songs: [res.data]
+				title: res.data[0].title,
+				genre: res.data[0].genre,
+				currentTitle: res.data[0].title,
+				currentGenre: res.data[0].genre,
+				song: res.data
 			}));
 	}
 
@@ -154,9 +183,23 @@ class EditSong extends Component {
 		const claims = {
 			title: this.state.title,
 			genre: this.state.genre,
+			song_id: this.state.songId
 		};
 
-		window.location.href = "/songupdated";
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.post(url + "/api/compositions/editsave", claims, config)
+			.then(res => {
+				window.location.href = "/songupdated";
+			})
+			.catch(err => {
+				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+			});
+
 	}
 
 	handleClickOpen() {
@@ -169,10 +212,22 @@ class EditSong extends Component {
 
 	handleDelete() {
 		const claims = {
-			title: this.state.title,
+			song_id: this.state.songId
 		};
 
-		window.location.href = "/songdeleted";
+		const config = {
+			headers: {
+				'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+			}
+		};
+
+		axios.post(url + "/api/compositions/delete", claims, config)
+			.then(res => {
+				window.location.href = "/songdeleted";
+			})
+			.catch(err => {
+				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+			});
 	}
 
 	render() {
@@ -236,17 +291,18 @@ class EditSong extends Component {
 													value={this.state.genre}
 												>
 													<MenuItem value="">&nbsp;</MenuItem>
-													<MenuItem value="Genre 1">Genre 1</MenuItem>
-													<MenuItem value="Genre 2">Genre 2</MenuItem>
-													<MenuItem value="Genre 3">Genre 3</MenuItem>
-													<MenuItem value="Genre 4">Genre 4</MenuItem>
-													<MenuItem value="Genre 5">Genre 5</MenuItem>
-													<MenuItem value="Genre 6">Genre 6</MenuItem>
-													<MenuItem value="Genre 7">Genre 7</MenuItem>
+													<MenuItem value="Trap">Trap</MenuItem>
+													<MenuItem value="Trance">Trance</MenuItem>
+													<MenuItem value="Techno">Techno</MenuItem>
+													<MenuItem value="Dubstep">Dubstep</MenuItem>
+													<MenuItem value="Drum and Bass">Drum and Bass</MenuItem>
+													<MenuItem value="Garage">Garage</MenuItem>
+													<MenuItem value="Juke House">Juke House</MenuItem>
+													<MenuItem value="Other">Other</MenuItem>
 												</Select>
 											</Grid>
 											<Grid item>
-												<div id="errorMessage" className={classes.errorMessage}>*Error message goes here</div>
+												<div id="errorMessage" className={classes.errorMessage}></div>
 											</Grid>
 											<Grid item>
 												<Grid container>
@@ -295,7 +351,7 @@ class EditSong extends Component {
 						</Grid>
 					</Grid>
 				</Grid>
-				<Songs songs={this.state.songs} fetchSongs={this.fetchSongs} />
+				<Songs songs={this.state.song} fetchSongs={this.fetchSongs} />
 			</div >
 		);
 	}

@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { Typography, withStyles, Link, IconButton, Menu, MenuItem } from "@material-ui/core";
+import { Typography, withStyles, Link, IconButton, Menu, MenuItem, Avatar } from "@material-ui/core";
 import { Link as RouterLink } from "react-router-dom";
 import { AccountCircle } from '@material-ui/icons/';
-import axios from "axios";
 
 const styles = theme => ({
     loginLink: {
@@ -12,6 +11,11 @@ const styles = theme => ({
     },
     mediumIcon: {
         fontSize: "1.5em",
+    },
+    avatar: {
+        width: 30,
+        height: 30,
+        backgroundColor: "rgba(255, 255, 255, 0.7)"
     },
 });
 
@@ -64,7 +68,8 @@ class ProfileIcon extends Component {
                         aria-haspopup="true"
                         onClick={this.handleClick}
                     >
-                        <AccountCircle className={classes.mediumIcon} />
+                        {/* <AccountCircle className={classes.mediumIcon} /> */}
+                        <Avatar alt={this.state.username.toString().toUpperCase()} src="#" className={classes.avatar} />
                     </IconButton>
                 </Typography>
                 <Menu

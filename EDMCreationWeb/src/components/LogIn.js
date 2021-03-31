@@ -117,7 +117,10 @@ class LogIn extends Component {
 				}
 			})
 			.catch(err => {
-				document.getElementById("errorMessage").innerHTML = err.response.data.msg;
+				if (err.response.data.verified !== undefined)
+					document.getElementById("errorMessage").innerHTML = "Please verify";
+				else
+					document.getElementById("errorMessage").innerHTML = err.response.data.msg;
 			});
 	}
 
@@ -126,7 +129,7 @@ class LogIn extends Component {
 
 		if (localStorage.getItem("access_token") !== null) {
 			return (
-				<Redirect to="/" />
+				<Redirect to="/profile" />
 			)
 		}
 
