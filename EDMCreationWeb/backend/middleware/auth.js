@@ -3,7 +3,7 @@ require('dotenv').config();
 
 function auth(req, res, next) {
 
-    if (!req.headers.authorization) {//no token provided
+    if (!req.headers.authorization||req.headers.authorization==NULL) {//no token provided
         return res.status(401).json({ msg: 'No Auth token provided, access denied' });
     }
 

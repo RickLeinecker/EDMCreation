@@ -959,7 +959,7 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
 
 // //modify for get training
 // //single play and update count for when a user hits play on a given song
-router.route('/trainingudownload').get(auth,(req, res) => {
+router.route('/trainingdownload').get(auth,(req, res) => {
     
     User.findOne({_id : req.body.ID})
         .then(user=>{ 
