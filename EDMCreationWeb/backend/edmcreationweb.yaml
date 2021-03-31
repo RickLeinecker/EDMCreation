@@ -591,7 +591,7 @@ paths:
                     type: string
   /api/compositions/editinfo:
     get:
-      summary: song info for edit page
+      summary: Song info for edit page
       tags:
         - compositions
       parameters:
