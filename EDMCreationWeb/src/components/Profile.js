@@ -159,7 +159,7 @@ class Profile extends Component {
 
         axios.get(url + "/api/compositions/user/" + this.state.username + "?page=" + page)
             .then(res => {
-                this.setState({ uploads: res.data, uploadsPage: page });
+                this.setState({ uploads: res.data.songs, uploadsPage: page });
             });
     }
 
@@ -170,7 +170,7 @@ class Profile extends Component {
 
         axios.get(url + "/api/users/favorites?username=" + this.state.username + "&page=" + page)
             .then(res => {
-                this.setState({ favorites: res.data, favoritesPage: page });
+                this.setState({ favorites: res.data.songs, favoritesPage: page });
             });
     }
 

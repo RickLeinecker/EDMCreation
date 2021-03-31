@@ -36,7 +36,7 @@ class Genres extends Component {
 
 	fetchSongs() {
 		axios.get(url + "/api/compositions/genre?genre=" + this.state.genre + "&page=" + this.state.page)
-			.then(res => this.setState({ songs: res.data }));
+			.then(res => this.setState({ songs: res.data.songs }));
 	}
 
 	render() {

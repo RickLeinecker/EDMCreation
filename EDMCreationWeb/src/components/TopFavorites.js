@@ -35,7 +35,7 @@ class TopFavorites extends Component {
 
 	fetchSongs() {
 		axios.get(url + "/api/compositions/topfavorites?page=" + this.state.page)
-			.then(res => this.setState({ songs: res.data }));
+			.then(res => this.setState({ songs: res.data.songs }));
 	}
 
 	render() {
