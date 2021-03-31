@@ -16,15 +16,19 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}" Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
-        <Button IsDefault="True" Command="{Binding OkCommand}" Grid.Row="1" Grid.Column="0" x:Name="confirmButton" Margin="20" HorizontalAlignment="Right" />
-        <Button IsCancel="True" Command="{Binding CancelCommand}" Grid.Row="1" Grid.Column="1" x:Name="cancelButton" Margin="20" HorizontalAlignment="Left" />
+        <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}"
+                   Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" 
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+            <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
+        </StackPanel>
+        
     </Grid>
 </Window>

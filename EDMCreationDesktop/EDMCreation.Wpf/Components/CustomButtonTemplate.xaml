@@ -15,7 +15,7 @@
                     <Grid Height="{TemplateBinding Size, Converter={StaticResource StringToSizeConverter}}"
                           Width="{TemplateBinding Size, Converter={StaticResource StringToSizeConverter}}"
                           x:Name="buttonParent" >
-                        <Button x:Name="newButton" mvx:Bi.nd="{TemplateBinding Command}" Padding="0"
+                        <Button x:Name="button" mvx:Bi.nd="{TemplateBinding Command}" Padding="0"
                                 VerticalAlignment="Center" HorizontalAlignment="Center" 
                                 Style="{DynamicResource MaterialDesignOutlinedButton}"
                                 BorderBrush="{DynamicResource PrimaryHueLightBrush}"
@@ -26,12 +26,12 @@
                                 <SolidColorBrush Color="{DynamicResource Primary200}"/>
                             </Button.Foreground>
                             <DockPanel VerticalAlignment="Center">
-                                <materialDesign:PackIcon HorizontalAlignment="Center" DockPanel.Dock="Top"
+                                <materialDesign:PackIcon HorizontalAlignment="Center" DockPanel.Dock="Top" x:Name="icon"
                                                          Kind="{TemplateBinding IconKind, Converter={StaticResource IconKindValueConverter}}"
                                                          Margin="{TemplateBinding IconMargin, Converter={StaticResource StringToThicknessConverter}}"
                                                          Height="{TemplateBinding IconSize, Converter={StaticResource StringToSizeConverter}}" 
                                                          Width="{TemplateBinding IconSize, Converter={StaticResource StringToSizeConverter}}"/>
-                                <TextBlock DockPanel.Dock="Bottom" Text="{TemplateBinding Text}" TextWrapping="Wrap" TextAlignment="Center" Margin="5 0 5 0"/>
+                                <TextBlock x:Name="text" DockPanel.Dock="Bottom" Text="{TemplateBinding Text}" TextWrapping="Wrap" TextAlignment="Center" Margin="5 0 5 0"/>
                             </DockPanel>
                         </Button>
                     </Grid>

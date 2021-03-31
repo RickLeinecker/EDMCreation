@@ -17,6 +17,7 @@ namespace EDMCreation.Wpf
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IDialogService, DialogService>();
             IDialogService dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
             dialogService.Register<YesNoDialogViewModel, YesNoDialogView>();
+            dialogService.Register<InformationDialogViewModel, InformationDialogView>();
         }
     }
 }

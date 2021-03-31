@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EDMCreation.Core.Services.Interfaces;
 using EDMCreation.Core.Models;
+using System.IO;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -24,7 +25,7 @@ namespace EDMCreation.Core.ViewModels
             _genreService = genreService;
 
             BackCommand = new MvxAsyncCommand(GoBack);
-            ShowSongGenerationViewCommand = new MvxAsyncCommand(ShowSongGenerationView);
+            ShowSongGenerationViewCommand = new MvxAsyncCommand<string>( async (genre) => { await ShowSongGenerationView(genre); });
 
             _genres = _genreService.Genres;
         }
@@ -35,11 +36,12 @@ namespace EDMCreation.Core.ViewModels
             await _navigationService.Close(this);
         }
 
-        public MvxAsyncCommand ShowSongGenerationViewCommand { get; set; }
+        public MvxAsyncCommand<string> ShowSongGenerationViewCommand { get; set; }
 
-        public async Task ShowSongGenerationView()
+        public async Task ShowSongGenerationView(string genre)
         {
-            await _navigationService.Navigate<SongGenerationViewModel>();
+            SessionModel session = new SessionModel(genre);
+            await _navigationService.Navigate<SongGenerationViewModel, SessionModel>(session);
         }
     }
 }

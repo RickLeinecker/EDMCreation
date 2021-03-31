@@ -36,20 +36,14 @@
 
         <WrapPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Grid.ColumnSpan="1">
             
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[0].Name}" IconKind="{Binding Genres[0].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[1].Name}" IconKind="{Binding Genres[1].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[2].Name}" IconKind="{Binding Genres[2].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[3].Name}" IconKind="{Binding Genres[3].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[4].Name}" IconKind="{Binding Genres[4].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[5].Name}" IconKind="{Binding Genres[5].Icon}" IconSize="20"/>
-            <components:CustomButton Size="80" Margin="10" Command="Command ShowSongGenerationViewCommand"
-                                 Text="{Binding Genres[6].Name}" IconKind="{Binding Genres[6].Icon}" IconSize="20"/>
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[0]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[1]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[2]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[3]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[4]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[5]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[6]}" />
+
         </WrapPanel>
 
     </Grid>

@@ -1,20 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Driver;
+using System.Net;
+using System.IO;
+using System.Net.Http;
+using EDMCreation.Core.Services.Interfaces;
 
 namespace EDMCreation.Core.Utilities
 {
     public class MongoDataAccess : IDataAccess
     {
-        private readonly IMongoDatabase _dataBase;
-        public MongoDataAccess(IMongoClient mongoClient)
+        private readonly HttpClient _client;
+        private readonly IAuthenticationService _authService;
+
+        public MongoDataAccess(IHttpClientService clientService, IAuthenticationService authenticationService)
         {
-            _dataBase = mongoClient.GetDatabase("dbname");
+            _authService = authenticationService;
+            _client = clientService.Client;
         }
-        public async Task<List<T>> LoadData<T>(T data)
+
+        public async Task<Stream> LoadTrainingFile()
         {
-            throw new NotImplementedException();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "users/trainingdownload");
+            request.Headers.Add("Authorization", $"Bearer {_authService.LoginToken}");
+
+            var response = await _client.SendAsync(request);
+            Stream trainingFile;
+
+            if (response.IsSuccessStatusCode)
+            {
+                trainingFile = await response.Content.ReadAsStreamAsync();
+                return trainingFile;
+            }
+            else
+                return null;
         }
 
         public async Task<bool> StoreData<T>(T data)

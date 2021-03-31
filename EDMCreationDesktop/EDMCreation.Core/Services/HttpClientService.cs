@@ -10,10 +10,10 @@ namespace EDMCreation.Core.Services
     {
         private HttpClient client;
         public HttpClient Client { get { return client; } }
-        public HttpClientService()
+        public HttpClientService(string baseUri)
         {
             client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5000/api/");
+            client.BaseAddress = new Uri(baseUri);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         }
     }

@@ -43,6 +43,8 @@
                        Text="{Binding CurrentGen, Converter={StaticResource IntegerToGenNumberValueConverter}}"
                        VerticalAlignment="Center" Margin="20 0 0 0"/>
         </StackPanel>
+        <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Right" 
+                   Text="{Binding Genre}" Margin="5" VerticalAlignment="Center" />
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">
             <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Settings">

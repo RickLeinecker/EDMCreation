@@ -4,7 +4,6 @@ using EDMCreation.Core.Models;
 using EDMCreation.Core.Services;
 using EDMCreation.Core.ViewModels;
 using MvvmCross.IoC;
-using MongoDB.Driver;
 using EDMCreation.Core.Utilities;
 using EDMCreation.Core.Services.Interfaces;
 using System;
@@ -12,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Python.Included;
 using Python.Runtime;
+using System.Diagnostics;
 
 namespace EDMCreation.Core
 {
@@ -34,17 +34,13 @@ namespace EDMCreation.Core
             Installer.PipInstallModule("numpy");
             Installer.PipInstallModule("mido");
 
-
-
-
-            //Keras.Keras.DisablePySysConsoleLog = true;
-
             CreatableTypes()
                 .EndingWith("Service")
                 .AsInterfaces()
                 .RegisterAsLazySingleton();
 
-            Mvx.IoCProvider.RegisterSingleton<IMongoClient>(new MongoClient(@"mongodb+srv://admin:LeineckerGroup16@cluster0.ttjwc.mongodb.net"));
+            // must register client service first
+            Mvx.IoCProvider.RegisterSingleton<IHttpClientService>(() => new HttpClientService("http://localhost:5000/api/"));
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IDataAccess, MongoDataAccess>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAuthenticationService, AuthenticationService>();
 

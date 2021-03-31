@@ -4,10 +4,8 @@ using System.Text;
 
 namespace EDMCreation.Core.Models
 {
-    public class TrainingFileModel : ITrainingFileModel
+    public class TrainingFileModel
     {
         public string File { get; set; }
-        public string UploadedOn { get; set; }
-        public string LastModified { get; set; }
     }
 }

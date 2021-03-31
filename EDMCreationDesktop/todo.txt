@@ -1,4 +1,8 @@
-- song generator (interface and class)
-- hook up to database
-- login/authentication
+- training file session conversion
+- save model state
+- dispose of resources after leaving training
 - session file/folder saving and loading
+- ability to go to previous generations
+- load from PC
+- volume adjust option
+- mutation rate adjust option

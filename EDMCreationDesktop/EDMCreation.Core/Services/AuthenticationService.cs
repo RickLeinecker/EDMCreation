@@ -1,45 +1,65 @@
 ﻿using EDMCreation.Core.Models;
 using EDMCreation.Core.Services.Interfaces;
-using EDMCreation.Core.Utilities;
-using EDMCreation.Core.ViewModels;
-using System;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace EDMCreation.Core.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IDataAccess _dataAccess;
+        private static string loginToken;
+        public string LoginToken { get { return loginToken; } }
 
-        public AuthenticationService(IDataAccess dataAccess)
+        private bool isAuthenticated;
+        public bool IsAuthenticated { get { return isAuthenticated; } }
+
+        private readonly HttpClient _client;
+        public AuthenticationService(IHttpClientService clientService)
         {
-            _dataAccess = dataAccess;
+            isAuthenticated = false;
+            _client = clientService.Client;
         }
-        public async Task Register(string email, string username, string password, string confirmPassword)
-        {
-            bool success = false;
 
-            if (password == confirmPassword)
+        public async Task<bool> Login(UserModel user)
+        {
+            if (user == null)
             {
-                IUserModel user = new UserModel()
-                {
-                    Email = email,
-                    Username = username,
-                    Password = password
-                };
+                return false;
             }
 
-            await _dataAccess.LoadData<UserModel>(new UserModel());
-        }
+            var body = new StringContent($"{{\"username\":\"{user.Username}\",\"password\":\"{user.Password}\"}}", Encoding.UTF8, "application/json");
 
-        public async Task<IUserModel> Login(LoginViewModel user)
-        {
-            throw new NotImplementedException();
-        }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "users/login"){ Content = body };
+            request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
-        public Task<bool> IsAuthenticated()
-        {
-            throw new NotImplementedException();
+            HttpResponseMessage response;
+            try
+            {
+                response = await _client.SendAsync(request);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                isAuthenticated = true;
+                var key = response.Content.ReadAsStringAsync().Result;
+                loginToken = JsonConvert.DeserializeObject<LoginResponse>(key).sJWT;
+            }
+
+            return isAuthenticated;
         }
+    }
+    
+    internal class LoginResponse
+    {
+        // ignore naming style conventions
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        public string sJWT { get; set; }
     }
 }

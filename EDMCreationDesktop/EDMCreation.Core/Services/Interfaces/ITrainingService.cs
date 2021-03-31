@@ -4,8 +4,6 @@ namespace EDMCreation.Core.Services.Interfaces
 {
     public interface ITrainingService
     {
-        List<string> GenerateSongs(List<string> prevGen);
-
-        void TrainModel();
+        List<string> GenerateSongs(List<string> inputSongs);
     }
 }

@@ -1,52 +1,61 @@
 ﻿using EDMCreation.Core.Models;
 using EDMCreation.Core.Services.Interfaces;
+using EDMCreation.Core.Utilities;
+using EDMCreation.Core.ViewModels.Dialogs;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace EDMCreation.Core.ViewModels
 {
     public class LoginViewModel : MvxViewModel
     {
-        public override async Task Initialize()
-        {
-            await base.Initialize();
-        }
+        private UserModel user;
 
-        public override void Prepare()
-        {
-            _email = "";
-            _password = "";
-        }
-
-        private string _email;
-
-        public string Email
-        { 
-            get { return _email; } 
-            set { SetProperty(ref _email, value); }
-        }
-
-        private string _password;
-
-        public string Password
-        {
-            get { return _password; }
-            set { SetProperty(ref _password, value); }
-        }
+        public UserModel User { get { return user; } set { SetProperty(ref user, value); } }
 
         private readonly IMvxNavigationService _navigationService;
         private readonly IAuthenticationService _authenticationService;
-
-        public LoginViewModel(IMvxNavigationService navigationService, IAuthenticationService loginService)
+        private readonly IDialogService _dialogService;
+        private readonly IDataAccess _dataAccess;
+        public LoginViewModel(IMvxNavigationService navigationService, IAuthenticationService loginService, IDialogService dialogService, IDataAccess dataAccess)
         {
+            user = new UserModel();
+
             _navigationService = navigationService;
             _authenticationService = loginService;
+            _dialogService = dialogService;
+            _dataAccess = dataAccess;
+
             BackCommand = new MvxAsyncCommand(GoBack);
+            LoginCommand = new MvxAsyncCommand(Login);
         }
 
+        public MvxAsyncCommand LoginCommand { get; set; }
+
+        public async Task Login()
+        {
+            bool result = await _authenticationService.Login(user);
+
+            if (result)
+            {
+                // login successful, go to song gen page with training file
+                Stream trainingFile = await _dataAccess.LoadTrainingFile();
+                SessionModel session = new SessionModel(trainingFile);
+                await _navigationService.Navigate<SongGenerationViewModel, SessionModel>(session);
+            }
+            else
+            {
+                string message = "Login unsuccessful.";
+                InformationDialogViewModel dialog = new InformationDialogViewModel(message);
+                _dialogService.ShowDialog(dialog);
+            }
+
+            // do something with result
+        }
         public MvxAsyncCommand BackCommand { get; set; }
 
         public async Task GoBack()

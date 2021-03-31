@@ -9,46 +9,29 @@ using EDMCreation.Core.Services.Interfaces;
 using EDMCreation.Core.ViewModels.Dialogs;
 using System.Linq;
 using System;
+using System.IO;
+using EDMCreation.Core.Models;
 
 namespace EDMCreation.Core.ViewModels
 {
-    public class SongGenerationViewModel : MvxViewModel<string>
+    public class SongGenerationViewModel : MvxViewModel<SessionModel>
     {
-        public override void Prepare()
+        // the session is either created or loaded, then passed to this view model as a parameter
+        private SessionModel _session;
+        public override void Prepare(SessionModel session)
         {
-            _trainingFile = GenerateNewTrainingFile();
+            _session = session;
             base.Prepare();
-        }
-
-        public override void Prepare(string trainingFile)
-        {
-            _trainingFile = trainingFile;
-            base.Prepare();
-        }
-
-        public override Task Initialize()
-        {
-
-            return base.Initialize();
         }
 
         private readonly IMvxNavigationService _navigationService;
         private readonly ITrainingService _trainingService;
         private readonly IDialogService _dialogService;
 
-        private string _trainingFile;
+        public string Genre { get { return _session.Genre; } }
+        public MvxViewModel CurrentContainer { get { return _session.CurrentContainer; } }
+        public int CurrentGen { get { return _session.CurrentGen; } }
 
-        private readonly List<string> _currentSongFiles;
-        private List<SongViewModel> _currentSongPanels;
-        private int _totalGens;
-
-        public EmptyContainerViewModel EmptyContainer;
-
-        private MvxViewModel _currentContainer;
-        public MvxViewModel CurrentContainer { get { return _currentContainer; } }
-
-        private int _currentGen;
-        public int CurrentGen { get { return _currentGen; } }
 
         private bool _notOnFirstGen;
         public bool NotOnFirstGen { get { return _notOnFirstGen; } set { SetProperty(ref _notOnFirstGen, value); } }
@@ -56,14 +39,9 @@ namespace EDMCreation.Core.ViewModels
         private bool _notOnLastGen;
         public bool NotOnLastGen { get { return _notOnLastGen; } set { SetProperty(ref _notOnLastGen, value); } }
 
-        public bool AdvancedModeEnabled { get; set; }
 
-        public double MutationRate { get; set; }
-
-
-        private readonly List<SongsContainerViewModel> _songsContainers;
-
-        public SongGenerationViewModel(IMvxNavigationService navigationService, ITrainingService trainingService, IDialogService dialogService)
+        public SongGenerationViewModel(IMvxNavigationService navigationService, ITrainingService trainingService, 
+            IDialogService dialogService)
         {
             _navigationService = navigationService;
             _trainingService = trainingService;
@@ -74,18 +52,17 @@ namespace EDMCreation.Core.ViewModels
             NextGenCommand = new MvxCommand(NextGeneration);
             GenerateCommand = new MvxCommand(Generate);
 
-            EmptyContainer = new EmptyContainerViewModel();
 
-            // use training file to check for progress
+            // use session to check for progress
             // if new project, generate 10 songs, otherwise load the latest generation
 
             // assumes initial entry with no prior training
-            _songsContainers = new List<SongsContainerViewModel>();
-            _currentSongPanels = new List<SongViewModel>();
-            _currentSongFiles = new List<string>();
-            _totalGens = 0;
-            _currentGen = -1;
-            _currentContainer = EmptyContainer;
+            
+
+            //LoadSession will take the _trainingFile and initialize the view model based on the file's parameters
+            //LoadSession();
+
+            
 
             PlaybackCurrentTimeWatcher.Instance.Start(); // remember to stop this at some point, and reassign playbacks when the view switches
 
@@ -96,7 +73,7 @@ namespace EDMCreation.Core.ViewModels
         {
             PauseAll();
 
-            if (_currentGen + 1 != _totalGens)
+            if (_session.CurrentGen + 1 != _session.TotalGens)
             {
                 string question = "You are on a previous generation. This will overwrite any future generations. Generate?";
                 YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
@@ -106,7 +83,7 @@ namespace EDMCreation.Core.ViewModels
                 {
                     if (result.Value) // yes, delete future generations
                     {
-                        DestroyFutureGenerations(_currentGen);
+                        DestroyFutureGenerations(_session.CurrentGen);
                     }
                     else
                         return;
@@ -119,20 +96,21 @@ namespace EDMCreation.Core.ViewModels
         private void GenerateAndShowNext()
         {
             GenerateNext();
-            _currentGen++;
-            ShowGeneration(_currentGen);
+            _session.CurrentGen++;
+            ShowGeneration(_session.CurrentGen);
         }
 
         private void GenerateNext()
         {
+            // remember to filter by selected *************************************
             // generates the next generation without updating view
-            var songFiles = _trainingService.GenerateSongs(_currentSongFiles); // uses test files for now
+            var songFiles = _trainingService.GenerateSongs(_session.CurrentSongFiles); // uses test files for now
 
             var songPanels = GenerateSongPanels(songFiles);
 
-            SongsContainerViewModel container = new SongsContainerViewModel(_currentGen + 1, songPanels);
-            _songsContainers.Add(container);
-            _totalGens++;
+            SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
+            _session.SongsContainers.Add(container);
+            _session.TotalGens++;
 
         }
 
@@ -154,7 +132,7 @@ namespace EDMCreation.Core.ViewModels
 
         private void PauseAll()
         {
-            foreach(SongViewModel song in _currentSongPanels)
+            foreach(SongViewModel song in _session.CurrentSongPanels)
             {
                 if (song.IsPlaying)
                     song.Pause();
@@ -163,7 +141,7 @@ namespace EDMCreation.Core.ViewModels
 
         private void StopAll()
         {
-            foreach(SongViewModel song in _currentSongPanels)
+            foreach(SongViewModel song in _session.CurrentSongPanels)
             {
                 if (song.IsPlaying)
                     song.Stop();
@@ -176,26 +154,26 @@ namespace EDMCreation.Core.ViewModels
             NotOnFirstGen = true;
             NotOnLastGen = true;
 
-            foreach (SongViewModel s in _currentSongPanels)
+            foreach (SongViewModel s in _session.CurrentSongPanels)
             {
                 s.StopWatching();
             }
 
-            _currentGen = gen;
-            _currentContainer = _songsContainers[gen];
-            _currentSongPanels = _songsContainers[gen].Songs;
+            _session.CurrentGen = gen;
+            _session.CurrentContainer = _session.SongsContainers[gen];
+            _session.CurrentSongPanels = _session.SongsContainers[gen].Songs;
 
-            _currentSongFiles.Clear();
+            _session.CurrentSongFiles.Clear();
 
-            foreach (SongViewModel s in _currentSongPanels)
+            foreach (SongViewModel s in _session.CurrentSongPanels)
             {
-                _currentSongFiles.Add(s.MidiFilePath);
+                _session.CurrentSongFiles.Add(s.MidiFilePath);
                 s.StartWatching();
             }
 
-            if (_currentGen == 0)
+            if (_session.CurrentGen == 0)
                 NotOnFirstGen = false;
-            if (_currentGen + 1 == _totalGens)
+            if (_session.CurrentGen + 1 == _session.TotalGens)
                 NotOnLastGen = false;
 
             RaisePropertyChanged(nameof(CurrentContainer));
@@ -203,9 +181,9 @@ namespace EDMCreation.Core.ViewModels
         }
 
         // Does nothing right now
-        private string GenerateNewTrainingFile()
+        private Stream GenerateNewTrainingFile()
         {
-            return "placeholder.txt";
+            throw new NotImplementedException();
         }
 
         public MvxAsyncCommand BackCommand { get; set; }
@@ -213,6 +191,8 @@ namespace EDMCreation.Core.ViewModels
         private async Task GoBack()
         {
             PauseAll();
+
+            // have to discard all training as well
 
             string question = "Leave training? Any unsaved progress will be lost.";
             YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
@@ -237,27 +217,27 @@ namespace EDMCreation.Core.ViewModels
 
         private void DestroyGeneration(SongsContainerViewModel gen)
         {
-            if (_totalGens <= 0)
+            if (_session.TotalGens <= 0)
                 return;
 
-            if (!_songsContainers.Contains(gen))
+            if (!_session.SongsContainers.Contains(gen))
                 return;
 
             gen.Dispose();
-            _songsContainers.Remove(gen);
+            _session.SongsContainers.Remove(gen);
 
-            _totalGens--;
+            _session.TotalGens--;
 
             RaisePropertyChanged(nameof(CurrentContainer));
         }
 
         private void DestroyFutureGenerations(int currentGen)
         {
-            var total = _totalGens;
+            var total = _session.TotalGens;
             List<SongsContainerViewModel> gensToDestroy = new List<SongsContainerViewModel>();
             for (int i = currentGen + 1; i < total; i++)
             {
-                gensToDestroy.Add(_songsContainers[i]);
+                gensToDestroy.Add(_session.SongsContainers[i]);
             }
 
             foreach(SongsContainerViewModel gen in gensToDestroy)
@@ -275,7 +255,7 @@ namespace EDMCreation.Core.ViewModels
             if (NotOnFirstGen)
             {
                 PauseAll();
-                ShowGeneration(_currentGen - 1);
+                ShowGeneration(_session.CurrentGen - 1);
             }
         }
         private void NextGeneration()
@@ -283,7 +263,7 @@ namespace EDMCreation.Core.ViewModels
             if (NotOnLastGen)
             {
                 PauseAll();
-                ShowGeneration(_currentGen + 1);
+                ShowGeneration(_session.CurrentGen + 1);
             }
         }
 
