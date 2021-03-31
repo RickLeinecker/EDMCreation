@@ -297,6 +297,9 @@ router.route('/postcomment').post(auth, (req, res) => {
             const username = user.username;
             newComment = new Comment({ username, user_id, comment });
         })
+        .catch(err => {
+            res.status(400).json({ msg: err });
+        })
         .then(() => {
             User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment } })
                 .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
@@ -409,6 +412,9 @@ router.route('/editsave').post(auth,
         //add a check for is the song belongs to the user
         User.findOne({ $and: [{ _id: req.body.ID }, { "compositions": { $elemMatch: { _id: mongoose.Types.ObjectId(req.body.song_id) } } }] })
             .then(async user => {
+                if (req.body.genre === "") {
+                    req.body.genre = "Other";
+                }
 
                 if (user) {//if present
                     user.compositions.id(req.body.song_id).title = req.body.title;
@@ -422,6 +428,9 @@ router.route('/editsave').post(auth,
                     //song doesnot belong to user access denied
                 }//end add
 
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
             });//end then
 
     }
@@ -658,7 +667,7 @@ router.route('/random').get(async (req, res) => {
                     path: 1,
                     listens: 1,
                     likes: { $size: "$favorites" },
-                    rand: { $multiply: [ { $rand: {} }, 12345 ] } 
+                    rand: { $multiply: [{ $rand: {} }, 12345] }
                 }
             },
             { $sort: { "rand": -1 } }, //descending values for listens
@@ -692,7 +701,7 @@ router.route('/genre').get(async (req, res) => {
                 }
             },
             {
-                $match:{ "compositions.genre": { $regex: "^" + genre, '$options': 'i' } }
+                $match: { "compositions.genre": { $regex: "^" + genre, '$options': 'i' } }
             },
             {
                 $project: {
