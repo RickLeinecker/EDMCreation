@@ -185,16 +185,16 @@ router.route('/popular').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+            { $sort: { "listens": -1, "_id": 1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
         if (!songs) throw Error('No songs');
-        
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+
+        const lastPage = songs.length < 5;
+
+        res.status(200).json({ songs, lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -280,9 +280,9 @@ router.route('/user/:username').get(async (req, res) => {
         ]);
 
         if (!songs) throw Error('No songs');
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+        const lastPage = songs.length < 5;
+
+        res.status(200).json({ songs, lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -507,8 +507,8 @@ router.route('/search').get(async (req, res) => {
     const skip = songsPerPage * (req.query.page - 1);
     const lookup = req.query.search;
 
-    
-        
+
+
     try {
         const songs = await User.aggregate([
 
@@ -524,7 +524,7 @@ router.route('/search').get(async (req, res) => {
                 {
                     $or:
                         [//partial hit search all categories
-                            { "compositions.username":{ $regex: ".*" + lookup + ".*", '$options': 'i' } },
+                            { "compositions.username": { $regex: ".*" + lookup + ".*", '$options': 'i' } },
                             { "compositions.genre": { $regex: ".*" + lookup + ".*", '$options': 'i' } },
                             { "compositions.title": { $regex: ".*" + lookup + ".*", '$options': 'i' } }
                         ]
@@ -589,18 +589,18 @@ router.route('/search').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            
-            { $sort: { "_id": 1, "listens": -1 } }, //descending values for listens
+
+            { $sort: { "listens": -1, "_id": 1 } }, //descending values for listens
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
-            
+
         ]);
 
         if (!songs) throw Error('No songs');
 
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+        const lastPage = songs.length < 5;
+
+        res.status(200).json({ songs, lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -772,16 +772,16 @@ router.route('/genre').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "_id": 1, "likes": -1 } }, //descending values for likes
+            { $sort: { "likes": -1, "_id": 1 } }, //descending values for likes
             { $skip: skip },
             { $limit: songsPerPage }, //skip controls page number and limit controls output
         ]);
 
         if (!songs) throw Error('No songs');
-       
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+
+        const lastPage = songs.length < 5;
+
+        res.status(200).json({ songs, lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -899,16 +899,16 @@ router.route('/topfavorites').get(async (req, res) => {
                     listens: { $first: "$listens" },
                 }
             },
-            { $sort: { "_id": 1, "likes": 1 } },
+            { $sort: { "likes": -1, "_id": 1 } },
             { $skip: skip },
             { $limit: songsPerPage },
         ]);
 
         if (!songs) throw Error('No songs');
-        
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+
+        const lastPage = songs.length < 5;
+
+        res.status(200).json({ songs, lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
