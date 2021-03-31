@@ -118,12 +118,6 @@ class EditProfile extends Component {
     handleSubmit(e) {
         e.preventDefault();
 
-        const config = {
-            headers: {
-                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
-            }
-        };
-
         const claims = {
             email: this.state.email,
             username: this.state.username,
@@ -133,7 +127,22 @@ class EditProfile extends Component {
             description: this.state.description,
         };
 
-        axios.post(url + "/api/users/editsave", claims, config)
+        const formData = new FormData();
+        formData.append("email", this.state.email);
+        formData.append("username", this.state.username);
+        formData.append("password", this.state.password);
+        formData.append("newPassword", this.state.newPassword);
+        formData.append("confirmationPassword", this.state.confirmationNewPassword);
+        formData.append("description", this.state.description);
+
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+                'Authorization': ['Bearer ' + localStorage.getItem("access_token")]
+            }
+        };
+
+        axios.post(url + "/api/users/editsave", formData, config)
             .then(res => {
                 if (this.state.email === this.state.currentEmail) {
                     window.location.href = "/accountupdated";
