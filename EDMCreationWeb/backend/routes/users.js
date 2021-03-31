@@ -141,6 +141,9 @@ router.route('/signup').post(
 
                     // res.json({ sJWT, msg: 'Registration Successful!' }); //return token in body for log in
                 } //end adding user
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
             }); //end of user search
 }); //end registration
 
@@ -204,6 +207,9 @@ router.route('/login').post(
                 else {
                     return res.status(400).json({ msg: "Invalid username and/or password" });
                 }
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
             }); //end user search
     }); //end login
 
@@ -280,6 +286,9 @@ router.route('/liketoggle').post(auth, (req, res) => {
                 );
             }//end add
 
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });//end then
 
 
@@ -335,6 +344,9 @@ router.route('/followtoggle').post(auth, (req, res) => {
                 );
             }//end add
 
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });//end then
 
 });
@@ -350,6 +362,9 @@ router.route('/isliked').get(auth, (req, res) => {
             else {
                 res.status(200).json({ liked: false });
             }
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });
 });
 
@@ -363,6 +378,9 @@ router.route('/getfollow').get(auth, (req, res) => {
             else {
                 res.status(200).json({ followed: false });
             }
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });
 });
 
@@ -382,6 +400,9 @@ router.route('/editinfo').get(auth, (req, res) => {
             } else {
                 return res.status(400).json({ msg: "Invalid username" });
             }
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         }); //end user search
 
 });
@@ -728,6 +749,9 @@ const sendVerification = (req, res) => {
                     res.status(200).json({ 'msg': 'Verification request email sent' });
                 }
             });
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });
 };
 
@@ -794,6 +818,9 @@ router.route('/verify').get((req, res) => {
             else {
                 res.status(400).json({ msg: 'Email already verified' })
             }
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });
 });
 
@@ -839,6 +866,9 @@ resetPasswordRequest = (req, res) => {
                 }
             });
         })
+        .catch(err => {
+            res.status(400).json({ msg: err });
+        });
 };
 
 router.route('/resetpassword').get(resetPasswordRequest);
@@ -893,6 +923,9 @@ router.route('/changepassword').post(
                     .catch(err => {
                         res.status(200).json({ msg: "Error" });
                     });
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
             });
     }
 );
@@ -911,6 +944,9 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
                     }
                 });
             }
+        })
+        .catch(err => {
+            res.status(400).json({ msg: err });
         });
 
     User.updateOne({ _id: req.body.ID }, { $set: { "training_file_id": req.file.id }})
@@ -946,6 +982,8 @@ router.route('/trainingudownload').get(auth,(req, res) => {
                 //error retrieving user
             }
             
+        }).catch(err => {
+            res.status(400).json({ msg: err });
         });
     
    

@@ -297,6 +297,9 @@ router.route('/postcomment').post(auth, (req, res) => {
             const username = user.username;
             newComment = new Comment({ username, user_id, comment });
         })
+        .catch(err => {
+            res.status(400).json({ msg: err });
+        })
         .then(() => {
             User.updateOne({ "compositions._id": mongoose.Types.ObjectId(song) }, { $push: { "compositions.$.comments": newComment } })
                 .then(() => res.status(200).json({ msg: 'Comment uploaded' }))
@@ -425,6 +428,9 @@ router.route('/editsave').post(auth,
                     //song doesnot belong to user access denied
                 }//end add
 
+            })
+            .catch(err => {
+                res.status(400).json({ msg: err });
             });//end then
 
     }

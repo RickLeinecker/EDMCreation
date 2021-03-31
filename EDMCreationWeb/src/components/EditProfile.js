@@ -304,7 +304,7 @@ class EditProfile extends Component {
                                                             fullWidth
                                                             name="confirmationNewPassword"
                                                             variant="filled"
-                                                            label="Comfirm new password"
+                                                            label="Confirm new password"
                                                             onChange={this.handleChange}
                                                             InputProps={{ className: classes.inputBox, disableUnderline: true }}
                                                             InputLabelProps={{ className: classes.inputBoxLabel }}
