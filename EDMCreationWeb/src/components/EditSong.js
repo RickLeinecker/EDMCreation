@@ -298,6 +298,7 @@ class EditSong extends Component {
 													<MenuItem value="Drum and Bass">Drum and Bass</MenuItem>
 													<MenuItem value="Garage">Garage</MenuItem>
 													<MenuItem value="Juke House">Juke House</MenuItem>
+													<MenuItem value="Other">Other</MenuItem>
 												</Select>
 											</Grid>
 											<Grid item>
