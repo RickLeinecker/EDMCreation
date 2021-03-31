@@ -118,21 +118,12 @@ class EditProfile extends Component {
     handleSubmit(e) {
         e.preventDefault();
 
-        const claims = {
-            email: this.state.email,
-            username: this.state.username,
-            password: this.state.password,
-            newPassword: this.state.newPassword,
-            confirmationNewPassword: this.state.confirmationNewPassword,
-            description: this.state.description,
-        };
-
         const formData = new FormData();
         formData.append("email", this.state.email);
         formData.append("username", this.state.username);
         formData.append("password", this.state.password);
         formData.append("newPassword", this.state.newPassword);
-        formData.append("confirmationPassword", this.state.confirmationNewPassword);
+        formData.append("confirmationNewPassword", this.state.confirmationNewPassword);
         formData.append("description", this.state.description);
 
         const config = {
