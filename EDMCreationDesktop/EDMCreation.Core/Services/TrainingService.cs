@@ -26,16 +26,6 @@ namespace EDMCreation.Core.Services
             DirectoryInfo baseDir = new DirectoryInfo(basePath);
             DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
 
-            // if we have gone to a previous gen, we need to overwrite later gens
-            if (genNum + 1 < totalGens)
-            {
-                foreach (DirectoryInfo gen in sessionsDir.GetDirectories())
-                {
-                    if (gen.Name.CompareTo($"gen{genNum}") >= 0) // delete future generations
-                        gen.Delete(true);
-                }
-            }
-
             // delete the files in base
             foreach (FileInfo file in baseDir.GetFiles())
             {
@@ -63,7 +53,8 @@ namespace EDMCreation.Core.Services
                 File.Copy(file, Path.Combine(genPath, filename));
             }
 
-            List<string> songs  = new List<string>(Directory.GetFiles(outputPath));
+            // using the genPath will ensure the files will always exist at their specified filepaths
+            List<string> songs  = new List<string>(Directory.GetFiles(genPath));
 
             return songs;
         }
@@ -94,7 +85,8 @@ namespace EDMCreation.Core.Services
                 File.Copy(file, Path.Combine(genPath, filename));
             }
 
-            List<string> songs = new List<string>(Directory.GetFiles(outputPath));
+            // using the genPath will ensure the files will always exist at their specified filepaths
+            List<string> songs = new List<string>(Directory.GetFiles(genPath));
 
             return songs;
         }
@@ -109,40 +101,7 @@ namespace EDMCreation.Core.Services
             dynamic generate = Py.Import("python.generate");
             generate.generate_mutations(generate.create_base());
         }
-
-        public List<string> UpdateGeneration(int genNum)
-        {
-            string absPath = Path.GetFullPath(".");
-            string sessionsPath = $"{absPath}\\python\\sessions";
-            string outputPath = $"{absPath}\\python\\output";
-
-            Directory.CreateDirectory(sessionsPath);
-            Directory.CreateDirectory(outputPath);
-
-            // clear the output folder
-            DirectoryInfo outputDir = new DirectoryInfo(outputPath);
-            foreach (FileInfo file in outputDir.GetFiles())
-            {
-                file.Delete();
-            }
-
-
-            DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
-            var directories = sessionsDir.GetDirectories().OrderByDescending(x => x.Name).ToArray();
-            var files = directories[genNum].GetFiles();
-
-            // copy each file to the output folder
-            foreach (FileInfo f in files)
-            {
-                var filename = f.Name;
-                var path = f.FullName;
-                File.Copy(path, Path.Combine(outputPath, filename));
-            }
-
-            List<string> songs = new List<string>(Directory.GetFiles(outputPath));
-            return songs;
-        }
-
+                
         public void Initialize(string genre)
         {
             // populate base directory with base files
@@ -174,14 +133,9 @@ namespace EDMCreation.Core.Services
             string absPath = Path.GetFullPath(".");
             string sessionsPath = $"{absPath}\\python\\sessions";
 
-            DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
-            var directories = sessionsDir.GetDirectories().OrderByDescending(x => x.Name).ToArray();
-            var files = directories[genNum].GetFiles();
-            
-            foreach (FileInfo file in files)
-            {
-                file.Delete();
-            }
+            DirectoryInfo sessionsDir = new DirectoryInfo($"{sessionsPath}\\gen{genNum}");
+
+            sessionsDir.Delete(true);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace EDMCreation.Core.Services.Interfaces
     {
         List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens);
         List<string> GenerateFirstSongs();
-        List<string> UpdateGeneration(int genNum);
         void Initialize(string genre);
         void DestroyGeneration(int genNum);
 

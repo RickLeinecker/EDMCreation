@@ -186,9 +186,6 @@ namespace EDMCreation.Core.ViewModels
                 s.StopWatching();
             }
 
-            // ensures the files are where they are expected to be
-            _trainingService.UpdateGeneration(gen);
-
             _session.CurrentGen = gen;
             _session.CurrentContainer = _session.SongsContainers[gen];
             _session.CurrentSongPanels = _session.SongsContainers[gen].Songs;
