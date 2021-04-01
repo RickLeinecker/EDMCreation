@@ -9,6 +9,10 @@ from tensorflow import keras
 from tensorflow.keras import layers, activations
 import keras.backend as K
 
+import mido
+import numpy as np
+import os
+
 def drumvec2mid(drums, filename, n_beats, div_per_beat):
     mid = mido.MidiFile()
     track = mido.MidiTrack()
@@ -91,7 +95,7 @@ def mid2drumvec(filename, n_beats, div_per_beat, loop=False):
                     drums[4, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
                 elif msg.note in [42, 22, 44]: # Closed Hat
                     drums[5, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
-                elif msg.note in [50, 48]: # High Tom
+                elif msg.note in [50, 48, 66]: # High Tom
                     drums[6, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
                 elif msg.note in [43, 58]: # High Floor Tom
                     drums[7, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
@@ -99,7 +103,7 @@ def mid2drumvec(filename, n_beats, div_per_beat, loop=False):
                     drums[8, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
                 elif msg.note in [41]: # Low Floor Tom
                     drums[9, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
-                elif msg.note in [56]: # Cowbell
+                elif msg.note in [56, 76, 77]: # Cowbell
                     drums[10, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
                 elif msg.note in [60]: # Hi Bongo
                     drums[11, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
@@ -107,8 +111,10 @@ def mid2drumvec(filename, n_beats, div_per_beat, loop=False):
                     drums[12, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
                 elif msg.note in [39]: # Hand Clap
                     drums[13, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
-                elif msg.note in [71, 72]: # Whistle
+                elif msg.note in [71, 72, 78, 79]: # Whistle
                     drums[14, int(np.round(beat*div_per_beat - 1))] = msg.velocity/127
+                elif msg.note in [33, 34]:
+                    pass
                 else:
                     print(filename + ' unknown drum ' + str(msg.note))
                     if msg.note < 35 or msg.note > 81:
