@@ -18,21 +18,18 @@ namespace EDMCreation.Core.Models
         public double MutationRate { get; set; }
         public MvxViewModel CurrentContainer { get; set; }
 
-        private EmptyContainerViewModel emptyContainer;
-
-
         // creating new session
         public SessionModel(string genre)
         {
-            emptyContainer = new EmptyContainerViewModel();
-
+            MutationRate = 0.5;
             Genre = genre;
             SongsContainers = new List<SongsContainerViewModel>();
             CurrentSongPanels = new List<SongViewModel>();
-            CurrentSongFiles = new List<string>();
             TotalGens = 0;
             CurrentGen = -1;
-            CurrentContainer = emptyContainer;
+            CurrentContainer = new EmptyContainerViewModel();
+
+            CurrentSongFiles = new List<string>();
         }
 
         // loading session

@@ -21,6 +21,7 @@ namespace EDMCreation.Core.ViewModels
         public override void Prepare(SessionModel session)
         {
             _session = session;
+            _trainingService.Initialize(_session.Genre);
             base.Prepare();
         }
 
@@ -52,20 +53,7 @@ namespace EDMCreation.Core.ViewModels
             NextGenCommand = new MvxCommand(NextGeneration);
             GenerateCommand = new MvxCommand(Generate);
 
-
-            // use session to check for progress
-            // if new project, generate 10 songs, otherwise load the latest generation
-
-            // assumes initial entry with no prior training
-            
-
-            //LoadSession will take the _trainingFile and initialize the view model based on the file's parameters
-            //LoadSession();
-
-            
-
             PlaybackCurrentTimeWatcher.Instance.Start(); // remember to stop this at some point, and reassign playbacks when the view switches
-
         }
 
         public MvxCommand GenerateCommand { get; set; }
@@ -102,16 +90,38 @@ namespace EDMCreation.Core.ViewModels
 
         private void GenerateNext()
         {
-            // remember to filter by selected *************************************
             // generates the next generation without updating view
-            var songFiles = _trainingService.GenerateSongs(_session.CurrentSongFiles); // uses test files for now
 
-            var songPanels = GenerateSongPanels(songFiles);
+            // checks if generating the first set or not
+            if (_session.CurrentGen == -1 && _session.TotalGens == 0)
+            {
+                var songFiles = _trainingService.GenerateFirstSongs();
+                var songPanels = GenerateSongPanels(songFiles);
 
-            SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
-            _session.SongsContainers.Add(container);
-            _session.TotalGens++;
+                SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
+                _session.SongsContainers.Add(container);
+                _session.TotalGens++;
+            }
+            else
+            {
+                List<string> selectedSongs = new List<string>();
+                foreach (SongViewModel s in _session.CurrentSongPanels)
+                {
+                    if (s.IsSelected)
+                    {
+                        selectedSongs.Add(s.MidiFilePath);
+                    }
+                }
 
+                var songFiles = _trainingService.GenerateSongs(selectedSongs, _session.CurrentGen, _session.TotalGens); // uses test files for now
+
+                var songPanels = GenerateSongPanels(songFiles);
+
+                SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
+                _session.SongsContainers.Add(container);
+                _session.TotalGens++;
+            }
+            
         }
 
         private List<SongViewModel> GenerateSongPanels(List<string> songFiles)
@@ -159,6 +169,9 @@ namespace EDMCreation.Core.ViewModels
                 s.StopWatching();
             }
 
+            // ensures the files are where they are expected to be
+            _trainingService.UpdateGeneration(gen);
+
             _session.CurrentGen = gen;
             _session.CurrentContainer = _session.SongsContainers[gen];
             _session.CurrentSongPanels = _session.SongsContainers[gen].Songs;
@@ -178,12 +191,6 @@ namespace EDMCreation.Core.ViewModels
 
             RaisePropertyChanged(nameof(CurrentContainer));
             RaisePropertyChanged(nameof(CurrentGen));
-        }
-
-        // Does nothing right now
-        private Stream GenerateNewTrainingFile()
-        {
-            throw new NotImplementedException();
         }
 
         public MvxAsyncCommand BackCommand { get; set; }

@@ -10,7 +10,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Margin="50 60 50 50">
+        <TextBlock Style="{DynamicResource MaterialDesignHeadline5TextBlock}" HorizontalAlignment="Center" 
+                   VerticalAlignment="Center" TextWrapping="Wrap" Margin="50" TextAlignment="Center">
         No songs generated. Click GENERATE to begin generating songs.
         </TextBlock>
     </Grid>
