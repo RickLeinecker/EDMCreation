@@ -21,7 +21,7 @@ namespace EDMCreation.Core.Services
                 },
                 new GenreModel()
                 {
-                    Name = "Trance",
+                    Name = "Breakbeat",
                     Icon = "MusicCircle"
                 },
                 new GenreModel()
@@ -36,7 +36,7 @@ namespace EDMCreation.Core.Services
                 },
                 new GenreModel()
                 {
-                    Name = "Drum and Bass",
+                    Name = "Dub",
                     Icon = "MusicCircle"
                 },
                 new GenreModel()
@@ -46,7 +46,7 @@ namespace EDMCreation.Core.Services
                 },
                 new GenreModel()
                 {
-                    Name = "Juke House",
+                    Name = "Future Bass",
                     Icon = "MusicCircle"
                 }
             };

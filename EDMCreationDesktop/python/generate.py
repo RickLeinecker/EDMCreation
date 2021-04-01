@@ -149,12 +149,12 @@ def create_base():
         filename = os.path.basename(filename)
         bases[i] = mid2drumvec(f'{file_location}/base/{filename}', n_beats, div_per_beat).T
 
-    latent_bases = np.zeros(shape=(len(listdir), timesteps, latent_dim))
+    latent_bases = np.zeros(shape=(len(listdir), 80))
     for i, latent_base in enumerate(vae.encoder.predict_on_batch(bases)):
         latent_bases[i] = latent_base[i]
 
     mean = np.mean(latent_bases, axis=0)
-    return np.append(np.ndarray(shape=(0, timesteps, latent_dim)), [mean], axis=0)
+    return np.append(np.ndarray(shape=(0, 80)), [mean], axis=0)
 
 def generate_mutations(latent_base, N=10, mutation_rate=.5):
     for i in range(N):

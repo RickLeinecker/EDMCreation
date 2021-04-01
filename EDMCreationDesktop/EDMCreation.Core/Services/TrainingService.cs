@@ -98,8 +98,12 @@ namespace EDMCreation.Core.Services
             dynamic sys = PythonEngine.ImportModule("sys");
             dynamic os = PythonEngine.ImportModule("os");
 
-            dynamic generate = Py.Import("python.generate");
-            generate.generate_mutations(generate.create_base());
+            using (Py.GIL())
+            {
+                dynamic generate = Py.Import("python.generate");
+                generate.generate_mutations(generate.create_base());
+            }
+            
         }
                 
         public void Initialize(string genre)
@@ -109,6 +113,7 @@ namespace EDMCreation.Core.Services
             string basePath = $"{absPath}\\python\\base";
             string sessionsPath = $"{absPath}\\python\\sessions";
             string outputPath = $"{absPath}\\python\\output";
+            string genrePath = $"{absPath}\\python\\genres\\{genre}";
 
 
             Directory.CreateDirectory(basePath);
@@ -117,6 +122,7 @@ namespace EDMCreation.Core.Services
 
             DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
             DirectoryInfo outputDir = new DirectoryInfo(outputPath);
+            DirectoryInfo baseDir = new DirectoryInfo(basePath);
 
             foreach (DirectoryInfo dir in sessionsDir.GetDirectories())
             {
@@ -125,6 +131,18 @@ namespace EDMCreation.Core.Services
             foreach (FileInfo file in outputDir.GetFiles())
             {
                 file.Delete();
+            }
+            foreach (FileInfo file in baseDir.GetFiles())
+            {
+                file.Delete();
+            }
+
+            var genreFiles = Directory.GetFiles(genrePath);
+
+            foreach (string file in genreFiles)
+            {
+                var filename = Path.GetFileName(file);
+                File.Copy(file, Path.Combine(basePath, filename));
             }
         }
 
