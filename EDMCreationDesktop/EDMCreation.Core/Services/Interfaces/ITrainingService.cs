@@ -8,5 +8,7 @@ namespace EDMCreation.Core.Services.Interfaces
         List<string> GenerateFirstSongs();
         List<string> UpdateGeneration(int genNum);
         void Initialize(string genre);
+        void DestroyGeneration(int genNum);
+
     }
 }

@@ -61,6 +61,23 @@ namespace EDMCreation.Core.ViewModels
         {
             PauseAll();
 
+            List<string> selectedSongs = new List<string>();
+            foreach (SongViewModel s in _session.CurrentSongPanels)
+            {
+                if (s.IsSelected)
+                {
+                    selectedSongs.Add(s.MidiFilePath);
+                }
+            }
+            if (selectedSongs.Count < 1 && _session.TotalGens != 0)
+            {
+                string message = "Not enough songs selected. Please select at least 1 song.";
+                InformationDialogViewModel dialog = new InformationDialogViewModel(message);
+                _dialogService.ShowDialog(dialog);
+
+                return;
+            }
+
             if (_session.CurrentGen + 1 != _session.TotalGens)
             {
                 string question = "You are on a previous generation. This will overwrite any future generations. Generate?";
@@ -229,6 +246,8 @@ namespace EDMCreation.Core.ViewModels
 
             if (!_session.SongsContainers.Contains(gen))
                 return;
+
+            _trainingService.DestroyGeneration(gen.GenNum);
 
             gen.Dispose();
             _session.SongsContainers.Remove(gen);

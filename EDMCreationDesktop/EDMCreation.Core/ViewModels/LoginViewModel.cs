@@ -54,7 +54,6 @@ namespace EDMCreation.Core.ViewModels
                 _dialogService.ShowDialog(dialog);
             }
 
-            // do something with result
         }
         public MvxAsyncCommand BackCommand { get; set; }
 

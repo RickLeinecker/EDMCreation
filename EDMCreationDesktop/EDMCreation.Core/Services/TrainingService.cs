@@ -146,7 +146,42 @@ namespace EDMCreation.Core.Services
         public void Initialize(string genre)
         {
             // populate base directory with base files
+            string absPath = Path.GetFullPath(".");
+            string basePath = $"{absPath}\\python\\base";
+            string sessionsPath = $"{absPath}\\python\\sessions";
+            string outputPath = $"{absPath}\\python\\output";
 
+
+            Directory.CreateDirectory(basePath);
+            Directory.CreateDirectory(sessionsPath);
+            Directory.CreateDirectory(outputPath);
+
+            DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
+            DirectoryInfo outputDir = new DirectoryInfo(outputPath);
+
+            foreach (DirectoryInfo dir in sessionsDir.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+            foreach (FileInfo file in outputDir.GetFiles())
+            {
+                file.Delete();
+            }
+        }
+
+        public void DestroyGeneration(int genNum)
+        {
+            string absPath = Path.GetFullPath(".");
+            string sessionsPath = $"{absPath}\\python\\sessions";
+
+            DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
+            var directories = sessionsDir.GetDirectories().OrderByDescending(x => x.Name).ToArray();
+            var files = directories[genNum].GetFiles();
+            
+            foreach (FileInfo file in files)
+            {
+                file.Delete();
+            }
         }
     }
 }
