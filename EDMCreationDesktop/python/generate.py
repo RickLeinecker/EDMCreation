@@ -21,35 +21,35 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat):
 
     track.append(mido.Message('program_change', program=12, time=0))
     for i in range(n_beats*div_per_beat):
-        if drums[0,i] > 0.: # Bass / Kick
+        if drums[0,i] > 0.01: # Bass / Kick
             track.append(mido.Message('note_on', channel=9, note=36, velocity=min(int(drums[0,i]*127), 127), time=0))
-        if drums[1,i] > 0.: # Snare
+        if drums[1,i] > 0.01: # Snare
             track.append(mido.Message('note_on', channel=9, note=38, velocity=min(int(drums[1,i]*127), 127), time=0))
-        if drums[2,i] > 0.: # Crash Cymbal
+        if drums[2,i] > 0.01: # Crash Cymbal
             track.append(mido.Message('note_on', channel=9, note=49, velocity=min(int(drums[2,i]*127), 127), time=0))
-        if drums[3,i] > 0.: # Ride Cymbal
+        if drums[3,i] > 0.01: # Ride Cymbal
             track.append(mido.Message('note_on', channel=9, note=51, velocity=min(int(drums[3,i]*127), 127), time=0))
-        if drums[4,i] > 0.: # Open Hat
+        if drums[4,i] > 0.01: # Open Hat
             track.append(mido.Message('note_on', channel=9, note=46, velocity=min(int(drums[4,i]*127), 127), time=0))
-        if drums[5,i] > 0.: # Closed Hat
+        if drums[5,i] > 0.01: # Closed Hat
             track.append(mido.Message('note_on', channel=9, note=42, velocity=min(int(drums[5,i]*127), 127), time=0))
-        if drums[6,i] > 0.: # High Tom
+        if drums[6,i] > 0.01: # High Tom
             track.append(mido.Message('note_on', channel=9, note=50, velocity=min(int(drums[6,i]*127), 127), time=0))
-        if drums[7,i] > 0.: # High Floor Tom
+        if drums[7,i] > 0.01: # High Floor Tom
             track.append(mido.Message('note_on', channel=9, note=43, velocity=min(int(drums[7,i]*127), 127), time=0))
-        if drums[8,i] > 0.: # Low - Mid Tom
+        if drums[8,i] > 0.01: # Low - Mid Tom
             track.append(mido.Message('note_on', channel=9, note=47, velocity=min(int(drums[8,i]*127), 127), time=0))
-        if drums[9,i] > 0.: # Low Floor Tom
+        if drums[9,i] > 0.01: # Low Floor Tom
             track.append(mido.Message('note_on', channel=9, note=41, velocity=min(int(drums[9,i]*127), 127), time=0))
-        if drums[10,i] > 0.: # Cowbell
+        if drums[10,i] > 0.01: # Cowbell
             track.append(mido.Message('note_on', channel=9, note=56, velocity=min(int(drums[10,i]*127), 127), time=0))
-        if drums[11,i] > 0.: # Hi Bongo
+        if drums[11,i] > 0.01: # Hi Bongo
             track.append(mido.Message('note_on', channel=9, note=60, velocity=min(int(drums[11,i]*127), 127), time=0))
-        if drums[12,i] > 0.: # Mute Hi conga
+        if drums[12,i] > 0.01: # Mute Hi conga
             track.append(mido.Message('note_on', channel=9, note=62, velocity=min(int(drums[12,i]*127), 127), time=0))
-        if drums[13,i] > 0.: # Hand Clap
+        if drums[13,i] > 0.01: # Hand Clap
             track.append(mido.Message('note_on', channel=9, note=39, velocity=min(int(drums[13,i]*127), 127), time=0))
-        if drums[14,i] > 0.: # Long Whistle
+        if drums[14,i] > 0.01: # Long Whistle
             track.append(mido.Message('note_on', channel=9, note=72, velocity=min(int(drums[14,i]*127), 127), time=0))
         track.append(mido.Message('note_off', channel=9, velocity=64, time=mid.ticks_per_beat//div_per_beat))
 
