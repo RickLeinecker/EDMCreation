@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import mido
+import glob
 
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="2"
@@ -139,13 +140,14 @@ timesteps = n_beats*div_per_beat
 input_dim = 15
 latent_dim = 2
 
-vae = tf.keras.models.load_model(f'{file_location}/vae')
+vae = tf.keras.models.load_model(f'{file_location}/lstm_vae')
 
 def create_base():
-    listdir = os.listdir(f'{file_location}/base/')
+    listdir = glob.glob(f'{file_location}/base/*.mid')
     bases = np.ndarray(shape=(len(listdir), timesteps, input_dim))
     for i, filename in enumerate(listdir):
-        bases[i] = mid2drumvec(f'{file_location}/base/' + filename, n_beats, div_per_beat).T
+        filename = os.path.basename(filename)
+        bases[i] = mid2drumvec(f'{file_location}/base/{filename}', n_beats, div_per_beat).T
 
     latent_bases = np.zeros(shape=(len(listdir), timesteps, latent_dim))
     for i, latent_base in enumerate(vae.encoder.predict_on_batch(bases)):
@@ -161,4 +163,4 @@ def generate_mutations(latent_base, N=10, mutation_rate=.5):
         latent_mutation = latent_base + offset
         mutation = vae.decoder(latent_mutation).numpy()
         mutation = vae(mutation).numpy().T
-        drumvec2mid(mutation, f'{file_location}/output/{i}', n_beats, div_per_beat)
+        drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)
