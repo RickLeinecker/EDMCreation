@@ -60,7 +60,7 @@ class SendVerification extends Component {
 			return (
 				<div>
 					<div className={classes.message}>
-						<Message message="Your email has been verified. Thank you." />
+						<Message message="Your email has been verified. Thanks." />
 					</div>
 					<LogIn />
 				</div>

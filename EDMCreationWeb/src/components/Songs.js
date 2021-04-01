@@ -203,7 +203,7 @@ class Songs extends Component {
 			return (
 				<div className={classes.root}>
 					<Typography variant="body2">
-						You've reached the end. &nbsp; ‘︿’
+						There are no songs here. &nbsp; ‘︿’
 						<br /><br />
 					</Typography>
 				</div>

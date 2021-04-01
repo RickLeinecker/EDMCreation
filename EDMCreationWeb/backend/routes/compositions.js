@@ -185,16 +185,20 @@ router.route('/popular').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "listens": -1, "composition_id": 1 } }, //descending values for listens
-            { $skip: skip },
-            { $limit: songsPerPage }, //skip controls page number and limit controls output
+            { $sort: { "listens": -1, "composition_id": 1 } },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
 
-        const lastPage = songs.length < 5;
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
 
-        res.status(200).json({ songs, lastPage });
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -274,15 +278,20 @@ router.route('/user/:username').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "_id": -1 } },
-            { $skip: skip },
-            { $limit: songsPerPage },
+            { $sort: { "date": -1, "composition_id": 1 } },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
-        const lastPage = songs.length < 5;
 
-        res.status(200).json({ songs, lastPage });
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
+
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -589,18 +598,20 @@ router.route('/search').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-
-            { $sort: { "listens": -1, "composition_id": 1 } }, //descending values for listens
-            { $skip: skip },
-            { $limit: songsPerPage }, //skip controls page number and limit controls output
-
+            { $sort: { "listens": -1, "composition_id": 1 } },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
 
-        const lastPage = songs.length < 5;
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
 
-        res.status(200).json({ songs, lastPage });
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -772,16 +783,20 @@ router.route('/genre').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "likes": -1, "composition_id": 1 } }, //descending values for likes
-            { $skip: skip },
-            { $limit: songsPerPage }, //skip controls page number and limit controls output
+            { $sort: { "listens": -1, "composition_id": 1 } },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
 
-        const lastPage = songs.length < 5;
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
 
-        res.status(200).json({ songs, lastPage });
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -902,15 +917,19 @@ router.route('/topfavorites').get(async (req, res) => {
                 }
             },
             { $sort: { "likes": -1, "_id": 1 } },
-            { $skip: skip },
-            { $limit: songsPerPage },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
 
-        const lastPage = songs.length < 5;
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
 
-        res.status(200).json({ songs, lastPage });
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }

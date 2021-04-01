@@ -181,6 +181,9 @@ function NavBar(props) {
 							anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 							transformOrigin={{ vertical: "top", horizontal: "center" }}
 						>
+							<MenuItem component={RouterLink} to="/genres?genre=Dance" onClick={handleClose}>
+								Dance
+                    		</MenuItem>
 							<MenuItem component={RouterLink} to="/genres?genre=Trap" onClick={handleClose}>
 								Trap
                     		</MenuItem>
@@ -193,14 +196,17 @@ function NavBar(props) {
 							<MenuItem component={RouterLink} to="/genres?genre=Dubstep" onClick={handleClose}>
 								Dubstep
                     		</MenuItem>
-							<MenuItem component={RouterLink} to="/genres?genre=Drum%20and%20Bass" onClick={handleClose}>
-								Drum and Bass
+							<MenuItem component={RouterLink} to="/genres?genre=Drum%20%26%20Bass" onClick={handleClose}>
+								Drum & Bass
                     		</MenuItem>
 							<MenuItem component={RouterLink} to="/genres?genre=Garage" onClick={handleClose}>
 								Garage
                     		</MenuItem>
 							<MenuItem component={RouterLink} to="/genres?genre=Juke%20House" onClick={handleClose}>
 								Juke House
+                    		</MenuItem>
+							<MenuItem component={RouterLink} to="/genres?genre=Other" onClick={handleClose}>
+								Other
                     		</MenuItem>
 						</Menu>
 					</Toolbar>

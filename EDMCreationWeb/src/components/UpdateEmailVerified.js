@@ -21,7 +21,7 @@ class SongUploaded extends Component {
 
 		return (
 			<div>
-				<Message message="Your email has been verified. Thank you." />
+				<Message message="Your email has been verified. Thanks." />
 				<Profile />
 			</div>
 		)

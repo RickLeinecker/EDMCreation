@@ -74,7 +74,7 @@ const fileStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'images',
-        allowed_formats: ['jpg', 'jpeg','png'],
+        allowed_formats: ['jpg', 'jpeg', 'png'],
         resource_type: 'raw'
     },
 });
@@ -167,7 +167,7 @@ router.route('/signup').post(
             .catch(err => {
                 res.status(400).json({ msg: err });
             }); //end of user search
-}); //end registration
+    }); //end registration
 
 //login
 router.route('/login').post(
@@ -190,7 +190,7 @@ router.route('/login').post(
                         if (isMatch) {
                             if (user.verified === false) {
                                 const link = process.env.URL + "sendverification?email=" + user.email;
-                               return res.status(400).json(
+                                return res.status(400).json(
                                     {
                                         msg: "Please verify your email. Click <a href=" +
                                             link + " style=\"color: #BDBDBD\">here</a> to resend verification link."
@@ -459,22 +459,22 @@ router.route('/editsave').post(auth, parser.single("file"), auth,
             .then(user => {
                 if (user) {
                     user.description = req.body.description;
-                    
 
-                    if(req.file){
+
+                    if (req.file) {
                         const path = user.image_id.split("/");
                         const publicId = path[path.length - 2] + "/" + path[path.length - 1];
-    
+
                         cloudinary.uploader.destroy(
                             publicId,
                             { invalidate: true, resource_type: "raw" },
                             //cloudinaryRes => res.send(cloudinaryRes)
                         );
-                        
+
                         user.image_id = req.file.path;
                     }
 
-                    
+
 
                     if (user.email !== req.body.email) {
                         user.new_email = req.body.email;
@@ -499,11 +499,11 @@ router.route('/editsave').post(auth, parser.single("file"), auth,
                                 sendVerification(payload);
                             }
 
-                           return res.status(200).json({ msg: "Profile has been updated" })
+                            return res.status(200).json({ msg: "Profile has been updated" })
                         })
                         .catch(err => res.status(400).json('Error: ' + err));
                 } else {
-                    if(req.file){
+                    if (req.file) {
                         const path = req.file.path.split("/");
                         const publicId = path[path.length - 2] + "/" + path[path.length - 1];
 
@@ -651,16 +651,20 @@ router.route('/favorites').get(async (req, res) => {
                     likes: { $size: "$favorites" }
                 }
             },
-            { $sort: { "favorited_date": -1 } },
-            { $skip: skip },
-            { $limit: songsPerPage },
+            { $sort: { "favorited_date": -1, "composition_id": 1 } },
+            {
+                $facet: {
+                    songs: [{ $skip: skip }, { $limit: songsPerPage }],
+                    totalCount: [{ $count: 'count' }]
+                }
+            }
         ]);
 
         if (!songs) throw Error('No songs');
-       
-        const lastPage = songs.length<5;
-        
-        res.status(200).json({songs,lastPage});
+
+        const lastPage = Math.ceil(songs[0].totalCount[0].count / songsPerPage);
+
+        res.status(200).json({ songs: songs[0].songs, lastPage: lastPage });
     } catch (e) {
         res.status(400).json({ msg: e.message });
     }
@@ -786,7 +790,7 @@ const sendVerification = (req, res) => {
             const mailOptions = {
                 'to': email,
                 'subject': "EDM Creation: Verify your email address",
-                'html': "Hello "+user.username+",<br><br>Please click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+                'html': "Hello " + user.username + ",<br><br>Please click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
             }
 
             smtpTransport.sendMail(mailOptions, (error, transportRes) => {
@@ -984,11 +988,11 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
 
     //NEED TO DELETE OLD TRAINING IF IT EXISTS
     User.findOne({ _id: req.body.ID })
-        .then(user=>{ 
-            if(user.training_file_id){//if not empty
+        .then(user => {
+            if (user.training_file_id) {//if not empty
                 gfs.remove({ _id: user.training_file_id, root: 'uploads' }, (err) => {
                     if (err) {
-                    return res.status(404).json({ err: err });
+                        return res.status(404).json({ err: err });
                     }
                 });
             }
@@ -997,7 +1001,7 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
             res.status(400).json({ msg: err });
         });
 
-    User.updateOne({ _id: req.body.ID }, { $set: { "training_file_id": req.file.id }})
+    User.updateOne({ _id: req.body.ID }, { $set: { "training_file_id": req.file.id } })
         .then(() => res.status(200).json({ msg: 'training uploaded' }))
         .catch(err => res.status(400).json('Error: ' + err)); //might need to remove uploaded song from database if error occured
 
@@ -1007,34 +1011,34 @@ router.route('/trainingupload').post(auth, upload.single('file'), auth, (req, re
 
 // //modify for get training
 // //single play and update count for when a user hits play on a given song
-router.route('/trainingdownload').get(auth,(req, res) => {
-    
-    User.findOne({_id : req.body.ID})
-        .then(user=>{ 
-            
-            if(user){
-                
+router.route('/trainingdownload').get(auth, (req, res) => {
+
+    User.findOne({ _id: req.body.ID })
+        .then(user => {
+
+            if (user) {
+
                 gfs.files.findOne({ _id: user.training_file_id }, (err, file) => {
                     // Check if file
                     if (!file || file.length === 0) {
                         return res.status(404).json({ err: 'No file exists' });
                     }
-            
+
                     const readstream = gfs.createReadStream(file.filename);
                     return readstream.pipe(res); //front end saves?
-                     //res.status(200).json( "Training returned" );
-                
+                    //res.status(200).json( "Training returned" );
+
 
                 });
-            }else{
+            } else {
                 //error retrieving user
             }
-            
+
         }).catch(err => {
             res.status(400).json({ msg: err });
         });
-    
-   
+
+
 });
 
 

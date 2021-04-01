@@ -261,11 +261,12 @@ class UploadSong extends Component {
                                                     className={classes.select}
                                                 >
                                                     <MenuItem value="">&nbsp;</MenuItem>
+                                                    <MenuItem value="Dance">Dance</MenuItem>
 													<MenuItem value="Trap">Trap</MenuItem>
 													<MenuItem value="Trance">Trance</MenuItem>
 													<MenuItem value="Techno">Techno</MenuItem>
 													<MenuItem value="Dubstep">Dubstep</MenuItem>
-													<MenuItem value="Drum and Bass">Drum and Bass</MenuItem>
+													<MenuItem value="Drum & Bass">Drum & Bass</MenuItem>
 													<MenuItem value="Garage">Garage</MenuItem>
 													<MenuItem value="Juke House">Juke House</MenuItem>
 													<MenuItem value="Other">Other</MenuItem>

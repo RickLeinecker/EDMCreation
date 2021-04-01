@@ -48,7 +48,14 @@ class Popular extends Component {
 
 	fetchSongs() {
 		axios.get(url + "/api/compositions/popular?page=" + this.state.page)
-			.then(res => this.setState({ songs: res.data.songs, lastPage: res.data.lastPage }));
+			.then(res => {
+				const lastPage = (parseInt(this.state.page) === parseInt(res.data.lastPage));
+
+				this.setState({
+					songs: res.data.songs,
+					lastPage: lastPage
+				})
+			});
 	}
 
 	render() {

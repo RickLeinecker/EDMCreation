@@ -78,8 +78,8 @@ class Following extends Component {
                         this.setState({ hasMore: false });
                     }
 
-                    if (this.state.page > 1) {
-                        this.setState({ timeout: 1500 });
+                    if (this.state.page == 1) {
+                        this.setState({ timeout: 1000 });
                     }
 
                     this.setState({ followedUsers: this.state.followedUsers.concat(res.data), page: [this.state.page + 1] },
