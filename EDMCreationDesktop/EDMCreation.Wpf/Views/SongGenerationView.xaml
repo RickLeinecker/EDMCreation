@@ -47,7 +47,7 @@
                    Text="{Binding Genre}" Margin="5" VerticalAlignment="Center" />
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">
-            <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Settings">
+            <Button mvx:Bi.nd="Command OptionsCommand" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Settings">
                 <materialDesign:PackIcon Kind="Gear" />
             </Button>
             <Button Style="{DynamicResource MaterialDesignToolButton}" ToolTip="About">

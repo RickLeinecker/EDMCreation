@@ -1,8 +1,8 @@
 - training file session conversion
-- save model state
 - dispose of resources after leaving training
 - session file/folder saving and loading
-- ability to go to previous generations
 - load from PC
 - volume adjust option
 - mutation rate adjust option
+
+- use authentication service to stay logged in etc

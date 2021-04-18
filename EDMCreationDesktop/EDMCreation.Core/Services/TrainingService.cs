@@ -10,7 +10,7 @@ namespace EDMCreation.Core.Services
 {
     public class TrainingService : ITrainingService
     {
-        public List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens)
+        public List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens, double mutationRate)
         {
             // edit base folder here using the filepaths passed
             string absPath = Path.GetFullPath(".");
@@ -24,7 +24,6 @@ namespace EDMCreation.Core.Services
             Directory.CreateDirectory(outputPath);
 
             DirectoryInfo baseDir = new DirectoryInfo(basePath);
-            DirectoryInfo sessionsDir = new DirectoryInfo(sessionsPath);
 
             // delete the files in base
             foreach (FileInfo file in baseDir.GetFiles())
@@ -39,7 +38,7 @@ namespace EDMCreation.Core.Services
                 File.Copy(s, Path.Combine(basePath, filename));
             }
 
-            Generate();
+            Generate(mutationRate);
 
             // save the output as the next generation
             string genPath = $"{sessionsPath}\\gen{genNum + 1}";
@@ -59,25 +58,22 @@ namespace EDMCreation.Core.Services
             return songs;
         }
 
-        public List<string> GenerateFirstSongs()
+        public List<string> GenerateFirstSongs(double mutationRate)
         {
             string absPath = Path.GetFullPath(".");
-            string basePath = $"{absPath}\\python\\base";
             string sessionsPath = $"{absPath}\\python\\sessions";
             string outputPath = $"{absPath}\\python\\output";
 
-
-            Directory.CreateDirectory(basePath);
             Directory.CreateDirectory(sessionsPath);
             Directory.CreateDirectory(outputPath);
 
-            Generate();
+            Generate(mutationRate);
+
+            var outputFiles = Directory.GetFiles(outputPath);
 
             // save the output as the initial generation
             string genPath = $"{sessionsPath}\\gen0";
             Directory.CreateDirectory(genPath);
-
-            var outputFiles = Directory.GetFiles(outputPath);
 
             foreach (string file in outputFiles)
             {
@@ -91,7 +87,7 @@ namespace EDMCreation.Core.Services
             return songs;
         }
 
-        private void Generate()
+        private void Generate(double mutationRate)
         {
             Installer.InstallPath = Path.GetFullPath(".");
             PythonEngine.Initialize();
@@ -101,7 +97,8 @@ namespace EDMCreation.Core.Services
             using (Py.GIL())
             {
                 dynamic generate = Py.Import("python.generate");
-                generate.generate_mutations(generate.create_base());
+                generate.generate_mutations(generate.create_base(), mutation_rate: mutationRate);
+                // (check with nick)
             }
             
         }
@@ -115,7 +112,6 @@ namespace EDMCreation.Core.Services
             string outputPath = $"{absPath}\\python\\output";
             string genrePath = $"{absPath}\\python\\genres\\{genre}";
 
-
             Directory.CreateDirectory(basePath);
             Directory.CreateDirectory(sessionsPath);
             Directory.CreateDirectory(outputPath);
@@ -128,10 +124,12 @@ namespace EDMCreation.Core.Services
             {
                 dir.Delete(true);
             }
+
             foreach (FileInfo file in outputDir.GetFiles())
             {
                 file.Delete();
             }
+
             foreach (FileInfo file in baseDir.GetFiles())
             {
                 file.Delete();

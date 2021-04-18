@@ -52,6 +52,7 @@ namespace EDMCreation.Core.ViewModels
             PrevGenCommand = new MvxCommand(PreviousGeneration);
             NextGenCommand = new MvxCommand(NextGeneration);
             GenerateCommand = new MvxCommand(Generate);
+            OptionsCommand = new MvxCommand(Options);
 
             PlaybackCurrentTimeWatcher.Instance.Start(); // remember to stop this at some point, and reassign playbacks when the view switches
         }
@@ -112,7 +113,7 @@ namespace EDMCreation.Core.ViewModels
             // checks if generating the first set or not
             if (_session.CurrentGen == -1 && _session.TotalGens == 0)
             {
-                var songFiles = _trainingService.GenerateFirstSongs();
+                var songFiles = _trainingService.GenerateFirstSongs(_session.MutationRate);
                 var songPanels = GenerateSongPanels(songFiles);
 
                 SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
@@ -130,7 +131,7 @@ namespace EDMCreation.Core.ViewModels
                     }
                 }
 
-                var songFiles = _trainingService.GenerateSongs(selectedSongs, _session.CurrentGen, _session.TotalGens); // uses test files for now
+                var songFiles = _trainingService.GenerateSongs(selectedSongs, _session.CurrentGen, _session.TotalGens, _session.MutationRate); // uses test files for now
 
                 var songPanels = GenerateSongPanels(songFiles);
 
@@ -205,6 +206,25 @@ namespace EDMCreation.Core.ViewModels
 
             RaisePropertyChanged(nameof(CurrentContainer));
             RaisePropertyChanged(nameof(CurrentGen));
+        }
+
+        public MvxCommand OptionsCommand { get; set; }
+
+        private void Options()
+        {
+            PauseAll();
+
+            string message = "Change Mutation Rate";
+            MutationRateDialogViewModel dialog = new MutationRateDialogViewModel(message, _session.MutationRate);
+            bool? result = _dialogService.ShowDialog(dialog);
+
+            if (result.HasValue)
+            {
+                if(result.Value)
+                {
+                    _session.MutationRate = dialog.MutationRate;
+                }
+            }
         }
 
         public MvxAsyncCommand BackCommand { get; set; }

@@ -18,6 +18,7 @@ namespace EDMCreation.Wpf
             IDialogService dialogService = Mvx.IoCProvider.Resolve<IDialogService>();
             dialogService.Register<YesNoDialogViewModel, YesNoDialogView>();
             dialogService.Register<InformationDialogViewModel, InformationDialogView>();
+            dialogService.Register<MutationRateDialogViewModel, MutationRateDialogView>();
         }
     }
 }
