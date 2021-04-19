@@ -43,9 +43,11 @@ namespace EDMCreation.Core.ViewModels
             if (result)
             {
                 // login successful, go to song gen page with training file
-                Stream trainingFile = await _dataAccess.LoadTrainingFile();
-                SessionModel session = new SessionModel(trainingFile);
-                await _navigationService.Navigate<SongGenerationViewModel, SessionModel>(session);
+                // this needs to be updated
+
+                //Stream trainingFile = await _dataAccess.LoadTrainingFile();
+                //SessionModel session = new SessionModel(trainingFile);
+                //await _navigationService.Navigate<SongGenerationViewModel, SessionModel>(session);
             }
             else
             {

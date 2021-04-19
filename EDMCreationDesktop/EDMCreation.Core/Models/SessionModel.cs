@@ -9,36 +9,40 @@ namespace EDMCreation.Core.Models
 {
     public class SessionModel
     {
+        public double MutationRate { get; set; }
         public string Genre { get; }
         public int CurrentGen { get; set; }
         public int TotalGens { get; set; }
         public List<SongsContainerViewModel> SongsContainers { get; set; }
         public List<SongViewModel> CurrentSongPanels { get; set; }
         public List<string> CurrentSongFiles { get; set; }
-        public double MutationRate { get; set; }
         public MvxViewModel CurrentContainer { get; set; }
+        public string SessionsPath { get; }
 
         // creating new session
         public SessionModel(string genre)
         {
             MutationRate = 0.5;
             Genre = genre;
-            SongsContainers = new List<SongsContainerViewModel>();
-            CurrentSongPanels = new List<SongViewModel>();
-            TotalGens = 0;
             CurrentGen = -1;
-            CurrentContainer = new EmptyContainerViewModel();
+            TotalGens = 0;
 
+            SongsContainers = new List<SongsContainerViewModel>();
             CurrentSongFiles = new List<string>();
         }
 
         // loading session
-        public SessionModel(Stream trainingFile)
+        public SessionModel(TrainingFile trainingFile)
         {
-            // ????
-            // genre = trainingfile.getgenre
-        }
+            SessionsPath = trainingFile.SessionsPath;
 
-        // public static convertToTrainingFile() 
+            MutationRate = trainingFile.MutationRate;
+            Genre = trainingFile.Genre;
+            CurrentGen = trainingFile.CurrentGen;
+            TotalGens = trainingFile.TotalGens;
+
+            SongsContainers = new List<SongsContainerViewModel>();
+            CurrentSongFiles = new List<string>();
+        }
     }
 }

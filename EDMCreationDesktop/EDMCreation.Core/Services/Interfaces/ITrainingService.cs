@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using EDMCreation.Core.Models;
+using System.Collections.Generic;
 
 namespace EDMCreation.Core.Services.Interfaces
 {
@@ -6,8 +7,8 @@ namespace EDMCreation.Core.Services.Interfaces
     {
         List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens, double mutationRate);
         List<string> GenerateFirstSongs(double mutationRate);
-        void Initialize(string genre);
+        void Initialize(SessionModel session);
         void DestroyGeneration(int genNum);
-
+        string SessionsPath { get; }
     }
 }

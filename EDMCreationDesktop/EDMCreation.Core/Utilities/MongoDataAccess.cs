@@ -35,15 +35,5 @@ namespace EDMCreation.Core.Utilities
             else
                 return null;
         }
-
-        public async Task<bool> StoreData<T>(T data)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> UpdateData<T>(T data)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

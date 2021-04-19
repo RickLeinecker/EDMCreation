@@ -110,7 +110,6 @@ namespace EDMCreation.Core.ViewModels
 
             PlayPauseCommand = new MvxCommand(PlayPause);
             StopCommand = new MvxCommand(Stop);
-            SaveCommand = new MvxCommand(Save);
         }
 
         public MvxCommand PlayPauseCommand { get; set; }
@@ -126,12 +125,6 @@ namespace EDMCreation.Core.ViewModels
 
         public MvxCommand StopCommand { get; set; }
         public void Stop() { _midiPlayer.Stop(); }
-
-        public MvxCommand SaveCommand { get; set; }
-        public void Save()
-        {
-
-        }
 
         public void Dispose()
         {

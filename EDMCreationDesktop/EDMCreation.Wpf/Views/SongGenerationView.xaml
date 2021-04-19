@@ -60,6 +60,7 @@
             <ContentControl Content="{Binding CurrentContainer}"/>
         </Border>
 
+        <!-- Right-Side Buttons -->
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
             <Button mvx:Bi.nd="Command GenerateCommand" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Margin="20" Padding="0" Height="40">
                 <DockPanel>
@@ -67,7 +68,7 @@
                     <materialDesign:PackIcon DockPanel.Dock="Right" Kind="Dna" VerticalAlignment="Center" Height="20" Width="20"/>
                 </DockPanel>
             </Button>
-            <Button mvx:Bi.nd="Command SaveComand" Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2">
+            <Button x:Name="saveButton" Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2" Click="OnSaveButton_Click" >
                 <Button.Foreground>
                     <SolidColorBrush Color="{DynamicResource Primary200}"/>
                 </Button.Foreground>

@@ -18,16 +18,22 @@ namespace EDMCreation.Core.ViewModels
     {
         // the session is either created or loaded, then passed to this view model as a parameter
         private SessionModel _session;
+        public SessionModel Session { get { return _session; } }
         public override void Prepare(SessionModel session)
         {
             _session = session;
-            _trainingService.Initialize(_session.Genre);
+            _trainingService.Initialize(_session);
+
+            ShowGeneration(_session.CurrentGen);
+
             base.Prepare();
         }
 
         private readonly IMvxNavigationService _navigationService;
-        private readonly ITrainingService _trainingService;
         private readonly IDialogService _dialogService;
+
+        public ITrainingService TrainingService { get { return _trainingService; } }
+        private readonly ITrainingService _trainingService;
 
         public string Genre { get { return _session.Genre; } }
         public MvxViewModel CurrentContainer { get { return _session.CurrentContainer; } }
@@ -114,6 +120,19 @@ namespace EDMCreation.Core.ViewModels
             if (_session.CurrentGen == -1 && _session.TotalGens == 0)
             {
                 var songFiles = _trainingService.GenerateFirstSongs(_session.MutationRate);
+                /*var songFiles = new List<string>()
+                {
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test2.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test3.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test4.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test5.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test6.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test7.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test8.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test9.mid",
+                    @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test10.mid",
+                };*/
                 var songPanels = GenerateSongPanels(songFiles);
 
                 SongsContainerViewModel container = new SongsContainerViewModel(_session.CurrentGen + 1, songPanels);
@@ -179,6 +198,17 @@ namespace EDMCreation.Core.ViewModels
         // Datacontext related properties are updated only in this function
         private void ShowGeneration(int gen)
         {
+            if( gen == -1 )
+            {
+                _session.CurrentContainer = new EmptyContainerViewModel();
+                _session.CurrentSongPanels = new List<SongViewModel>();
+                _session.CurrentGen = -1;
+                NotOnFirstGen = false;
+                NotOnLastGen = false;
+
+                return;
+            }
+
             NotOnFirstGen = true;
             NotOnLastGen = true;
 
@@ -235,16 +265,24 @@ namespace EDMCreation.Core.ViewModels
 
             // have to discard all training as well
 
-            string question = "Leave training? Any unsaved progress will be lost.";
-            YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
-            bool? result = _dialogService.ShowDialog(dialog);
-
-            if (result.HasValue)
+            if (_session.TotalGens == 0 && _session.CurrentGen == -1)
             {
-                if(result.Value)
+                await _navigationService.Close(this);
+            }
+
+            else
+            {
+                string question = "Leave training? Any unsaved progress will be lost.";
+                YesNoDialogViewModel dialog = new YesNoDialogViewModel(question);
+                bool? result = _dialogService.ShowDialog(dialog);
+
+                if (result.HasValue)
                 {
-                    DestroyAllGenerations();
-                    await _navigationService.Close(this);
+                    if (result.Value)
+                    {
+                        DestroyAllGenerations();
+                        await _navigationService.Close(this);
+                    }
                 }
             }
         }

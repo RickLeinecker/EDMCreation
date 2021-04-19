@@ -7,6 +7,7 @@ using MvvmCross.ViewModels;
 
 using System.Threading.Tasks;
 using EDMCreation.Core.Services.Interfaces;
+using EDMCreation.Core.Models;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -21,13 +22,14 @@ namespace EDMCreation.Core.ViewModels
 
             BackCommand = new MvxAsyncCommand(GoBack);
             ShowLoginViewCommand = new MvxAsyncCommand(ShowLoginView);
-            HandleFileCommand = new MvxCommand<string>(s => { HandleFile(s); });
+            HandleFileCommand = new MvxAsyncCommand<string>( async (s) => { await HandleFile(s); });
         }
 
-        public MvxCommand<string> HandleFileCommand { get; set; }
-        public void HandleFile(string s)
+        public MvxAsyncCommand<string> HandleFileCommand { get; set; }
+        public async Task HandleFile(string s)
         {
-            Test = s;
+            SessionModel session = new SessionModel(new TrainingFile(s));
+            await _navigationService.Navigate<SongGenerationViewModel, SessionModel>(session);
         }
 
         public MvxAsyncCommand BackCommand { get; set; }

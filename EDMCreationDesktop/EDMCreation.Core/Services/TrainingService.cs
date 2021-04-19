@@ -5,11 +5,23 @@ using Python.Included;
 using Python.Runtime;
 using System;
 using System.Linq;
+using EDMCreation.Core.Models;
+using EDMCreation.Core.Utilities;
+using EDMCreation.Core.ViewModels;
 
 namespace EDMCreation.Core.Services
 {
     public class TrainingService : ITrainingService
     {
+        public string SessionsPath
+        {
+            get
+            {
+                string absPath = Path.GetFullPath(".");
+                string sessionsPath = $"{absPath}\\python\\sessions";
+                return sessionsPath;
+            }
+        }
         public List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens, double mutationRate)
         {
             // edit base folder here using the filepaths passed
@@ -103,14 +115,14 @@ namespace EDMCreation.Core.Services
             
         }
                 
-        public void Initialize(string genre)
+        public void Initialize(SessionModel session)
         {
             // populate base directory with base files
             string absPath = Path.GetFullPath(".");
             string basePath = $"{absPath}\\python\\base";
             string sessionsPath = $"{absPath}\\python\\sessions";
             string outputPath = $"{absPath}\\python\\output";
-            string genrePath = $"{absPath}\\python\\genres\\{genre}";
+            string genrePath = $"{absPath}\\python\\genres\\{session.Genre}";
 
             Directory.CreateDirectory(basePath);
             Directory.CreateDirectory(sessionsPath);
@@ -135,12 +147,50 @@ namespace EDMCreation.Core.Services
                 file.Delete();
             }
 
-            var genreFiles = Directory.GetFiles(genrePath);
-
-            foreach (string file in genreFiles)
+            // if it is a new session
+            if (session.TotalGens == 0)
             {
-                var filename = Path.GetFileName(file);
-                File.Copy(file, Path.Combine(basePath, filename));
+                var genreFiles = Directory.GetFiles(genrePath);
+
+                foreach (string file in genreFiles)
+                {
+                    var filename = Path.GetFileName(file);
+                    File.Copy(file, Path.Combine(basePath, filename));
+                }
+            }
+
+            // if it is not a new session
+            else
+            {
+                CopyDir.Copy(session.SessionsPath, sessionsPath);
+
+                for (int i = 0; i < session.TotalGens; i++)
+                {
+                    string genPath = $"{sessionsPath}\\gen{i}";
+                    var songs = Directory.GetFiles(genPath);
+
+                    int j = 0;
+                    List<SongViewModel> songPanels = new List<SongViewModel>();
+
+                    foreach (string s in songs)
+                    {
+                        IMidiPlayer midiPlayer = new MidiPlayer(s);
+                        SongViewModel songPanel = new SongViewModel(midiPlayer, j);
+                        songPanels.Add(songPanel);
+                        j++;
+                    }
+
+                    session.SongsContainers.Add(new SongsContainerViewModel(i, songPanels));
+                }
+
+                session.CurrentContainer = session.SongsContainers[session.CurrentGen];
+                session.CurrentSongPanels = session.SongsContainers[session.CurrentGen].Songs;
+
+                foreach (SongViewModel s in session.CurrentSongPanels)
+                {
+                    session.CurrentSongFiles.Add(s.MidiFilePath);
+                    s.StartWatching();
+                }
             }
         }
 
@@ -151,7 +201,10 @@ namespace EDMCreation.Core.Services
 
             DirectoryInfo sessionsDir = new DirectoryInfo($"{sessionsPath}\\gen{genNum}");
 
-            sessionsDir.Delete(true);
+            if (sessionsDir.Exists)
+            {
+                sessionsDir.Delete(true);
+            }
         }
     }
 }
