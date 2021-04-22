@@ -17,6 +17,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -25,21 +27,21 @@
         </Grid.RowDefinitions>
 
         <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}"
-                   Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" 
+                   Grid.Row="0" Grid.ColumnSpan="3" x:Name="messageBlock" VerticalAlignment="Center" 
                    HorizontalAlignment="Center" TextAlignment="Center"/>
-        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBox Grid.Row="2" Grid.Column="2" Margin="5" Text="{Binding User.Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <TextBlock Grid.Row="2" Grid.Column="3" Margin="5" Text="Email" />
+        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBox Margin="5" MinWidth="100" Text="{Binding User.Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBlock Margin="5" Text="Email" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <components:BindablePasswordBox Grid.Row="3" Grid.Column="2" Margin="5" Password="{Binding User.Password}" />
-                <TextBlock Grid.Row="3" Grid.Column="3" Margin="5" Text="Password" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <components:BindablePasswordBox Margin="5" MinWidth="100" Password="{Binding User.Password}" />
+                <TextBlock Margin="5" Text="Password" />
             </StackPanel>
             
         </StackPanel>
         
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
             <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
             <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
         </StackPanel>
