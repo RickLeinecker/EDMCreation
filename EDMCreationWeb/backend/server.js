@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;//file or 5000
+const https = require('https');
+const fs = require('fs');
 
 //for gridfs use
 const bodyParser = require('body-parser');
@@ -41,9 +43,19 @@ app.use('/api/users', require('./routes/users'));//combined
 app.use('/api/compositions', require('./routes/compositions'));//combined
 
 // Server
-app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Server is running on port: ${port}`);
+// });
+
+const httpsOptions = {
+    key: fs.readFileSync('./security/cert.key'),
+    cert: fs.readFileSync('./security/cert.pem')
+}
+
+const server = https.createServer(httpsOptions, app)
+    .listen(port, () => {
+        console.log('Server running at ' + port)
+    })
 
 // Swagger
 const swaggerUi = require('swagger-ui-express');

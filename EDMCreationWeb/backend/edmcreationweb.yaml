@@ -5,7 +5,7 @@ info:
   version: '1.0'
 
 servers:
-  - url: http://localhost:5000
+  - url: https://localhost:5000
 
 components:
   securitySchemes:
