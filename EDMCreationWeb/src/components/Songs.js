@@ -54,6 +54,7 @@ const styles = theme => ({
 	},
 	largeIcon: {
 		fontSize: "4.5cm",
+		color: "rgba(255, 255, 255, 0.8)"
 	},
 	smallIcon: {
 		fontSize: "0.4cm",
@@ -124,6 +125,10 @@ const styles = theme => ({
 			color: "#EB5757"
 		}
 	},
+	artwork: {
+		maxHeight: "4.2cm",
+		maxWidth: "4.2cm",
+	}
 });
 
 class Songs extends Component {
@@ -249,7 +254,10 @@ class Songs extends Component {
 											</Typography>
 										</Grid>
 										<Grid item align="center">
-											<Image className={classes.largeIcon} />
+											{song.image_id ?
+												<img src={song.image_id} className={classes.artwork} /> :
+												<Image className={classes.largeIcon} />
+											}
 										</Grid>
 										<Grid item xs>
 											<Typography variant="body2" className={classes.date}>

@@ -71,7 +71,7 @@ const fileStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'compositions',
-        allowed_formats: ['mid', 'midi'],
+        allowed_formats: ['mid', 'midi', 'jpg', 'jpeg', 'png'],
         resource_type: 'raw'
     },
 });
@@ -79,10 +79,23 @@ const fileStorage = new CloudinaryStorage({
 const parser = multer({ storage: fileStorage });
 
 //upload new composition
-router.route('/upload').post(auth, parser.single("file"), auth, [
-    check('title').isLength({ min: 1 }).withMessage('Title is required'),
-    check('genre').isLength({ min: 1 }).withMessage('Genre is required')], (req, res) => {
-
+router.route('/upload').post(
+    auth,
+    parser.fields(
+        [
+            {
+                name: 'file', maxCount: 1
+            },
+            {
+                name: 'image', maxCount: 1
+            }
+        ]),
+    auth,
+    [
+        check('title').isLength({ min: 1 }).withMessage('Title is required'),
+        check('genre').isLength({ min: 1 }).withMessage('Genre is required')
+    ],
+    (req, res) => {
         //check the results of  the validation
         const errors = validationResult(req)
 
@@ -91,18 +104,23 @@ router.route('/upload').post(auth, parser.single("file"), auth, [
         }
 
         var { title, genre } = req.body;
-        const path = req.file.path;
+        const path = req.files.file[0].path;
         listens = 0; //0 listens
         favorites = 0; // 0 favorites
         comment_count = 0;
         user_id = req.body.ID; //for finding account
         username = req.body.uName;
+        var image_id;
+
+        if (req.files.image !== undefined) {
+            image_id = req.files.image[0].path;
+        }
 
         if (genre === "") {
             genre = "Other";
         }
 
-        const newComp = new Composition({ title, username, genre, path, listens }); //just drop this line for only user upload?
+        const newComp = new Composition({ title, username, genre, path, listens, image_id }); //just drop this line for only user upload?
 
         User.updateOne({ _id: user_id }, { $push: { "compositions": newComp } })
             .then(() => res.status(200).json({ msg: 'Composition uploaded' }))
@@ -136,7 +154,8 @@ router.route('/popular').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id"
                 },
             },
             {
@@ -160,6 +179,7 @@ router.route('/popular').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" }
                 }
             },
             {
@@ -182,7 +202,8 @@ router.route('/popular').get(async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
-                    likes: { $size: "$favorites" }
+                    likes: { $size: "$favorites" },
+                    image_id: 1
                 }
             },
             { $sort: { "listens": -1, "composition_id": 1 } },
@@ -229,7 +250,8 @@ router.route('/user/:username').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id"
                 },
             },
             {
@@ -253,6 +275,7 @@ router.route('/user/:username').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             {
@@ -275,7 +298,8 @@ router.route('/user/:username').get(async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
-                    likes: { $size: "$favorites" }
+                    likes: { $size: "$favorites" },
+                    image_id: 1
                 }
             },
             { $sort: { "date": -1, "composition_id": 1 } },
@@ -342,7 +366,8 @@ router.route('/editinfo').get(auth, async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id",
                 },
             },
             { $match: { composition_id: mongoose.Types.ObjectId(req.query.song_id) } },
@@ -367,6 +392,7 @@ router.route('/editinfo').get(auth, async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             {
@@ -389,7 +415,8 @@ router.route('/editinfo').get(auth, async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
-                    likes: { $size: "$favorites" }
+                    likes: { $size: "$favorites" },
+                    image_id: 1
                 }
             },
         ]);
@@ -467,7 +494,8 @@ router.route('/delete').post(auth, (req, res) => {
             },
             {
                 $project: {
-                    path: "$compositions.path"
+                    path: "$compositions.path",
+                    image_id: "$compositions.image_id"
                 }
             }
         ])
@@ -480,6 +508,17 @@ router.route('/delete').post(auth, (req, res) => {
                 { invalidate: true, resource_type: "raw" },
                 cloudinaryRes => res.send(cloudinaryRes)
             );
+
+            if (result[0].image_id !== undefined) {
+                const imageId = result[0].image_id.split("/");
+                const imagePublicId = imageId[imageId.length - 2] + "/" + imageId[imageId.length - 1];
+
+                cloudinary.uploader.destroy(
+                    imagePublicId,
+                    { invalidate: true, resource_type: "raw" },
+                    cloudinaryRes => res.send(cloudinaryRes)
+                );
+            }
 
             User.updateOne(
                 { _id: req.body.ID },
@@ -549,7 +588,8 @@ router.route('/search').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id"
                 },
             },
             {
@@ -573,6 +613,7 @@ router.route('/search').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             {
@@ -595,6 +636,7 @@ router.route('/search').get(async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
+                    image_id: 1,
                     likes: { $size: "$favorites" }
                 }
             },
@@ -641,7 +683,8 @@ router.route('/random').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id"
                 },
             },
             {
@@ -665,6 +708,7 @@ router.route('/random').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             {
@@ -687,6 +731,7 @@ router.route('/random').get(async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
+                    image_id: 1,
                     likes: { $size: "$favorites" },
                     rand: { $multiply: [{ $rand: {} }, 12345] }
                 }
@@ -734,7 +779,8 @@ router.route('/genre').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id",
                 },
             },
             {
@@ -758,6 +804,7 @@ router.route('/genre').get(async (req, res) => {
                     genre: { $first: "$genre" },
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             {
@@ -780,6 +827,7 @@ router.route('/genre').get(async (req, res) => {
                     genre: 1,
                     path: 1,
                     listens: 1,
+                    image_id: 1,
                     likes: { $size: "$favorites" }
                 }
             },
@@ -888,7 +936,8 @@ router.route('/topfavorites').get(async (req, res) => {
                     comments: "$compositions.comments",
                     genre: "$compositions.genre",
                     path: "$compositions.path",
-                    listens: "$compositions.listens"
+                    listens: "$compositions.listens",
+                    image_id: "$compositions.image_id",
                 },
             },
             {
@@ -914,6 +963,7 @@ router.route('/topfavorites').get(async (req, res) => {
                     path: { $first: "$path" },
                     listens: { $first: "$listens" },
                     date: { $first: "$date" },
+                    image_id: { $first: "$image_id" },
                 }
             },
             { $sort: { "likes": -1, "_id": 1 } },

@@ -45,7 +45,7 @@ class Comments extends Component {
     render() {
         const { classes } = this.props;
 
-        if (this.props.comments === undefined) {
+        if (this.props.comments === undefined || this.props.comments == "") {
             return (
                 <div>
                     <Typography>

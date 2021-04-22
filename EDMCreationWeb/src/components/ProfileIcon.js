@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Typography, withStyles, Link, IconButton, Menu, MenuItem, Avatar } from "@material-ui/core";
 import { Link as RouterLink } from "react-router-dom";
 import { AccountCircle } from '@material-ui/icons/';
+import axios from "axios";
+import { url } from "./URL";
 
 const styles = theme => ({
     loginLink: {
@@ -30,10 +32,16 @@ class ProfileIcon extends Component {
 
         this.handleClick = this.handleClick.bind(this);
         this.handleClose = this.handleClose.bind(this);
+        this.getUserInfo = this.getUserInfo.bind(this);
     }
 
     componentDidMount() {
-        this.setState({ username: [localStorage.getItem("username")] });
+        this.setState(
+            { username: [localStorage.getItem("username")] },
+            // () => {
+            //     this.getUserInfo();
+            // }
+        );
     }
 
     handleClick(e) {
@@ -42,6 +50,11 @@ class ProfileIcon extends Component {
 
     handleClose() {
         this.setState({ anchorEl: null });
+    }
+
+    getUserInfo() {
+        axios.get(url + "/api/users/info/" + this.state.username)
+            .then(res => this.setState({ image_id: res.data.image_id }));
     }
 
     render() {

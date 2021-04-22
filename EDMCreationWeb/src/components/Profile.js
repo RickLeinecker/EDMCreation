@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography, withStyles, Grid, Paper, Tabs, Tab, Box, Button } from "@material-ui/core";
+import { Typography, withStyles, Grid, Paper, Tabs, Tab, Box, Button, Avatar } from "@material-ui/core";
 import PropTypes from "prop-types";
 import { AccountBox, PlayArrow, MusicNote } from '@material-ui/icons/';
 import Songs from "./Songs";
@@ -81,6 +81,13 @@ const styles = theme => ({
         },
         paddingLeft: "25px",
         paddingRight: "25px",
+    },
+    avatar: {
+        width: theme.spacing(20),
+        height: theme.spacing(20),
+        marginRight: 23,
+        marginBottom: 32,
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
     },
 });
 
@@ -225,9 +232,13 @@ class Profile extends Component {
 
         return (
             <div className={classes.profile}>
-                <Grid container>
-                    <Grid item align="center">
-                        <AccountBox className={classes.largeIcon} />
+                <Grid container alignItems="flex-end">
+                    <Grid item>
+                        <Avatar
+                            variant="rounded"
+                            src={this.state.user.image_id}
+                            className={classes.avatar}
+                        />
                     </Grid>
                     <Grid container direction="column" xs justify="space-between" className={classes.profileArea}>
                         <Grid container direction="column">

@@ -157,6 +157,7 @@ class UploadSong extends Component {
         this.handleFileUpload = this.handleFileUpload.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.changeButton = this.changeButton.bind(this);
+        this.handleImageUpload = this.handleImageUpload.bind(this);
     }
 
     handleChange(e) {
@@ -165,6 +166,10 @@ class UploadSong extends Component {
 
     handleFileUpload(file) {
         this.setState({ file: file[0] }, function () { this.changeButton() });
+    }
+
+    handleImageUpload(e) {
+        this.setState({ image: e.target.files[0] });
     }
 
     changeButton() {
@@ -185,6 +190,10 @@ class UploadSong extends Component {
         formData.append("title", this.state.title);
         formData.append("genre", this.state.genre);
         formData.append("file", this.state.file);
+
+        if (this.state.image !== undefined) {
+            formData.append("image", this.state.image);
+        }
 
         const config = {
             headers: {
@@ -262,14 +271,14 @@ class UploadSong extends Component {
                                                 >
                                                     <MenuItem value="">&nbsp;</MenuItem>
                                                     <MenuItem value="Dance">Dance</MenuItem>
-													<MenuItem value="Trap">Trap</MenuItem>
-													<MenuItem value="Trance">Trance</MenuItem>
-													<MenuItem value="Techno">Techno</MenuItem>
-													<MenuItem value="Dubstep">Dubstep</MenuItem>
-													<MenuItem value="Drum & Bass">Drum & Bass</MenuItem>
-													<MenuItem value="Garage">Garage</MenuItem>
-													<MenuItem value="Juke House">Juke House</MenuItem>
-													<MenuItem value="Other">Other</MenuItem>
+                                                    <MenuItem value="Trap">Trap</MenuItem>
+                                                    <MenuItem value="Trance">Trance</MenuItem>
+                                                    <MenuItem value="Techno">Techno</MenuItem>
+                                                    <MenuItem value="Dubstep">Dubstep</MenuItem>
+                                                    <MenuItem value="Drum & Bass">Drum & Bass</MenuItem>
+                                                    <MenuItem value="Garage">Garage</MenuItem>
+                                                    <MenuItem value="Juke House">Juke House</MenuItem>
+                                                    <MenuItem value="Other">Other</MenuItem>
                                                 </Select>
                                             </Grid>
                                             <Grid item>
@@ -292,6 +301,13 @@ class UploadSong extends Component {
                                                         previewText="Selected file"
                                                     />
                                                 </MuiThemeProvider>
+                                            </Grid>
+                                            <Grid item>
+                                                <br />
+                                                <InputLabel className={classes.label}>
+                                                    Song artwork (optional):
+                                                </InputLabel>
+                                                <input type="file" onChange={this.handleImageUpload} />
                                             </Grid>
                                             <Grid item>
                                                 <div id="errorMessage" className={classes.errorMessage}></div>

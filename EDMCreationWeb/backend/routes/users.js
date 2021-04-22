@@ -220,7 +220,7 @@ router.route('/login').post(
 
                             const sJWT = JSRSASign.jws.JWS.sign("HS512", sHeader, sPayload, key); //token creation
 
-                            res.status(200).json({ sJWT, username: user.username, user_id: user._id, msg: 'Login successful!' }); //return token in body for log in      
+                            res.status(200).json({ sJWT, username: user.username, user_id: user._id, image_id: user.image_id, msg: 'Login successful!' }); //return token in body for log in      
                         } else {
                             return res.status(400).json({ msg: "Incorrect username and/or password" });
                         } //end password checking
@@ -246,7 +246,8 @@ router.route('/info/:username').get((req, res) => {
                     username: "$username",
                     description: "$description",
                     listens_count: { $sum: "$compositions.listens" },
-                    upload_count: { $cond: { if: { $isArray: "$compositions" }, then: { $size: "$compositions" }, else: "NA" } }
+                    upload_count: { $cond: { if: { $isArray: "$compositions" }, then: { $size: "$compositions" }, else: "NA" } },
+                    image_id: "$image_id"
                 },
             }
         ])
@@ -417,6 +418,7 @@ router.route('/editinfo').get(auth, (req, res) => {
                         username: user.username,
                         description: user.description,
                         email: user.email,
+                        image_id: user.image_id
                     }
                 );
             } else {
@@ -460,21 +462,34 @@ router.route('/editsave').post(auth, parser.single("file"), auth,
                 if (user) {
                     user.description = req.body.description;
 
-
                     if (req.file) {
-                        const path = user.image_id.split("/");
-                        const publicId = path[path.length - 2] + "/" + path[path.length - 1];
+                        if (user.image_id) {
+                            const path = user.image_id.split("/");
+                            const publicId = path[path.length - 2] + "/" + path[path.length - 1];
 
-                        cloudinary.uploader.destroy(
-                            publicId,
-                            { invalidate: true, resource_type: "raw" },
-                            //cloudinaryRes => res.send(cloudinaryRes)
-                        );
+                            cloudinary.uploader.destroy(
+                                publicId,
+                                { invalidate: true, resource_type: "raw" },
+                                //cloudinaryRes => res.send(cloudinaryRes)
+                            );
+                        }
 
                         user.image_id = req.file.path;
                     }
+                    else if (req.body.removeImage) {
+                        if (user.image_id) {
+                            const path = user.image_id.split("/");
+                            const publicId = path[path.length - 2] + "/" + path[path.length - 1];
 
+                            cloudinary.uploader.destroy(
+                                publicId,
+                                { invalidate: true, resource_type: "raw" },
+                                //cloudinaryRes => res.send(cloudinaryRes)
+                            );
 
+                            user.image_id = undefined;
+                        }
+                    }
 
                     if (user.email !== req.body.email) {
                         user.new_email = req.body.email;
