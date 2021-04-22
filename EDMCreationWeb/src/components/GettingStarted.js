@@ -9,7 +9,8 @@ import {
 import {
     GetApp,
     AccountBox,
-    Publish
+    Publish,
+    Edit
 } from '@material-ui/icons';
 
 const styles = theme => ({
@@ -84,11 +85,11 @@ class Songs extends Component {
                         </Grid>
                         <Grid item xs>
                             <Typography variant="subtitle1">
-                                Make an account for the site by clicking <Link href={"/register"} className={classes.makeAccountLink}>here</Link> and fill out your information.
+                                Edit the music in a DAW.
                             </Typography>
                         </Grid>
                         <Grid item xs={1} className={classes.iconGrid}>
-                            <AccountBox className={classes.largeIcon} />
+                            <Edit className={classes.largeIcon} />
                         </Grid>
                     </Grid>
                 </Paper>
@@ -101,7 +102,24 @@ class Songs extends Component {
                         </Grid>
                         <Grid item xs>
                             <Typography variant="subtitle1">
-                                Start uploading your creations through the upload tab through the profile menu at the top right of the page once you're signed in.
+                                Make an account for the site by clicking <Link href={"/register"} className={classes.makeAccountLink}>here</Link> and fill out your information.
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={1} className={classes.iconGrid}>
+                            <AccountBox className={classes.largeIcon} />
+                        </Grid>
+                    </Grid>
+                </Paper>
+                <Paper className={classes.paper}>
+                    <Grid container direction="row">
+                        <Grid item xs={3}>
+                            <Typography variant="h5">
+                                Step 4
+                            </Typography>
+                        </Grid>
+                        <Grid item xs>
+                            <Typography variant="subtitle1">
+                                Start uploading your creations through the upload tab under the profile menu at the top right of the page once you're signed in.
                             </Typography>
                         </Grid>
                         <Grid item xs={1} className={classes.iconGrid}>
