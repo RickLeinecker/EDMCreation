@@ -1,5 +1,6 @@
 ﻿using MvvmCross.Commands;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace EDMCreation.Core.ViewModels.Dialogs
@@ -8,13 +9,23 @@ namespace EDMCreation.Core.ViewModels.Dialogs
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         public string Message { get; }
-        public MvxCommand OkCommand { get; }
-        public MvxCommand CancelCommand { get; }
+        public MvxAsyncCommand OkCommand { get; }
+        public MvxAsyncCommand CancelCommand { get; }
         public BaseDialogViewModel(string message)
         {
             Message = message;
-            OkCommand = new MvxCommand(() => CloseRequested?.Invoke(this, new DialogCloseRequestedEventArgs(true)));
-            CancelCommand = new MvxCommand(() => CloseRequested?.Invoke(this, new DialogCloseRequestedEventArgs(false)));
+            OkCommand = new MvxAsyncCommand(Ok);
+            CancelCommand = new MvxAsyncCommand(Cancel);
+        }
+
+        protected virtual async Task Ok()
+        {
+            CloseRequested?.Invoke(this, new DialogCloseRequestedEventArgs(true));
+        }
+
+        protected virtual async Task Cancel()
+        {
+            CloseRequested?.Invoke(this, new DialogCloseRequestedEventArgs(false));
         }
     }
 }

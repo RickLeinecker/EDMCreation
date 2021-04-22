@@ -68,7 +68,7 @@
                     <materialDesign:PackIcon DockPanel.Dock="Right" Kind="Dna" VerticalAlignment="Center" Height="20" Width="20"/>
                 </DockPanel>
             </Button>
-            <Button x:Name="saveButton" Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2" Click="OnSaveButton_Click" >
+            <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2" Click="OnSaveButton_Click" >
                 <Button.Foreground>
                     <SolidColorBrush Color="{DynamicResource Primary200}"/>
                 </Button.Foreground>
@@ -76,8 +76,20 @@
                     <SolidColorBrush Color="{DynamicResource Primary200}"/>
                 </Button.BorderBrush>
                 <DockPanel>
-                    <TextBlock Text="SAVE TRAINING" DockPanel.Dock="Left" Margin="0 0 5 0" />
+                    <TextBlock Text="SAVE" DockPanel.Dock="Left" Margin="0 0 15 0" />
                     <materialDesign:PackIcon Kind="ContentSaveAll" DockPanel.Dock="Right" />
+                </DockPanel>
+            </Button>
+            <Button Style="{DynamicResource MaterialDesignOutlinedButton}" Margin="20" Padding="0" BorderThickness="2" mvx:Bi.nd="Command SaveToCloudCommand">
+                <Button.Foreground>
+                    <SolidColorBrush Color="{DynamicResource Primary200}"/>
+                </Button.Foreground>
+                <Button.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource Primary200}"/>
+                </Button.BorderBrush>
+                <DockPanel>
+                    <TextBlock Text="SAVE" DockPanel.Dock="Left" Margin="0 0 15 0" />
+                    <materialDesign:PackIcon Kind="Cloud" DockPanel.Dock="Right" />
                 </DockPanel>
             </Button>
         </StackPanel>

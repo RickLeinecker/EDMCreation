@@ -163,7 +163,7 @@ namespace EDMCreation.Core.Services
             // if it is not a new session
             else
             {
-                ZipFile.ExtractToDirectory(session.Path, pythonPath);
+                ZipFileExtensions.ExtractToDirectory(session.File.Archive, pythonPath);
                 string[] files = Directory.GetFiles(pythonPath);
                 foreach (string file in files)
                 {

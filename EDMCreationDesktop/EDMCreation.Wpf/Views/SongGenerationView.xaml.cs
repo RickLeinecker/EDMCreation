@@ -38,6 +38,9 @@ namespace EDMCreation.Wpf.Views
                 string zipPath = dialog.FileName;
                 string fileName = Path.GetFileNameWithoutExtension(dialog.FileName);
 
+
+                File.Delete(zipPath);
+
                 ZipFile.CreateFromDirectory(sessionPath, zipPath, compLvl, true);
                 ZipArchive archive = ZipFile.Open(zipPath, ZipArchiveMode.Update);
 

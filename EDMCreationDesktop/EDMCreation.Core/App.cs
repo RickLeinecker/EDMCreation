@@ -40,7 +40,7 @@ namespace EDMCreation.Core
                 .RegisterAsLazySingleton();
 
             // must register client service first
-            Mvx.IoCProvider.RegisterSingleton<IHttpClientService>(() => new HttpClientService("http://localhost:5000/api/"));
+            Mvx.IoCProvider.RegisterSingleton<IHttpClientService>(() => new HttpClientService("https://www.edmcreation.me:5000/api/"));
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IDataAccess, MongoDataAccess>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAuthenticationService, AuthenticationService>();
 

@@ -10,9 +10,6 @@ namespace EDMCreation.Core.Models
         private readonly double mutationRate;
         public double MutationRate { get { return mutationRate; } }
 
-        private readonly string _path;
-        public string Path { get { return _path; } }
-
         private readonly string genre;
         public string Genre { get { return genre; } }
 
@@ -21,6 +18,9 @@ namespace EDMCreation.Core.Models
 
         private readonly int totalGens;
         public int TotalGens { get { return totalGens; } }
+
+        private readonly ZipArchive _archive;
+        public ZipArchive Archive { get { return _archive; } }
 
         public TrainingFile(string path)
         {
@@ -32,11 +32,11 @@ namespace EDMCreation.Core.Models
              *  TotalGens
              */
 
-            ZipArchive archive = ZipFile.OpenRead(path);
+            _archive = ZipFile.OpenRead(path);
 
             ZipArchiveEntry infoFile = null;
 
-            foreach (ZipArchiveEntry entry in archive.Entries)
+            foreach (ZipArchiveEntry entry in _archive.Entries)
             {
                 if (entry.FullName.EndsWith(".info", StringComparison.OrdinalIgnoreCase))
                     infoFile = entry;
@@ -55,8 +55,33 @@ namespace EDMCreation.Core.Models
             totalGens = Convert.ToInt32(sr.ReadLine());
 
             sr.Close();
+        }
 
-            _path = path;
+        public TrainingFile(ZipArchive archive)
+        {
+            _archive = archive;
+
+            ZipArchiveEntry infoFile = null;
+
+            foreach (ZipArchiveEntry entry in _archive.Entries)
+            {
+                if (entry.FullName.EndsWith(".info", StringComparison.OrdinalIgnoreCase))
+                    infoFile = entry;
+            }
+
+            if (infoFile == null)
+            {
+                throw new FileNotFoundException();
+            }
+
+            StreamReader sr = new StreamReader(infoFile.Open());
+
+            mutationRate = Convert.ToDouble(sr.ReadLine());
+            genre = sr.ReadLine();
+            currentGen = Convert.ToInt32(sr.ReadLine());
+            totalGens = Convert.ToInt32(sr.ReadLine());
+
+            sr.Close();
         }
     }
 }

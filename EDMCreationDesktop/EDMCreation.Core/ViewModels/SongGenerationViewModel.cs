@@ -11,6 +11,8 @@ using System.Linq;
 using System;
 using System.IO;
 using EDMCreation.Core.Models;
+using System.IO.Compression;
+using System.Net.Http;
 
 namespace EDMCreation.Core.ViewModels
 {
@@ -31,6 +33,8 @@ namespace EDMCreation.Core.ViewModels
 
         private readonly IMvxNavigationService _navigationService;
         private readonly IDialogService _dialogService;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IDataAccess _dataAccess;
 
         public ITrainingService TrainingService { get { return _trainingService; } }
         private readonly ITrainingService _trainingService;
@@ -48,19 +52,100 @@ namespace EDMCreation.Core.ViewModels
 
 
         public SongGenerationViewModel(IMvxNavigationService navigationService, ITrainingService trainingService, 
-            IDialogService dialogService)
+            IDialogService dialogService, IAuthenticationService authenticationService, IDataAccess dataAccess)
         {
             _navigationService = navigationService;
             _trainingService = trainingService;
             _dialogService = dialogService;
+            _authenticationService = authenticationService;
+            _dataAccess = dataAccess;
 
             BackCommand = new MvxAsyncCommand(GoBack);
             PrevGenCommand = new MvxCommand(PreviousGeneration);
             NextGenCommand = new MvxCommand(NextGeneration);
             GenerateCommand = new MvxCommand(Generate);
             OptionsCommand = new MvxCommand(Options);
+            SaveToCloudCommand = new MvxAsyncCommand(AttemptSaveToCloud);
 
             PlaybackCurrentTimeWatcher.Instance.Start(); // remember to stop this at some point, and reassign playbacks when the view switches
+        }
+
+        public MvxAsyncCommand SaveToCloudCommand { get; set; }
+        private async Task AttemptSaveToCloud()
+        {
+            if (!_authenticationService.IsAuthenticated)
+            {
+                string message = "Please login to continue.";
+                LoginDialogViewModel dialog = new LoginDialogViewModel(message);
+                bool? result = _dialogService.ShowDialog(dialog);
+
+                if (result.HasValue)
+                {
+                    if (result.Value) // yes, login success
+                    {
+                        await SaveToCloud();
+                    }
+                    else
+                        return;
+                }
+            }
+            else
+            {
+                await SaveToCloud();
+            }
+            
+        }
+
+        private async Task SaveToCloud()
+        {
+            string fileName = $"{_session.Genre}_EDM_Session.edm";
+            CompressionLevel compLvl = CompressionLevel.NoCompression;
+
+            string absPath = Path.GetFullPath(".");
+            string tempPath = $"{absPath}\\temptrainingfile.temp";
+
+            ZipFile.CreateFromDirectory(_trainingService.SessionsPath, tempPath, compLvl, true);
+            ZipArchive archive = ZipFile.Open(tempPath, ZipArchiveMode.Update);
+
+            ZipArchiveEntry infoFile = archive.CreateEntry($"{fileName}.info", compLvl);
+            StreamWriter writer = new StreamWriter(infoFile.Open());
+
+            // create session_info which is readable for now, but should probably be non-readable
+            string[] sessionInfo =
+            {
+                    $"{_session.MutationRate}",
+                    $"{_session.Genre}",
+                    $"{_session.CurrentGen}",
+                    $"{_session.TotalGens}"
+                };
+
+            foreach (string line in sessionInfo)
+            {
+                writer.WriteLine(line);
+            }
+
+            writer.Close();
+            archive.Dispose();
+
+            // upload stream to database
+            byte[] bytes = File.ReadAllBytes(tempPath);
+            File.Delete(tempPath);
+            ByteArrayContent content = new ByteArrayContent(bytes);
+            bool result = await _dataAccess.SaveTrainingFile(content, fileName);
+
+            if (!result)
+            {
+                string message = "Upload failed.";
+                InformationDialogViewModel dialog = new InformationDialogViewModel(message);
+                _dialogService.ShowDialog(dialog);
+            }
+            else
+            {
+                string message = "File successfully saved to your account.";
+                InformationDialogViewModel dialog = new InformationDialogViewModel(message);
+                _dialogService.ShowDialog(dialog);
+            }
+
         }
 
         public MvxCommand GenerateCommand { get; set; }

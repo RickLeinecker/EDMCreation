@@ -20,7 +20,6 @@ namespace EDMCreation.Core.ViewModels
         private readonly IMvxNavigationService _navigationService;
         private readonly IAuthenticationService _authenticationService;
         private readonly IDialogService _dialogService;
-        private readonly IDataAccess _dataAccess;
         public LoginViewModel(IMvxNavigationService navigationService, IAuthenticationService loginService, IDialogService dialogService, IDataAccess dataAccess)
         {
             user = new UserModel();
@@ -28,7 +27,6 @@ namespace EDMCreation.Core.ViewModels
             _navigationService = navigationService;
             _authenticationService = loginService;
             _dialogService = dialogService;
-            _dataAccess = dataAccess;
 
             BackCommand = new MvxAsyncCommand(GoBack);
             LoginCommand = new MvxAsyncCommand(Login);

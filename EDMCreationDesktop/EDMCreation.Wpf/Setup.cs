@@ -19,6 +19,7 @@ namespace EDMCreation.Wpf
             dialogService.Register<YesNoDialogViewModel, YesNoDialogView>();
             dialogService.Register<InformationDialogViewModel, InformationDialogView>();
             dialogService.Register<MutationRateDialogViewModel, MutationRateDialogView>();
+            dialogService.Register<LoginDialogViewModel, LoginDialogView>();
         }
     }
 }
