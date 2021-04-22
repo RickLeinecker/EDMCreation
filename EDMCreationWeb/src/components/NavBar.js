@@ -166,6 +166,15 @@ function NavBar(props) {
 							<Typography color="inherit" variant="title" className={classes.menuItem}> Random
 							</Typography>
 						</MenuItem>
+						<MenuItem
+							selected={pathname === "/gettingstarted"}
+							component={Link}
+							href="/gettingstarted"
+							className={classes.menuItem}
+						>
+							<Typography color="inherit" variant="title" className={classes.menuItem}> Getting Started
+							</Typography>
+						</MenuItem>
 						<Menu
 							id="menu"
 							anchorEl={anchorEl}

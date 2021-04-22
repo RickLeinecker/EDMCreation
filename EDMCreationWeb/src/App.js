@@ -27,6 +27,7 @@ import SongDeleted from "./components/SongDeleted";
 import SendVerification from "./components/SendVerification";
 import Verify from "./components/Verify";
 import UpdateEmailVerified from "./components/UpdateEmailVerified";
+import GettingStarted from "./components/GettingStarted";
 
 const theme = createMuiTheme({
 	palette: {
@@ -87,6 +88,7 @@ class App extends Component {
 					<Route path="/accountupdated" component={AccountUpdated} />
 					<Route path="/accountemailupdated" component={AccountEmailUpdated} />
 					<Route path="/songdeleted" component={SongDeleted} />
+					<Route path="/gettingstarted" component={GettingStarted} />
 				</ThemeProvider>
 			</Router>
 		);
