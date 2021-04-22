@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using System.IO;
 using EDMCreation.Core.Models;
 using EDMCreation.Core.Utilities;
+using System.IO.Compression;
 
 namespace EDMCreation.Wpf.Views
 {
@@ -16,32 +17,34 @@ namespace EDMCreation.Wpf.Views
             InitializeComponent();
         }
 
+        // save session in an uncompressed zip file, but with custom .edm extension
         private void OnSaveButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var vm = (SongGenerationViewModel)DataContext;
+            var compLvl = CompressionLevel.NoCompression;
             string sessionPath = vm.TrainingService.SessionsPath;
             SessionModel session = vm.Session;
             
             SaveFileDialog dialog = new SaveFileDialog
             {
-                Filter = "EDM-Session files (*.edms)|*.edms",
+                Filter = "EDM-Session files (*.edm)|*.edm",
                 FilterIndex = 1,
-                FileName = $"{session.Genre}-EDM-Session",
+                FileName = $"{session.Genre}_EDM_Session",
                 RestoreDirectory = true
             };
 
             if (dialog.ShowDialog() == true)
             {
-                string saveFolder = dialog.FileName;
-                string path = $"{saveFolder}\\sessions";
-                Directory.CreateDirectory(path);
+                string zipPath = dialog.FileName;
+                string fileName = Path.GetFileNameWithoutExtension(dialog.FileName);
 
-                CopyDir.Copy(sessionPath, path);
+                ZipFile.CreateFromDirectory(sessionPath, zipPath, compLvl, true);
+                ZipArchive archive = ZipFile.Open(zipPath, ZipArchiveMode.Update);
 
-                string name = Path.GetFileNameWithoutExtension(dialog.FileName);
+                ZipArchiveEntry infoFile = archive.CreateEntry($"{fileName}.info", compLvl);
+                StreamWriter writer = new StreamWriter(infoFile.Open());
 
                 // create session_info which is readable for now, but should probably be non-readable
-                string sessionInfoPath = $"{saveFolder}\\{name}.edm";
                 string[] sessionInfo =
                 {
                     $"{session.MutationRate}",
@@ -50,7 +53,13 @@ namespace EDMCreation.Wpf.Views
                     $"{session.TotalGens}"
                 };
 
-                File.WriteAllLines(sessionInfoPath, sessionInfo);
+                foreach(string line in sessionInfo)
+                {
+                    writer.WriteLine(line);
+                }
+
+                writer.Close();
+                archive.Dispose();
             }
         }
     }

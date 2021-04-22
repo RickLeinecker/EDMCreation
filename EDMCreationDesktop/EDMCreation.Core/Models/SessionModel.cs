@@ -17,7 +17,7 @@ namespace EDMCreation.Core.Models
         public List<SongViewModel> CurrentSongPanels { get; set; }
         public List<string> CurrentSongFiles { get; set; }
         public MvxViewModel CurrentContainer { get; set; }
-        public string SessionsPath { get; }
+        public string Path { get; }
 
         // creating new session
         public SessionModel(string genre)
@@ -34,7 +34,7 @@ namespace EDMCreation.Core.Models
         // loading session
         public SessionModel(TrainingFile trainingFile)
         {
-            SessionsPath = trainingFile.SessionsPath;
+            Path = trainingFile.Path;
 
             MutationRate = trainingFile.MutationRate;
             Genre = trainingFile.Genre;

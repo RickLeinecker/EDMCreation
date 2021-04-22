@@ -6,44 +6,59 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
              xmlns:local="clr-namespace:EDMCreation.Wpf.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="166"/>
+            <ColumnDefinition Width=".2*"/>
+            <ColumnDefinition Width="166"/>
+            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="20" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
-            <RowDefinition />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition />
+            <RowDefinition Height="*"/>
+            <RowDefinition x:Name="buttonRow" Height="166"/>
+            <RowDefinition Height="*" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
         <Button Style="{DynamicResource MaterialDesignIconButton}" mvx:Bi.nd="Command BackCommand" Grid.Row="1" Grid.Column="1">
             <materialDesign:PackIcon Kind="ArrowBack" />
         </Button>
-        <Button Style="{DynamicResource MaterialDesignRaisedButton}" Grid.Row="2" Grid.Column="2" Margin="20" MinHeight="30" Click="OnOpenDialogButton_Click">
-            <StackPanel Orientation="Horizontal" >
-                <Label Content="Load from PC" />
-                <materialDesign:PackIcon Kind="Folder" VerticalAlignment="Center" Margin="10 0 0 0"/>
-            </StackPanel>
-        </Button>
-        <Button Style="{DynamicResource MaterialDesignRaisedButton}" mvx:Bi.nd="Command ShowLoginViewCommand" Grid.Row="3" Grid.Column="2" Margin="20" MinHeight="30">
-            <StackPanel Orientation="Horizontal" >
-                <Label Content="Load from Account" />
-                <materialDesign:PackIcon Kind="User" VerticalAlignment="Center" Margin="10 0 0 0"/>
-            </StackPanel>
-        </Button>
+
+        <TextBlock Style="{StaticResource MaterialDesignHeadline4TextBlock}" 
+                   Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Load Project
+        </TextBlock>
+
+        <Grid Grid.Row="2" Grid.Column="2" x:Name="buttonParent">
+            <Button x:Name="button" Padding="0" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                Style="{DynamicResource MaterialDesignOutlinedButton}"
+                                BorderBrush="{DynamicResource PrimaryHueLightBrush}"
+                                BorderThickness="2"
+                                Height="{Binding ElementName=buttonParent, Path=ActualHeight}" 
+                                Width="{Binding ElementName=buttonParent, Path=ActualWidth}"
+                                Click="OnOpenDialogButton_Click">
+                <Button.Foreground>
+                    <SolidColorBrush Color="{DynamicResource Primary200}"/>
+                </Button.Foreground>
+                <DockPanel VerticalAlignment="Center">
+                    <materialDesign:PackIcon HorizontalAlignment="Center" DockPanel.Dock="Top" x:Name="icon"
+                                                         Kind="Folder" Margin="0 0 0 20" Height="30" Width="30"/>
+                    <TextBlock x:Name="text" DockPanel.Dock="Bottom" Text="LOAD FROM PC" TextWrapping="Wrap" TextAlignment="Center" Margin="5 0 5 0"/>
+                </DockPanel>
+            </Button>
+        </Grid>
+
+        <components:CustomButton Grid.Row="2" Grid.Column="4" Command="Command ShowLoginViewCommand"
+                                 IconKind="User" IconMargin="0 0 0 20" IconSize="30" Text="LOAD FROM ACCOUNT"/>
+
 
     </Grid>
 </views:MvxWpfView>

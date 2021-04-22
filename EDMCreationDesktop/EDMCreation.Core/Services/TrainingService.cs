@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using Python.Included;
 using Python.Runtime;
-using System;
-using System.Linq;
+using System.IO.Compression;
 using EDMCreation.Core.Models;
 using EDMCreation.Core.Utilities;
 using EDMCreation.Core.ViewModels;
+using System;
 
 namespace EDMCreation.Core.Services
 {
@@ -119,10 +119,11 @@ namespace EDMCreation.Core.Services
         {
             // populate base directory with base files
             string absPath = Path.GetFullPath(".");
-            string basePath = $"{absPath}\\python\\base";
-            string sessionsPath = $"{absPath}\\python\\sessions";
-            string outputPath = $"{absPath}\\python\\output";
-            string genrePath = $"{absPath}\\python\\genres\\{session.Genre}";
+            string pythonPath = $"{absPath}\\python";
+            string basePath = $"{pythonPath}\\base";
+            string sessionsPath = $"{pythonPath}\\sessions";
+            string outputPath = $"{pythonPath}\\output";
+            string genrePath = $"{pythonPath}\\genres\\{session.Genre}";
 
             Directory.CreateDirectory(basePath);
             Directory.CreateDirectory(sessionsPath);
@@ -162,7 +163,15 @@ namespace EDMCreation.Core.Services
             // if it is not a new session
             else
             {
-                CopyDir.Copy(session.SessionsPath, sessionsPath);
+                ZipFile.ExtractToDirectory(session.Path, pythonPath);
+                string[] files = Directory.GetFiles(pythonPath);
+                foreach (string file in files)
+                {
+                    if (file.EndsWith(".info", StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Delete(file);
+                    }
+                }
 
                 for (int i = 0; i < session.TotalGens; i++)
                 {

@@ -1,10 +1,6 @@
-﻿using EDMCreation.Core.Utilities;
-using EDMCreation.Core.ViewModels;
-using MvvmCross.ViewModels;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Text;
+using System.IO.Compression;
 
 namespace EDMCreation.Core.Models
 {
@@ -14,8 +10,8 @@ namespace EDMCreation.Core.Models
         private readonly double mutationRate;
         public double MutationRate { get { return mutationRate; } }
 
-        private readonly string sessionsPath;
-        public string SessionsPath { get { return sessionsPath; } }
+        private readonly string _path;
+        public string Path { get { return _path; } }
 
         private readonly string genre;
         public string Genre { get { return genre; } }
@@ -28,9 +24,6 @@ namespace EDMCreation.Core.Models
 
         public TrainingFile(string path)
         {
-            string sessionInfoPath = path;
-            string parent = Directory.GetParent(path).FullName;
-
             /*  INFO LAYOUT:
              *  
              *  MutationRate
@@ -39,7 +32,22 @@ namespace EDMCreation.Core.Models
              *  TotalGens
              */
 
-            StreamReader sr = new StreamReader(sessionInfoPath);
+            ZipArchive archive = ZipFile.OpenRead(path);
+
+            ZipArchiveEntry infoFile = null;
+
+            foreach (ZipArchiveEntry entry in archive.Entries)
+            {
+                if (entry.FullName.EndsWith(".info", StringComparison.OrdinalIgnoreCase))
+                    infoFile = entry;
+            }
+
+            if (infoFile == null)
+            {
+                throw new FileNotFoundException();
+            }
+
+            StreamReader sr = new StreamReader(infoFile.Open());
 
             mutationRate = Convert.ToDouble(sr.ReadLine());
             genre = sr.ReadLine();
@@ -48,7 +56,7 @@ namespace EDMCreation.Core.Models
 
             sr.Close();
 
-            sessionsPath = $"{parent}\\sessions";
+            _path = path;
         }
     }
 }
