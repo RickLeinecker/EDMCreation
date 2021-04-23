@@ -98,21 +98,25 @@ class VisualizerElement extends HTMLElement {
         if (!this.ns) {
             return;
         }
-        if (this.type === 'piano-roll') {
-            this.wrapper.classList.add('piano-roll-visualizer');
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            this.wrapper.appendChild(svg);
-            this.visualizer = new PianoRollSVGVisualizer(this.ns, svg, this._config);
+        try {
+            if (this.type === 'piano-roll') {
+                this.wrapper.classList.add('piano-roll-visualizer');
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                this.wrapper.appendChild(svg);
+                this.visualizer = new PianoRollSVGVisualizer(this.ns, svg, this._config);
+            }
+            else if (this.type === 'waterfall') {
+                this.wrapper.classList.add('waterfall-visualizer');
+                this.visualizer = new WaterfallSVGVisualizer(this.ns, this.wrapper, this._config);
+            }
+            else if (this.type === 'staff') {
+                this.wrapper.classList.add('staff-visualizer');
+                const div = document.createElement('div');
+                this.wrapper.appendChild(div);
+                this.visualizer = new StaffSVGVisualizer(this.ns, div, this._config);
+            }
         }
-        else if (this.type === 'waterfall') {
-            this.wrapper.classList.add('waterfall-visualizer');
-            this.visualizer = new WaterfallSVGVisualizer(this.ns, this.wrapper, this._config);
-        }
-        else if (this.type === 'staff') {
-            this.wrapper.classList.add('staff-visualizer');
-            const div = document.createElement('div');
-            this.wrapper.appendChild(div);
-            this.visualizer = new StaffSVGVisualizer(this.ns, div, this._config);
+        catch {
         }
     }
     redraw(activeNote) {
@@ -494,8 +498,8 @@ class PlayerElement extends HTMLElement {
     }
     incrementPlayCount() {
         const claims = {
-			song_id: this.songId
-		};
+            song_id: this.songId
+        };
         axios.post(url + "/api/compositions/incrementplaycount", claims);
     }
 }
