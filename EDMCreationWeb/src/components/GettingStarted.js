@@ -22,7 +22,7 @@ const styles = theme => ({
     title: {
         margin: "auto",
         marginTop: 20,
-        marginBottom: 20,
+        marginBottom: 30,
         maxWidth: 800,
     },
     paper: {
