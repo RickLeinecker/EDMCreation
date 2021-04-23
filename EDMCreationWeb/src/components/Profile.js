@@ -40,6 +40,7 @@ const styles = theme => ({
     },
     description: {
         fontStyle: "italic",
+        marginBottom: 15
     },
     tabs: {
         background: "#4f4f4f",
