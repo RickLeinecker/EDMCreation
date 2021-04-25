@@ -41,12 +41,17 @@ namespace EDMCreation.Core.Services
                 },
                 new GenreModel()
                 {
-                    Name = "Garage",
+                    Name = "UK Garage",
                     Icon = "MusicCircle"
                 },
                 new GenreModel()
                 {
                     Name = "Future Bass",
+                    Icon = "MusicCircle"
+                },
+                new GenreModel()
+                {
+                    Name = "House",
                     Icon = "MusicCircle"
                 }
             };

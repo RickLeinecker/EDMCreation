@@ -43,6 +43,7 @@
             <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[4]}" />
             <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[5]}" />
             <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[6]}" />
+            <components:GenreButton Size="80" Margin="10" IconSize="20" Genre="{Binding Genres[7]}" />
 
         </WrapPanel>
 

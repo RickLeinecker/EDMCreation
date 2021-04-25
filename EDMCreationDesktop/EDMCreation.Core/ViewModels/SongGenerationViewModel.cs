@@ -329,8 +329,8 @@ namespace EDMCreation.Core.ViewModels
         {
             PauseAll();
 
-            string message = "Change Mutation Rate";
-            MutationRateDialogViewModel dialog = new MutationRateDialogViewModel(message, _session.MutationRate);
+            string message = "Song Generation Settings";
+            GenerationSettingsDialogViewModel dialog = new GenerationSettingsDialogViewModel(message, _session.MutationRate);
             bool? result = _dialogService.ShowDialog(dialog);
 
             if (result.HasValue)

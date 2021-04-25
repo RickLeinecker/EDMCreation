@@ -1,0 +1,73 @@
+﻿<Window x:Class="EDMCreation.Wpf.Views.Dialogs.GenerationSettingsDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:components="clr-namespace:EDMCreation.Wpf.Components"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    TextElement.FontWeight="Medium"
+                    TextElement.FontSize="14"
+                    FontFamily="{materialDesign:MaterialDesignFont}"
+        xmlns:local="clr-namespace:EDMCreation.Wpf.Views.Dialogs"
+        mc:Ignorable="d"
+        Title="" Height="250" Width="400" 
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}"
+                   Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" 
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <ScrollViewer Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Mutation Rate: "/>
+                <components:NumberBox Text="{Binding MutationRate, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Key: "/>
+                <components:NumberBox Text="{Binding Key, Mode=TwoWay}" AllowDecimals="False" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Generate Bass "/>
+                <CheckBox IsChecked="{Binding GenerateBass, Mode=TwoWay}"
+                  Style="{DynamicResource MaterialDesignAccentCheckBox}">
+                </CheckBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Bass Note Length: "/>
+                <components:NumberBox Text="{Binding BaseNoteLength, Mode=TwoWay}" AllowDecimals="False" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Generation Method" />
+                <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding GenerationMethod}">
+                    <ComboBoxItem Tag="Mean" Content="Mean"/>
+                    <ComboBoxItem Tag="Cross-Over" Content="Cross-Over"/>
+                </ComboBox>
+            </StackPanel>
+
+
+        </ScrollViewer>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
+            <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
+        </StackPanel>
+
+    </Grid>
+</Window>

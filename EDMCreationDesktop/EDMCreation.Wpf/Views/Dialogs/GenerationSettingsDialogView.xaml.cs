@@ -15,9 +15,9 @@ using System.Windows.Shapes;
 namespace EDMCreation.Wpf.Views.Dialogs
 {
     /// <summary>
-    /// Interaction logic for MutationRateDialogView.xaml
+    /// Interaction logic for GenerationSettingsDialogView.xaml
     /// </summary>
-    public partial class MutationRateDialogView : Window, IDialog
+    public partial class GenerationSettingsDialogView : Window, IDialog
     {
         public string ConfirmText { get; set; }
         public string CancelText { get; set; }
@@ -25,7 +25,7 @@ namespace EDMCreation.Wpf.Views.Dialogs
         public Button ConfirmButton { get; set; }
         public Button CancelButton { get; set; }
 
-        public MutationRateDialogView()
+        public GenerationSettingsDialogView()
         {
             ConfirmText = "Confirm";
             CancelText = "Cancel";
