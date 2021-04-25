@@ -8,12 +8,9 @@ namespace EDMCreation.Core.Utilities
 {
     public class MidiPlayer : IMidiPlayer
     {
-        try {
-            private static OutputDevice _outputDevice = OutputDevice.GetByName("VirtualMIDISynth #1");
-        }
-        catch (ArgumentException e) {
-            private static OutputDevice _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
-        }
+
+        private static OutputDevice _outputDevice = OutputDevice.GetByName("VirtualMIDISynth #1");
+
         
         public static OutputDevice OutputDevice { set { _outputDevice = value; } }
 
@@ -103,7 +100,15 @@ namespace EDMCreation.Core.Utilities
             this.midiFilePath = midiFilePath;
             midiFile = MidiFile.Read(midiFilePath);
 
-            playback = midiFile.GetPlayback(_outputDevice);
+            try
+            {
+                playback = midiFile.GetPlayback(_outputDevice);
+            }
+            catch (ArgumentException e)
+            {
+                _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
+                playback = midiFile.GetPlayback(_outputDevice);
+            }
 
             playback.InterruptNotesOnStop = true;
             playback.Finished += PlaybackFinished;

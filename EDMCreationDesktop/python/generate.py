@@ -56,7 +56,7 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=None, key=36, b
                                       )
                         )
     if bassline == "random":
-        bassline = random.sample((0, 3, 5, 7, 10), 4)
+        bassline = random.choices((0, 3, 5, 7, 10), k=n_beats//bass_note_length)
     if bassline:
         track = mido.MidiTrack()
         mid.tracks.append(track)

@@ -22,7 +22,7 @@ namespace EDMCreation.Core.Models
         // creating new session
         public SessionModel(string genre)
         {
-            MutationRate = 0.5;
+            MutationRate = 4;
             Genre = genre;
             CurrentGen = -1;
             TotalGens = 0;
