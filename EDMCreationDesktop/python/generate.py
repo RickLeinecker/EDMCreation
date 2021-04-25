@@ -171,7 +171,7 @@ input_dim = 15
 
 vae = tf.keras.models.load_model(f'{file_location}/deep_gru_vae')
 
-def create_base(average=True):
+def create_base():
     listdir = glob.glob(f'{file_location}/base/*.mid')
     bases = np.ndarray(shape=(len(listdir), timesteps, input_dim))
     for i, filename in enumerate(listdir):
@@ -180,27 +180,23 @@ def create_base(average=True):
 
     latent_bases = vae.encoder.predict_on_batch(bases)[2]
 
+    return latent_bases
 
-    if average:
-        return np.mean(latent_bases, axis=0)
-    else:
-        return latent_bases
-
-def generate_mutations(latent_base, N=10, mutation_rate=0.5, method=0, bassline=False, key=36, bass_note_length=4):
-    if method == 0:
+def generate_mutations(latent_bases, N=10, mutation_rate=0.5, method=0, bassline=False, key=36, bass_note_length=4):
+    if method == 0: # Average method
+        latent_base = np.mean(latent_bases, axis=0)
         for i in range(N):
             offset = (np.random.rand(*(latent_base.shape))*2) - 1
             offset /= np.linalg.norm(offset)
             offset *= mutation_rate
             latent_mutation = latent_base + offset
             latent_mutation = np.reshape(latent_mutation, newshape=(1, -1))
-
             mutation = vae.decoder(latent_mutation).numpy().T
             # mutation = vae(mutation).numpy().T
             drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat, bassline, key, bass_note_length)
-    elif method == 1:
+    elif method == 1: #  Crossover method
         for i in range(N):
-            latent = [np.random.choice(vec) for vec in latent_base.T]
+            latent = [np.random.choice(vec) for vec in latent_bases.T]
             offset = (np.random.rand(*(np.shape(latent)))*2) - 1
             offset /= np.linalg.norm(offset)
             offset *= mutation_rate
