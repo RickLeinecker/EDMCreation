@@ -14,48 +14,77 @@ import mido
 import numpy as np
 import os
 
-def drumvec2mid(drums, filename, n_beats, div_per_beat):
-    mid = mido.MidiFile()
+import random
+import math
+
+_drum_notes = (36, 38, 49, 51, 46, 42, 50, 43, 47, 41, 56, 60, 62, 39, 72)
+
+def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=None, key=36, bass_note_length=4):
+    mid = mido.MidiFile(type=1)
     track = mido.MidiTrack()
     mid.tracks.append(track)
 
     track.append(mido.Message('program_change', program=12, time=0))
     for i in range(n_beats*div_per_beat):
-        if drums[0,i] > 0.01: # Bass / Kick
-            track.append(mido.Message('note_on', channel=9, note=36, velocity=min(int(drums[0,i]*127), 127), time=0))
-        if drums[1,i] > 0.01: # Snare
-            track.append(mido.Message('note_on', channel=9, note=38, velocity=min(int(drums[1,i]*127), 127), time=0))
-        if drums[2,i] > 0.01: # Crash Cymbal
-            track.append(mido.Message('note_on', channel=9, note=49, velocity=min(int(drums[2,i]*127), 127), time=0))
-        if drums[3,i] > 0.01: # Ride Cymbal
-            track.append(mido.Message('note_on', channel=9, note=51, velocity=min(int(drums[3,i]*127), 127), time=0))
-        if drums[4,i] > 0.01: # Open Hat
-            track.append(mido.Message('note_on', channel=9, note=46, velocity=min(int(drums[4,i]*127), 127), time=0))
-        if drums[5,i] > 0.01: # Closed Hat
-            track.append(mido.Message('note_on', channel=9, note=42, velocity=min(int(drums[5,i]*127), 127), time=0))
-        if drums[6,i] > 0.01: # High Tom
-            track.append(mido.Message('note_on', channel=9, note=50, velocity=min(int(drums[6,i]*127), 127), time=0))
-        if drums[7,i] > 0.01: # High Floor Tom
-            track.append(mido.Message('note_on', channel=9, note=43, velocity=min(int(drums[7,i]*127), 127), time=0))
-        if drums[8,i] > 0.01: # Low - Mid Tom
-            track.append(mido.Message('note_on', channel=9, note=47, velocity=min(int(drums[8,i]*127), 127), time=0))
-        if drums[9,i] > 0.01: # Low Floor Tom
-            track.append(mido.Message('note_on', channel=9, note=41, velocity=min(int(drums[9,i]*127), 127), time=0))
-        if drums[10,i] > 0.01: # Cowbell
-            track.append(mido.Message('note_on', channel=9, note=56, velocity=min(int(drums[10,i]*127), 127), time=0))
-        if drums[11,i] > 0.01: # Hi Bongo
-            track.append(mido.Message('note_on', channel=9, note=60, velocity=min(int(drums[11,i]*127), 127), time=0))
-        if drums[12,i] > 0.01: # Mute Hi conga
-            track.append(mido.Message('note_on', channel=9, note=62, velocity=min(int(drums[12,i]*127), 127), time=0))
-        if drums[13,i] > 0.01: # Hand Clap
-            track.append(mido.Message('note_on', channel=9, note=39, velocity=min(int(drums[13,i]*127), 127), time=0))
-        if drums[14,i] > 0.01: # Long Whistle
-            track.append(mido.Message('note_on', channel=9, note=72, velocity=min(int(drums[14,i]*127), 127), time=0))
-        track.append(mido.Message('note_off', channel=9, velocity=64, time=mid.ticks_per_beat//div_per_beat))
+        # Notes on
+        for j in range(15):
+            if drums[j, i] > 0.:
+                track.append(mido.Message('note_on',
+                                          channel=9,
+                                          note=_drum_notes[j],
+                                          velocity=min(math.ceil(drums[j, i]*8)*16, 127),
+                                          time=0
+                                          )
+                            )
+        # Notes off
+        first_note_off = True
+        for j in range(15):
+            if drums[j, i] > 0.:
+                track.append(mido.Message('note_off',
+                                          channel=9,
+                                          note=_drum_notes[j],
+                                          velocity=64,
+                                          time=first_note_off*(mid.ticks_per_beat//div_per_beat)
+                                          )
+                            )
+                first_note_off = False
+        if first_note_off:
+            track.append(mido.Message('note_off',
+                                      channel=9,
+                                      velocity=64,
+                                      time=(mid.ticks_per_beat//div_per_beat)
+                                      )
+                        )
+    if bassline == "random":
+        bassline = random.sample((0, 3, 5, 7, 10), 4)
+    if bassline:
+        track = mido.MidiTrack()
+        mid.tracks.append(track)
+
+        track.append(mido.Message('program_change', program=38, time=0))
+
+        for note in bassline:
+            track.append(mido.Message('note_on',
+                                      channel=0,
+                                      note=note+key,
+                                      velocity=100,
+                                      time=0
+                                      )
+                        )
+            track.append(mido.Message('note_off',
+                                      channel=0,
+                                      note=note+key,
+                                      velocity=64,
+                                      time=mid.ticks_per_beat*bass_note_length
+                                      )
+                        )
+
 
     mid.save(filename)
 
-def mid2drumvec(filename, n_beats, div_per_beat, loop=False):
+
+
+def mid2drumvec(filename, n_beats, div_per_beat, loop=True):
     mid = mido.MidiFile(filename)
     now = 0
     tempo = 500000
@@ -134,33 +163,49 @@ def mid2drumvec(filename, n_beats, div_per_beat, loop=False):
 
 file_location = os.path.dirname(os.path.abspath(__file__))
 
-n_beats = 64
+n_beats = 16
 div_per_beat = 24
 timesteps = n_beats*div_per_beat
 input_dim = 15
-latent_dim = 2
 
-vae = tf.keras.models.load_model(f'{file_location}/lstm_vae')
 
-def create_base():
+vae = tf.keras.models.load_model(f'{file_location}/deep_gru_vae')
+
+def create_base(average=True):
     listdir = glob.glob(f'{file_location}/base/*.mid')
     bases = np.ndarray(shape=(len(listdir), timesteps, input_dim))
     for i, filename in enumerate(listdir):
         filename = os.path.basename(filename)
         bases[i] = mid2drumvec(f'{file_location}/base/{filename}', n_beats, div_per_beat).T
 
-    latent_bases = np.zeros(shape=(len(listdir), 80))
-    for i, latent_base in enumerate(vae.encoder.predict_on_batch(bases)):
-        latent_bases[i] = latent_base[i]
+    latent_bases = vae.encoder.predict_on_batch(bases)[2]
 
-    mean = np.mean(latent_bases, axis=0)
-    return np.append(np.ndarray(shape=(0, 80)), [mean], axis=0)
 
-def generate_mutations(latent_base, N=10, mutation_rate=.5):
-    for i in range(N):
-        offset = (np.random.rand(*(latent_base.shape))*2) - 1
-        offset *= mutation_rate
-        latent_mutation = latent_base + offset
-        mutation = vae.decoder(latent_mutation).numpy()
-        mutation = vae(mutation).numpy().T
-        drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)
+    if average:
+        return np.mean(latent_bases, axis=0)
+    else:
+        return latent_bases
+
+def generate_mutations(latent_base, N=10, mutation_rate=0.5, method='mean', bassline=False, key=36, bass_note_length=4):
+    if method == 'mean':
+        for i in range(N):
+            offset = (np.random.rand(*(latent_base.shape))*2) - 1
+            offset /= np.linalg.norm(offset)
+            offset *= mutation_rate
+            latent_mutation = latent_base + offset
+            latent_mutation = np.reshape(latent_mutation, newshape=(1, -1))
+
+            mutation = vae.decoder(latent_mutation).numpy().T
+            # mutation = vae(mutation).numpy().T
+            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)
+    elif method == 'crossover':
+        for i in range(N):
+            latent = [np.random.choice(vec) for vec in latent_base.T]
+            offset = (np.random.rand(*(np.shape(latent)))*2) - 1
+            offset /= np.linalg.norm(offset)
+            offset *= mutation_rate
+            latent_mutation = latent + offset
+            latent_mutation = np.reshape(latent_mutation, newshape=(1, -1))
+            mutation = vae.decoder(latent_mutation).numpy().T
+            # mutation = vae(mutation).numpy().T
+            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)

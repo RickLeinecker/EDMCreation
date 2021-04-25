@@ -102,12 +102,12 @@ namespace EDMCreation.Core.Services
         private void Generate(double mutationRate)
         {
             Installer.InstallPath = Path.GetFullPath(".");
-            PythonEngine.Initialize();
-            dynamic sys = PythonEngine.ImportModule("sys");
-            dynamic os = PythonEngine.ImportModule("os");
-
+            
             using (Py.GIL())
             {
+                dynamic sys = PythonEngine.ImportModule("sys");
+                dynamic os = PythonEngine.ImportModule("os");
+
                 dynamic generate = Py.Import("python.generate");
                 generate.generate_mutations(generate.create_base(), mutation_rate: mutationRate);
                 // (check with nick)

@@ -8,7 +8,13 @@ namespace EDMCreation.Core.Utilities
 {
     public class MidiPlayer : IMidiPlayer
     {
-        private static OutputDevice _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
+        try {
+            private static OutputDevice _outputDevice = OutputDevice.GetByName("VirtualMIDISynth #1");
+        }
+        catch (ArgumentException e) {
+            private static OutputDevice _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
+        }
+        
         public static OutputDevice OutputDevice { set { _outputDevice = value; } }
 
         private readonly MidiFile midiFile;
