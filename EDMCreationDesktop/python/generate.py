@@ -186,8 +186,8 @@ def create_base(average=True):
     else:
         return latent_bases
 
-def generate_mutations(latent_base, N=10, mutation_rate=0.5, method='mean', bassline=False, key=36, bass_note_length=4):
-    if method == 'mean':
+def generate_mutations(latent_base, N=10, mutation_rate=0.5, method=0, bassline=False, key=36, bass_note_length=4):
+    if method == 0:
         for i in range(N):
             offset = (np.random.rand(*(latent_base.shape))*2) - 1
             offset /= np.linalg.norm(offset)
@@ -197,8 +197,8 @@ def generate_mutations(latent_base, N=10, mutation_rate=0.5, method='mean', bass
 
             mutation = vae.decoder(latent_mutation).numpy().T
             # mutation = vae(mutation).numpy().T
-            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)
-    elif method == 'crossover':
+            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat, bassline, key, bass_note_length)
+    elif method == 1:
         for i in range(N):
             latent = [np.random.choice(vec) for vec in latent_base.T]
             offset = (np.random.rand(*(np.shape(latent)))*2) - 1
@@ -208,4 +208,4 @@ def generate_mutations(latent_base, N=10, mutation_rate=0.5, method='mean', bass
             latent_mutation = np.reshape(latent_mutation, newshape=(1, -1))
             mutation = vae.decoder(latent_mutation).numpy().T
             # mutation = vae(mutation).numpy().T
-            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat)
+            drumvec2mid(mutation, f'{file_location}/output/{i}.mid', n_beats, div_per_beat, bassline, key, bass_note_length)
