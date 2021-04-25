@@ -5,6 +5,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;//file or 5000
 const https = require('https');
+var http = require('http');
 const fs = require('fs');
 
 //for gridfs use
@@ -56,6 +57,8 @@ const server = https.createServer(httpsOptions, app)
     .listen(port, () => {
         console.log('Server running at ' + port)
     })
+
+http.createServer(httpsOptions, app).listen(5001)
 
 // Swagger
 const swaggerUi = require('swagger-ui-express');
