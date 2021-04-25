@@ -3,10 +3,9 @@ require('dotenv').config();
 const serverUrl = process.env['SERVER_URL'];
 
 describe("Compositions Tests", () => {
-    var result;
     var token;
 
-    beforeAll(() => {
+    beforeAll((done) => {
         const requestBody = {
             'username': process.env['TEST_USERNAME'],
             'password': process.env['TEST_PASSWORD']
@@ -15,25 +14,29 @@ describe("Compositions Tests", () => {
         axios.post(serverUrl + 'api/users/login', requestBody)
             .then(response => {
                 token = response.data['sJWT'];
+                done();
             })
             .catch(error => {
                 result = error.response.status;
+                done();
             });
     });
 
-    describe("GET: /api/users/info", () => {
-        var route = serverUrl + 'api/users/info/testuser';
+    describe("GET: /api/compositions/popular", () => {
+        var result;
+        var route = serverUrl + 'api/compositions/popular';
 
-        test("Status 200 - Using existing username.", () => {
+        test("Status 200 - Popular works.", (done) => {
             axios.get(route)
                 .then(res => {
                     result = res.status;
                 })
                 .catch(err => {
-                    result = err.res.status;
+                    result = err.response.status;
                 })
                 .finally(() => {
                     expect(result).toBe(200);
+                    done();
                 });
         });
     });
