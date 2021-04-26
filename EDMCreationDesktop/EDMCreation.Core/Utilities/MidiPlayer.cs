@@ -1,6 +1,8 @@
-﻿using Melanchall.DryWetMidi.Core;
+﻿using EDMCreation.Core.Services.Interfaces;
+using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Devices;
 using Melanchall.DryWetMidi.Interaction;
+using MvvmCross;
 using System;
 using System.Threading.Tasks;
 
@@ -8,11 +10,9 @@ namespace EDMCreation.Core.Utilities
 {
     public class MidiPlayer : IMidiPlayer
     {
+        private IOutputDeviceService _odService;
 
-        private static OutputDevice _outputDevice = OutputDevice.GetByName("VirtualMIDISynth #1");
-
-        
-        public static OutputDevice OutputDevice { set { _outputDevice = value; } }
+        private static OutputDevice _outputDevice;
 
         private readonly MidiFile midiFile;
         private readonly Playback playback;
@@ -100,15 +100,11 @@ namespace EDMCreation.Core.Utilities
             this.midiFilePath = midiFilePath;
             midiFile = MidiFile.Read(midiFilePath);
 
-            try
-            {
-                playback = midiFile.GetPlayback(_outputDevice);
-            }
-            catch (ArgumentException e)
-            {
-                _outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth");
-                playback = midiFile.GetPlayback(_outputDevice);
-            }
+            _odService = Mvx.IoCProvider.Resolve<IOutputDeviceService>();
+
+            _outputDevice = _odService.OutputDevice;
+
+            playback = midiFile.GetPlayback(_outputDevice);
 
             playback.InterruptNotesOnStop = true;
             playback.Finished += PlaybackFinished;

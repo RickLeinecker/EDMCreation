@@ -41,6 +41,7 @@ namespace EDMCreation.Core
 
             // must register client service first
             Mvx.IoCProvider.RegisterSingleton<IHttpClientService>(() => new HttpClientService("https://www.edmcreation.me:5000/api/"));
+            Mvx.IoCProvider.ConstructAndRegisterSingleton<IOutputDeviceService, OutputDeviceService>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IDataAccess, MongoDataAccess>();
             Mvx.IoCProvider.ConstructAndRegisterSingleton<IAuthenticationService, AuthenticationService>();
 
