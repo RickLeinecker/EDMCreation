@@ -44,7 +44,6 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=24, 
         tracks.append(track)
 
     for i in range(n_beats*div_per_beat):
-        # Notes on
         for j in range(15):
             if drums[j, i] > 0.:
                 tracks[j].append(mido.Message('note_on',
@@ -123,7 +122,7 @@ def mid2drumvec(filename, n_beats, div_per_beat, loop=True):
 
         if msg.type =="set_tempo":
             tempo = msg.tempo
-        elif msg.type == "note_on":#and msg.channel == 9:
+        elif msg.type == "note_on" and msg.channel == 9:
             hit_count += 1
             try:
                 if msg.note   in [35, 36]: # Bass / Kick
@@ -195,7 +194,7 @@ def create_base():
 
     return latent_bases
 
-def generate_mutations(latent_bases, N=10, mutation_rate=0.5, method=0, bassline=False, key=36, bass_note_length=4):
+def generate_mutations(latent_bases, N=10, mutation_rate=0.5, method=0, bassline=False, key=24, bass_note_length=4):
     if method == 0: # Average method
         latent_base = np.mean(latent_bases, axis=0)
         for i in range(N):
