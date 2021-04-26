@@ -39,5 +39,41 @@ describe("Compositions Tests", () => {
                     done();
                 });
         });
-    });
+    });//end endpoint
+
+    describe("GET: /api/compositions/user/tony", () => {
+        var result;
+        var route = serverUrl + 'api/compositions/user/tony';
+
+        test("Status 200 - users works.", (done) => {
+            axios.get(route)
+                .then(res => {
+                    result = res.status;
+                })
+                .catch(err => {
+                    result = err.response.status;
+                })
+                .finally(() => {
+                    expect(result).toBe(200);
+                    done();
+                });
+        });
+
+        test("Status 400 - wrong username.", (done) => {
+            var route = serverUrl + 'api/compositions/user/tonywrong';
+            axios.get(route)
+                .then(res => {
+                    result = res.status;
+                })
+                .catch(err => {
+                    result = err.response.status;
+                })
+                .finally(() => {
+                    expect(result).toBe(400);
+                    done();
+                });
+        });
+
+    });//end endpoint
+
 });
