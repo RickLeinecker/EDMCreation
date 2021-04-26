@@ -19,7 +19,7 @@ import math
 
 _drum_notes = (36, 38, 49, 51, 46, 42, 50, 43, 47, 41, 56, 60, 62, 39, 72)
 
-def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=None, key=36, bass_note_length=4):
+def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=36, bass_note_length=4):
     mid = mido.MidiFile(type=1)
     track = mido.MidiTrack()
     mid.tracks.append(track)
@@ -55,9 +55,8 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=None, key=36, b
                                       time=(mid.ticks_per_beat//div_per_beat)
                                       )
                         )
-    if bassline == "random":
-        bassline = random.choices((0, 3, 5, 7, 10), k=n_beats//bass_note_length)
     if bassline:
+        bassline = random.choices((0, 3, 5, 7, 10), k=n_beats//bass_note_length)
         track = mido.MidiTrack()
         mid.tracks.append(track)
 

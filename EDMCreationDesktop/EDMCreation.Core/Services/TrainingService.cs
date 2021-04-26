@@ -109,7 +109,7 @@ namespace EDMCreation.Core.Services
                 dynamic os = PythonEngine.ImportModule("os");
 
                 dynamic generate = Py.Import("python.generate");
-                generate.generate_mutations(generate.create_base(), mutation_rate: session.MutationRate, method: (int)session.GenerationMethod,
+                generate.generate_mutations(generate.create_base(), N: 10, mutation_rate: session.MutationRate, method: (int)session.GenerationMethod,
                     bassline: session.GenerateBass, key: session.Key, bass_note_length: session.BassNoteLength);
             }
         }
