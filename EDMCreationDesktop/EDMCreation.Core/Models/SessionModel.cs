@@ -7,9 +7,19 @@ using System.Text;
 
 namespace EDMCreation.Core.Models
 {
+    public enum GenerationMethod
+    {
+        Mean,
+        Crossover
+    }
+
     public class SessionModel
     {
         public double MutationRate { get; set; }
+        public int Key { get; set; }
+        public bool GenerateBass { get; set; }
+        public int BassNoteLength { get; set; }
+        public GenerationMethod GenerationMethod { get; set; }
         public string Genre { get; }
         public int CurrentGen { get; set; }
         public int TotalGens { get; set; }
@@ -23,6 +33,10 @@ namespace EDMCreation.Core.Models
         public SessionModel(string genre)
         {
             MutationRate = 4;
+            Key = 36;
+            GenerateBass = true;
+            BassNoteLength = 4;
+            GenerationMethod = GenerationMethod.Mean;
             Genre = genre;
             CurrentGen = -1;
             TotalGens = 0;
@@ -37,6 +51,10 @@ namespace EDMCreation.Core.Models
             File = trainingFile;
 
             MutationRate = trainingFile.MutationRate;
+            Key = trainingFile.Key;
+            GenerateBass = trainingFile.GenerateBass;
+            BassNoteLength = trainingFile.BassNoteLength;
+            GenerationMethod = trainingFile.GenerationMethod;
             Genre = trainingFile.Genre;
             CurrentGen = trainingFile.CurrentGen;
             TotalGens = trainingFile.TotalGens;

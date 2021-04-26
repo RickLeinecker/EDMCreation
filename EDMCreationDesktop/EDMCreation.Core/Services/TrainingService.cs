@@ -22,7 +22,7 @@ namespace EDMCreation.Core.Services
                 return sessionsPath;
             }
         }
-        public List<string> GenerateSongs(List<string> selectedSongPaths, int genNum, int totalGens, double mutationRate)
+        public List<string> GenerateSongs(List<string> selectedSongPaths, SessionModel session)
         {
             // edit base folder here using the filepaths passed
             string absPath = Path.GetFullPath(".");
@@ -50,10 +50,10 @@ namespace EDMCreation.Core.Services
                 File.Copy(s, Path.Combine(basePath, filename));
             }
 
-            Generate(mutationRate);
+            Generate(session);
 
             // save the output as the next generation
-            string genPath = $"{sessionsPath}\\gen{genNum + 1}";
+            string genPath = $"{sessionsPath}\\gen{session.CurrentGen + 1}";
             Directory.CreateDirectory(genPath);
 
             var outputFiles = Directory.GetFiles(outputPath);
@@ -70,7 +70,7 @@ namespace EDMCreation.Core.Services
             return songs;
         }
 
-        public List<string> GenerateFirstSongs(double mutationRate)
+        public List<string> GenerateFirstSongs(SessionModel session)
         {
             string absPath = Path.GetFullPath(".");
             string sessionsPath = $"{absPath}\\python\\sessions";
@@ -79,7 +79,7 @@ namespace EDMCreation.Core.Services
             Directory.CreateDirectory(sessionsPath);
             Directory.CreateDirectory(outputPath);
 
-            Generate(mutationRate);
+            Generate(session);
 
             var outputFiles = Directory.GetFiles(outputPath);
 
@@ -99,7 +99,7 @@ namespace EDMCreation.Core.Services
             return songs;
         }
 
-        private void Generate(double mutationRate)
+        private void Generate(SessionModel session)
         {
             Installer.InstallPath = Path.GetFullPath(".");
             
@@ -109,10 +109,9 @@ namespace EDMCreation.Core.Services
                 dynamic os = PythonEngine.ImportModule("os");
 
                 dynamic generate = Py.Import("python.generate");
-                generate.generate_mutations(generate.create_base(), mutation_rate: mutationRate);
-                // (check with nick)
+                generate.generate_mutations(generate.create_base(), mutation_rate: session.MutationRate, method: (int)session.GenerationMethod,
+                    bassline: session.GenerateBass, key: session.Key, bass_note_length: session.BassNoteLength);
             }
-            
         }
                 
         public void Initialize(SessionModel session)

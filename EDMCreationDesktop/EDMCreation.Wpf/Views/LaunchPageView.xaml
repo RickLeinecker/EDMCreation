@@ -30,6 +30,14 @@
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
+        <ComboBox Grid.Row="2" Grid.Column="1" Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding Test, Mode=TwoWay}">
+            <ComboBoxItem Content="asdf"/>
+            <ComboBoxItem Content="sdfg"/>
+            <ComboBoxItem Content="dfgh"/>
+        </ComboBox>
+
+        <TextBlock Text="{Binding Test, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" />
+
         <TextBlock Style="{StaticResource MaterialDesignHeadline4TextBlock}" 
                    Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Text="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center">
             Get Started

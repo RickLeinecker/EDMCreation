@@ -51,6 +51,10 @@ namespace EDMCreation.Wpf.Views
                 string[] sessionInfo =
                 {
                     $"{session.MutationRate}",
+                    $"{session.Key}",
+                    $"{session.GenerateBass}",
+                    $"{session.BassNoteLength}",
+                    $"{session.GenerationMethod}",
                     $"{session.Genre}",
                     $"{session.CurrentGen}",
                     $"{session.TotalGens}"

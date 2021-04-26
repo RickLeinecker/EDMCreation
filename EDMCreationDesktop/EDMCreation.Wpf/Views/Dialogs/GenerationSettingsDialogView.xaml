@@ -17,54 +17,59 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height=".5*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}"
-                   Grid.Row="0" Grid.ColumnSpan="2" x:Name="messageBlock" VerticalAlignment="Center" 
+                   Grid.Row="0" Grid.ColumnSpan="3" x:Name="messageBlock" VerticalAlignment="Center" 
                    HorizontalAlignment="Center" TextAlignment="Center"/>
 
-        <ScrollViewer Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Mutation Rate: "/>
-                <components:NumberBox Text="{Binding MutationRate, Mode=TwoWay}" />
-            </StackPanel>
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Background="{DynamicResource AttentionToActionBrush}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <TextBlock Text="Mutation Rate "/>
+                    <components:NumberBox Text="{Binding MutationRate, Mode=TwoWay}" />
+                </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Key: "/>
-                <components:NumberBox Text="{Binding Key, Mode=TwoWay}" AllowDecimals="False" />
-            </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <TextBlock Text="Key "/>
+                    <components:NumberBox Text="{Binding Key, Mode=TwoWay}" AllowDecimals="False" />
+                </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Generate Bass "/>
-                <CheckBox IsChecked="{Binding GenerateBass, Mode=TwoWay}"
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <TextBlock Text="Generate Bass "/>
+                    <CheckBox IsChecked="{Binding GenerateBass, Mode=TwoWay}"
                   Style="{DynamicResource MaterialDesignAccentCheckBox}">
-                </CheckBox>
+                    </CheckBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <TextBlock Text="Bass Note Length "/>
+                    <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding BassNoteLengthSelection, Mode=TwoWay}">
+                        <ComboBoxItem Content="2"/>
+                        <ComboBoxItem Content="4"/>
+                        <ComboBoxItem Content="8"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                    <TextBlock Text="Generation Method"/>
+                    <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding GenerationMethod}">
+                        <ComboBoxItem Tag="Mean" Content="Mean"/>
+                        <ComboBoxItem Tag="Cross-Over" Content="Cross-Over"/>
+                    </ComboBox>
+                </StackPanel>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Bass Note Length: "/>
-                <components:NumberBox Text="{Binding BaseNoteLength, Mode=TwoWay}" AllowDecimals="False" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Generation Method" />
-                <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding GenerationMethod}">
-                    <ComboBoxItem Tag="Mean" Content="Mean"/>
-                    <ComboBoxItem Tag="Cross-Over" Content="Cross-Over"/>
-                </ComboBox>
-            </StackPanel>
-
-
+            
         </ScrollViewer>
         
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center">
             <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
             <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
         </StackPanel>

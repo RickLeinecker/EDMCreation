@@ -110,14 +110,30 @@ namespace EDMCreation.Core.ViewModels
             ZipArchiveEntry infoFile = archive.CreateEntry($"{fileName}.info", compLvl);
             StreamWriter writer = new StreamWriter(infoFile.Open());
 
+            /*  INFO LAYOUT:
+             *  
+             *  MutationRate
+             *  Key
+             *  GenerateBass
+             *  BassNoteLength
+             *  GenerationMethod
+             *  Genre
+             *  CurrentGen
+             *  TotalGens
+             */
+
             // create session_info which is readable for now, but should probably be non-readable
             string[] sessionInfo =
             {
                     $"{_session.MutationRate}",
+                    $"{_session.Key}",
+                    $"{_session.GenerateBass}",
+                    $"{_session.BassNoteLength}",
+                    $"{_session.GenerationMethod}",
                     $"{_session.Genre}",
                     $"{_session.CurrentGen}",
                     $"{_session.TotalGens}"
-                };
+            };
 
             foreach (string line in sessionInfo)
             {
@@ -204,7 +220,7 @@ namespace EDMCreation.Core.ViewModels
             // checks if generating the first set or not
             if (_session.CurrentGen == -1 && _session.TotalGens == 0)
             {
-                var songFiles = _trainingService.GenerateFirstSongs(_session.MutationRate);
+                var songFiles = _trainingService.GenerateFirstSongs(_session);
                 /*var songFiles = new List<string>()
                 {
                     @"C:\Users\jakeg\OneDrive\Desktop\github_repositories\EDMCreation\EDMCreationDesktop\EDMCreation.Core\ViewModels\TestSongs\test.mid",
@@ -235,7 +251,7 @@ namespace EDMCreation.Core.ViewModels
                     }
                 }
 
-                var songFiles = _trainingService.GenerateSongs(selectedSongs, _session.CurrentGen, _session.TotalGens, _session.MutationRate); // uses test files for now
+                var songFiles = _trainingService.GenerateSongs(selectedSongs, _session); // uses test files for now
 
                 var songPanels = GenerateSongPanels(songFiles);
 
@@ -330,7 +346,7 @@ namespace EDMCreation.Core.ViewModels
             PauseAll();
 
             string message = "Song Generation Settings";
-            GenerationSettingsDialogViewModel dialog = new GenerationSettingsDialogViewModel(message, _session.MutationRate);
+            GenerationSettingsDialogViewModel dialog = new GenerationSettingsDialogViewModel(message, _session);
             bool? result = _dialogService.ShowDialog(dialog);
 
             if (result.HasValue)
@@ -338,6 +354,10 @@ namespace EDMCreation.Core.ViewModels
                 if(result.Value)
                 {
                     _session.MutationRate = dialog.MutationRate;
+                    _session.Key = dialog.Key;
+                    _session.GenerateBass = dialog.GenerateBass;
+                    _session.BassNoteLength = dialog.BassNoteLength;
+                    _session.GenerationMethod = (GenerationMethod)dialog.GenerationMethod;
                 }
             }
         }

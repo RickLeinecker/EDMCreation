@@ -10,6 +10,18 @@ namespace EDMCreation.Core.Models
         private readonly double mutationRate;
         public double MutationRate { get { return mutationRate; } }
 
+        private readonly int key;
+        public int Key { get { return key; } }
+
+        private readonly bool generateBass;
+        public bool GenerateBass { get { return generateBass; } }
+
+        private readonly int bassNoteLength;
+        public int BassNoteLength { get { return bassNoteLength; } }
+
+        private readonly GenerationMethod generationMethod;
+        public GenerationMethod GenerationMethod { get { return generationMethod; } }
+
         private readonly string genre;
         public string Genre { get { return genre; } }
 
@@ -24,14 +36,6 @@ namespace EDMCreation.Core.Models
 
         public TrainingFile(string path)
         {
-            /*  INFO LAYOUT:
-             *  
-             *  MutationRate
-             *  Genre
-             *  CurrentGen
-             *  TotalGens
-             */
-
             _archive = ZipFile.OpenRead(path);
 
             ZipArchiveEntry infoFile = null;
@@ -47,9 +51,27 @@ namespace EDMCreation.Core.Models
                 throw new FileNotFoundException();
             }
 
+            /*  INFO LAYOUT:
+             *  
+             *  MutationRate
+             *  Key
+             *  GenerateBass
+             *  BassNoteLength
+             *  GenerationMethod
+             *  Genre
+             *  CurrentGen
+             *  TotalGens
+             */
+
             StreamReader sr = new StreamReader(infoFile.Open());
 
             mutationRate = Convert.ToDouble(sr.ReadLine());
+            key = Convert.ToInt32(sr.ReadLine());
+            generateBass = Convert.ToBoolean(sr.ReadLine());
+            bassNoteLength = Convert.ToInt32(sr.ReadLine());
+            if (Enum.TryParse(sr.ReadLine(), out generationMethod))
+                if (!Enum.IsDefined(typeof(GenerationMethod), generationMethod))
+                    generationMethod = GenerationMethod.Mean;
             genre = sr.ReadLine();
             currentGen = Convert.ToInt32(sr.ReadLine());
             totalGens = Convert.ToInt32(sr.ReadLine());
@@ -74,9 +96,27 @@ namespace EDMCreation.Core.Models
                 throw new FileNotFoundException();
             }
 
+            /*  INFO LAYOUT:
+             *  
+             *  MutationRate
+             *  Key
+             *  GenerateBass
+             *  BassNoteLength
+             *  GenerationMethod
+             *  Genre
+             *  CurrentGen
+             *  TotalGens
+             */
+
             StreamReader sr = new StreamReader(infoFile.Open());
 
             mutationRate = Convert.ToDouble(sr.ReadLine());
+            key = Convert.ToInt32(sr.ReadLine());
+            generateBass = Convert.ToBoolean(sr.ReadLine());
+            bassNoteLength = Convert.ToInt32(sr.ReadLine());
+            if (Enum.TryParse(sr.ReadLine(), out generationMethod))
+                if (!Enum.IsDefined(typeof(GenerationMethod), generationMethod))
+                    generationMethod = GenerationMethod.Mean;
             genre = sr.ReadLine();
             currentGen = Convert.ToInt32(sr.ReadLine());
             totalGens = Convert.ToInt32(sr.ReadLine());
