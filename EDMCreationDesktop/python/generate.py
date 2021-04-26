@@ -18,46 +18,60 @@ import random
 import math
 
 _drum_notes = (36, 38, 49, 51, 46, 42, 50, 43, 47, 41, 56, 60, 62, 39, 72)
+_drum_names = ['Kick',
+               'Snare',
+               'Crash Cymbal',
+               'Ride Cymbal',
+               'Open Hat',
+               'Closed Hat',
+               'High Tom',
+               'High Floor Tom',
+               'Low-Mid Tom',
+               'Low Floor Tom',
+               'Cowbell',
+               'Hi Bongo',
+               'Mute Hi Conga',
+               'Hand Clap',
+               'Whistle']
 
 def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=36, bass_note_length=4):
     mid = mido.MidiFile(type=1)
-    track = mido.MidiTrack()
-    mid.tracks.append(track)
+    tracks = []
+    for i in range(15):
+        track = mido.MidiTrack()
+        track.name = _drum_names[i]
+        mid.tracks.append(track)
+        tracks.append(track)
 
-    track.append(mido.Message('program_change', program=12, time=0))
     for i in range(n_beats*div_per_beat):
         # Notes on
         for j in range(15):
             if drums[j, i] > 0.:
-                track.append(mido.Message('note_on',
+                tracks[j].append(mido.Message('note_on',
                                           channel=9,
                                           note=_drum_notes[j],
                                           velocity=min(math.ceil(drums[j, i]*8)*16, 127),
                                           time=0
                                           )
                             )
-        # Notes off
-        first_note_off = True
-        for j in range(15):
-            if drums[j, i] > 0.:
-                track.append(mido.Message('note_off',
+                tracks[j].append(mido.Message('note_off',
                                           channel=9,
                                           note=_drum_notes[j],
                                           velocity=64,
-                                          time=first_note_off*(mid.ticks_per_beat//div_per_beat)
+                                          time=(mid.ticks_per_beat//div_per_beat)
                                           )
                             )
-                first_note_off = False
-        if first_note_off:
-            track.append(mido.Message('note_off',
-                                      channel=9,
-                                      velocity=64,
-                                      time=(mid.ticks_per_beat//div_per_beat)
-                                      )
-                        )
+            else:
+                tracks[j].append(mido.Message('note_off',
+                                          channel=9,
+                                          velocity=64,
+                                          time=(mid.ticks_per_beat//div_per_beat)
+                                          )
+                            )
     if bassline:
         bassline = random.choices((0, 3, 5, 7, 10), k=n_beats//bass_note_length)
         track = mido.MidiTrack()
+        track.name = "Bass"
         mid.tracks.append(track)
 
         track.append(mido.Message('program_change', program=38, time=0))
