@@ -14,11 +14,7 @@ namespace EDMCreation.Core.Services
             // placeholders right now
             Genres = new List<GenreModel>()
             {
-                new GenreModel()
-                {
-                    Name = "Trap",
-                    Icon = "MusicCircle"
-                },
+
                 new GenreModel()
                 {
                     Name = "Breakbeat",
@@ -36,22 +32,27 @@ namespace EDMCreation.Core.Services
                 },
                 new GenreModel()
                 {
-                    Name = "Dub",
-                    Icon = "MusicCircle"
-                },
-                new GenreModel()
-                {
-                    Name = "UK Garage",
-                    Icon = "MusicCircle"
-                },
-                new GenreModel()
-                {
                     Name = "Future Bass",
                     Icon = "MusicCircle"
                 },
                 new GenreModel()
                 {
                     Name = "House",
+                    Icon = "MusicCircle"
+                },
+                new GenreModel()
+                {
+                    Name = "Trap",
+                    Icon = "MusicCircle"
+                },
+                new GenreModel()
+                {
+                    Name = "Dub",
+                    Icon = "MusicCircle"
+                },
+                new GenreModel()
+                {
+                    Name = "UK Garage",
                     Icon = "MusicCircle"
                 }
             };

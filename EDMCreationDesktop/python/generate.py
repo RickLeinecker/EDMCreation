@@ -34,7 +34,7 @@ _drum_names = ['Kick',
                'Hand Clap',
                'Whistle']
 
-def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=36, bass_note_length=4):
+def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=24, bass_note_length=4):
     mid = mido.MidiFile(type=1)
     tracks = []
     for i in range(15):
@@ -69,7 +69,7 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=36, 
                                           )
                             )
     if bassline:
-        bassline = random.choices((0, 3, 5, 7, 10), k=n_beats//bass_note_length)
+        bassline = random.choices((0, 2, 4, 7, 9), k=n_beats//bass_note_length)
         track = mido.MidiTrack()
         track.name = "Bass"
         mid.tracks.append(track)
@@ -80,7 +80,7 @@ def drumvec2mid(drums, filename, n_beats, div_per_beat, bassline=False, key=36, 
             track.append(mido.Message('note_on',
                                       channel=0,
                                       note=note+key,
-                                      velocity=100,
+                                      velocity=80,
                                       time=0
                                       )
                         )
