@@ -29,6 +29,8 @@ namespace EDMCreation.Wpf.Views
             if (dialog.ShowDialog() == true)
             {
                 string path = dialog.FileName;
+                if (File.Exists(path))
+                    File.Delete(path);
                 File.Copy(viewModel.MidiFilePath, path);
             }
         }
