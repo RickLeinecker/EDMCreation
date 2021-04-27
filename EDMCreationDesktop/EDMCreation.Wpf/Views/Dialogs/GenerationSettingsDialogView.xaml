@@ -12,7 +12,7 @@
                     FontFamily="{materialDesign:MaterialDesignFont}"
         xmlns:local="clr-namespace:EDMCreation.Wpf.Views.Dialogs"
         mc:Ignorable="d"
-        Title="" Height="250" Width="400" 
+        Title="" Height="320" Width="400" 
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -21,54 +21,55 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height=".5*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock TextWrapping="Wrap" Text="{Binding Message, FallbackValue='DIALOG_MESSAGE'}"
                    Grid.Row="0" Grid.ColumnSpan="3" x:Name="messageBlock" VerticalAlignment="Center" 
                    HorizontalAlignment="Center" TextAlignment="Center"/>
-
-        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Background="{DynamicResource AttentionToActionBrush}">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <TextBlock Text="Mutation Rate "/>
-                    <components:NumberBox Text="{Binding MutationRate, Mode=TwoWay}" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <TextBlock Text="Key "/>
-                    <components:NumberBox Text="{Binding Key, Mode=TwoWay}" AllowDecimals="False" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <TextBlock Text="Generate Bass "/>
-                    <CheckBox IsChecked="{Binding GenerateBass, Mode=TwoWay}"
-                  Style="{DynamicResource MaterialDesignAccentCheckBox}">
-                    </CheckBox>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <TextBlock Text="Bass Note Length "/>
-                    <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding BassNoteLengthSelection, Mode=TwoWay}">
-                        <ComboBoxItem Content="2"/>
-                        <ComboBoxItem Content="4"/>
-                        <ComboBoxItem Content="8"/>
-                    </ComboBox>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                    <TextBlock Text="Generation Method"/>
-                    <ComboBox Style="{DynamicResource MaterialDesignComboBox}" SelectedIndex="{Binding GenerationMethod}">
-                        <ComboBoxItem Tag="Mean" Content="Mean"/>
-                        <ComboBoxItem Tag="Cross-Over" Content="Cross-Over"/>
-                    </ComboBox>
-                </StackPanel>
-            </StackPanel>
-            
-        </ScrollViewer>
         
+        <Grid Grid.Row="1" Grid.Column="1" Background="{DynamicResource AttentionToActionBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+                    
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Mutation Rate" Margin="5"/>
+            <components:NumberBox Grid.Row="0" Grid.Column="1" Text="{Binding MutationRate, Mode=TwoWay}" HorizontalAlignment="Right" Margin="5"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Key" Margin="5"/>
+            <components:NumberBox Grid.Row="1" Grid.Column="1" Text="{Binding Key, Mode=TwoWay}"
+                                  AllowDecimals="False" HorizontalAlignment="Right" Margin="5"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Generate Bass" Margin="5"/>
+            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding GenerateBass, Mode=TwoWay}"
+                      Style="{DynamicResource MaterialDesignAccentCheckBox}" HorizontalAlignment="Right" Margin="5"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Bass Note Length" Margin="5"/>
+            <ComboBox Grid.Row="3" Grid.Column="1" Style="{DynamicResource MaterialDesignComboBox}"
+                      SelectedIndex="{Binding BassNoteLengthSelection, Mode=TwoWay}" HorizontalAlignment="Right" Margin="5">
+                <ComboBoxItem Tag="2" Content="2"/>
+                <ComboBoxItem Tag="4" Content="4"/>
+                <ComboBoxItem Tag="8" Content="8"/>
+            </ComboBox>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Generation Method" Margin="5"/>
+            <ComboBox Grid.Row="4" Grid.Column="1" Style="{DynamicResource MaterialDesignComboBox}"
+                      SelectedIndex="{Binding GenerationMethod}" HorizontalAlignment="Right" Margin="5">
+                <ComboBoxItem Tag="Mean" Content="Mean"/>
+                <ComboBoxItem Tag="Cross-Over" Content="Cross-Over"/>
+            </ComboBox>
+        </Grid>
+
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center">
             <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
             <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
