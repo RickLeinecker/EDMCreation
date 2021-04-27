@@ -17,7 +17,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3.5*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -31,6 +31,7 @@
                    HorizontalAlignment="Center" TextAlignment="Center"/>
         
         <Grid Grid.Row="1" Grid.Column="1" Background="{DynamicResource AttentionToActionBrush}">
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -72,7 +73,15 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center">
             <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
-            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20">
+                <Button.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}"/>
+                </Button.BorderBrush>
+                <Button.Background>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}"/>
+                </Button.Background>
+
+            </Button>
         </StackPanel>
 
     </Grid>

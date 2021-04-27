@@ -36,7 +36,11 @@
         </TextBlock>
 
         <Button Style="{DynamicResource MaterialDesignIconButton}" Grid.Row="1" Grid.Column="5">
-            <materialDesign:PackIcon Kind="Gear" />
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource Primary200}"/>
+            </Button.Foreground>
+
+            <materialDesign:PackIcon Kind="Gear"/>
         </Button>
 
         <components:CustomButton Margin="10" Grid.Row="2" Grid.Column="2" Command="Command ShowSelectGenreViewCommand"

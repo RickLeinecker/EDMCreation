@@ -43,7 +43,14 @@
         
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
             <Button IsDefault="True" Command="{Binding OkCommand}" x:Name="confirmButton" Margin="20" />
-            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}" x:Name="cancelButton" Margin="20" >
+                <Button.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}"/>
+                </Button.BorderBrush>
+                <Button.Background>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkColorKey}}"/>
+                </Button.Background>
+            </Button>
         </StackPanel>
 
     </Grid>
