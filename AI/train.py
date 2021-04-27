@@ -160,7 +160,7 @@ vae.fit(x_train, epochs=EPOCHS, batch_size=64, callbacks=[CustomCallback(), kera
 
 vae.evaluate(x_valid)
 
-vae.save('lstm_vae')
+vae.save('deep_gru_vae')
 # encoder.save('encoder')
 # decoder.save('decoder')
 

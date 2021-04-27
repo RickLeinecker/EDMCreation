@@ -33,7 +33,7 @@ namespace EDMCreation.Core.Models
         public SessionModel(string genre)
         {
             MutationRate = 4;
-            Key = 24;
+            Key = 36;
             GenerateBass = true;
             BassNoteLength = 4;
             GenerationMethod = GenerationMethod.Mean;
