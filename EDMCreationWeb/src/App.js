@@ -53,7 +53,9 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 
-		this.setState({ access_token: localStorage.getItem("access_token") });
+		this.state = {
+			access_token: localStorage.getItem("access_token")
+		}
 	}
 
 	render() {
